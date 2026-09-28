@@ -66,6 +66,7 @@ export async function syncOdds({ force = false } = {}) {
   const now = Date.now();
   const leagues = cfg.sports.filter((k) => sportOf(k));
   const last = await Promise.all(leagues.map(async (k) => Number(await getSetting(leagueKey("o", k))) || 0));
+  await removeDeselectedLeagues(leagues);
   const due = leagues
     .map((k, i) => ({ k, last: last[i] }))
     .filter((l) => force || now - l.last >= cfg.oddsHours * 3_600_000)
@@ -119,6 +120,22 @@ export async function syncOdds({ force = false } = {}) {
   } finally {
     await unlock("odds.lockOdds");
   }
+}
+
+/**
+ * Games from leagues the admin unchecked would keep stale odds: remove the
+ * upcoming ones that have no services (games with services stay and settle).
+ */
+async function removeDeselectedLeagues(selected: string[]) {
+  const keep = selected.map((k) => ({ externalId: { startsWith: `oddsapi:${k}:` } }));
+  await prisma.event.deleteMany({
+    where: {
+      externalId: { startsWith: "oddsapi:" },
+      status: "SCHEDULED",
+      NOT: keep.length ? { OR: keep } : undefined,
+      markets: { none: { selections: { some: { legs: { some: {} } } } } },
+    },
+  });
 }
 
 /** Live scores and results — only for leagues with started, unsettled games, each on its own interval. */
