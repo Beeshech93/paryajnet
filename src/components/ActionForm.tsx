@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, type ReactNode } from "react";
+import { createContext, useActionState, useContext, useEffect, useRef, useTransition, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
 import type { ActionResult } from "@/lib/types";
@@ -13,8 +13,17 @@ type Props = {
   resetOnSuccess?: boolean;
 };
 
+const PendingContext = createContext<boolean | null>(null);
+
+/**
+ * Form bound to a server action. Submits through onSubmit rather than
+ * `<form action>` because React resets uncontrolled fields after every form
+ * action — including failed ones — which would wipe what the player typed.
+ * Here fields are cleared only on success.
+ */
 export function ActionForm({ action, children, className, success, resetOnSuccess = true }: Props) {
-  const [state, formAction] = useActionState(action, null);
+  const [state, formAction, isPending] = useActionState(action, null);
+  const [, startTransition] = useTransition();
   const ref = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -22,9 +31,21 @@ export function ActionForm({ action, children, className, success, resetOnSucces
   }, [state, resetOnSuccess]);
 
   return (
-    <form ref={ref} action={formAction} className={className}>
-      {children}
-      <FormMessage state={state} success={success} />
+    <form
+      ref={ref}
+      className={className}
+      onSubmit={(e) => {
+        e.preventDefault();
+        // Include the clicked button's name/value (e.g. decision=approve).
+        const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLElement | null;
+        const data = new FormData(e.currentTarget, submitter);
+        startTransition(() => formAction(data));
+      }}
+    >
+      <PendingContext.Provider value={isPending}>
+        {children}
+        <FormMessage state={state} success={success} />
+      </PendingContext.Provider>
     </form>
   );
 }
@@ -41,7 +62,9 @@ export function FormMessage({ state, success }: { state: ActionResult<unknown> |
 }
 
 export function SubmitButton({ children, className = "btn-primary" }: { children: ReactNode; className?: string }) {
-  const { pending } = useFormStatus();
+  const contextPending = useContext(PendingContext);
+  const { pending: formPending } = useFormStatus();
+  const pending = contextPending ?? formPending;
   return (
     <button type="submit" className={className} disabled={pending}>
       {pending ? "…" : children}

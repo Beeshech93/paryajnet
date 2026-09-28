@@ -242,7 +242,38 @@
     "depositCreated": "Payment created — see the instructions below.",
     "withdrawCreated": "Withdrawal requested.",
     "kycNeeded": "Verify your identity to withdraw. It takes 2 minutes.",
-    "verifyNow": "Verify now"
+    "verifyNow": "Verify now",
+    "copy": "Copy",
+    "copied": "Copied",
+    "step1": "Pay exactly {amount}.",
+    "step2": "Include the reference in the transfer description.",
+    "step3": "Send us your receipt. Your balance is credited once our team confirms the payment.",
+    "receiptSent": "Receipt sent — we are checking your payment.",
+    "receiptThanks": "Thanks! We will confirm your deposit shortly.",
+    "paidTitle": "Already paid? Let us know",
+    "payerNote": "Payer name or transaction ID",
+    "payerNotePlaceholder": "e.g. Maria Silva · E1234…",
+    "receipt": "Receipt (photo or PDF)",
+    "sendReceipt": "Send receipt",
+    "pixKeyType": "Key type",
+    "pixTypes": {
+      "CPF": "CPF",
+      "CNPJ": "CNPJ",
+      "EMAIL": "Email",
+      "PHONE": "Phone",
+      "EVP": "Random key"
+    },
+    "pixPlaceholders": {
+      "CPF": "000.000.000-00",
+      "CNPJ": "00.000.000/0000-00",
+      "EMAIL": "name@email.com",
+      "PHONE": "(11) 98765-4321",
+      "EVP": "123e4567-e89b-12d3-a456-…"
+    },
+    "withdrawNote": "The amount is held from your balance and our team sends the payment to this key, usually within 24 hours. The key must be in your own name.",
+    "withdrawPending": "In progress: our team will send the payment to {destination}.",
+    "depositsUnavailable": "Deposits in this currency are not available yet.",
+    "depositNote": "Deposits are credited once our team confirms the payment. Winnings are credited automatically."
   },
   "bets": {
     "title": "My bets",
@@ -288,7 +319,8 @@
       "payments": "Payments",
       "users": "Players",
       "kyc": "KYC",
-      "banners": "Banners"
+      "banners": "Banners",
+      "settings": "Settings"
     },
     "overview": "Overview",
     "kpi": {
@@ -366,7 +398,17 @@
       "approve": "Approve",
       "reject": "Reject",
       "note": "Approve a deposit only once the money has arrived. Rejecting a withdrawal returns the funds to the player.",
-      "recent": "Recent"
+      "recent": "Recent",
+      "noteLabel": "Note (required to reject)",
+      "notePlaceholder": "e.g. PIX E2E id, or reason for rejecting",
+      "depositsTitle": "Deposits to confirm ({count})",
+      "depositsHelp": "Check your bank for a transfer with this amount and reference, then confirm: the balance is credited to the player instantly.",
+      "viewReceipt": "View receipt",
+      "noReceipt": "The player has not sent a receipt yet.",
+      "confirmDeposit": "Confirm deposit",
+      "withdrawalsTitle": "Withdrawals to pay ({count})",
+      "withdrawalsHelp": "Send the PIX from your bank to this key, then mark it as paid. Rejecting returns the amount to the player's balance.",
+      "markPaid": "Mark as paid"
     },
     "users": {
       "user": "Player",
@@ -424,6 +466,16 @@
       "activate": "Activate",
       "delete": "Delete",
       "empty": "No banners yet. Ad spaces stay hidden until you add one."
+    },
+    "settings": {
+      "saved": "Settings saved.",
+      "intro": "Where players send their deposits. Each deposit gets a PIX “copia e cola” code and QR with the exact amount and its reference; you confirm it in Payments when the money arrives.",
+      "beneficiary": "Beneficiary name",
+      "city": "City",
+      "bank": "Bank (optional)",
+      "pixHint": "Name and city appear in the player's bank app (max 25 and 15 characters, no accents needed). Leave the key empty to disable PIX deposits.",
+      "speiHint": "Leave the CLABE empty to disable manual SPEI deposits.",
+      "save": "Save settings"
     }
   },
   "errors": {
@@ -484,7 +536,11 @@
     "invalid_link": "The link must start with https:// or /.",
     "banner_image_missing": "Add the desktop image.",
     "banner_headline_missing": "Add a headline.",
-    "invalid_dates": "The end must be after the start."
+    "invalid_dates": "The end must be after the start.",
+    "too_many_pending": "You already have {max} deposits waiting for confirmation.",
+    "receipt_type": "The receipt must be a photo (JPG, PNG, WebP) or a PDF.",
+    "receipt_missing": "Add a note or attach the receipt.",
+    "pix_name_required": "Add the beneficiary name for the PIX key."
   },
   "kyc": {
     "title": "Identity verification",

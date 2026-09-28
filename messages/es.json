@@ -242,7 +242,38 @@
     "depositCreated": "Pago generado: consulta las instrucciones abajo.",
     "withdrawCreated": "Retiro solicitado.",
     "kycNeeded": "Verifica tu identidad para retirar. Toma 2 minutos.",
-    "verifyNow": "Verificar ahora"
+    "verifyNow": "Verificar ahora",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "step1": "Paga exactamente {amount}.",
+    "step2": "Incluye la referencia en la descripción de la transferencia.",
+    "step3": "Envíanos tu comprobante. Tu saldo se acredita cuando nuestro equipo confirma el pago.",
+    "receiptSent": "Comprobante enviado: estamos revisando tu pago.",
+    "receiptThanks": "¡Gracias! Confirmaremos tu depósito en breve.",
+    "paidTitle": "¿Ya pagaste? Avísanos",
+    "payerNote": "Nombre del titular o ID de la transacción",
+    "payerNotePlaceholder": "p. ej. María Pérez · E1234…",
+    "receipt": "Comprobante (foto o PDF)",
+    "sendReceipt": "Enviar comprobante",
+    "pixKeyType": "Tipo de clave",
+    "pixTypes": {
+      "CPF": "CPF",
+      "CNPJ": "CNPJ",
+      "EMAIL": "Correo",
+      "PHONE": "Teléfono",
+      "EVP": "Clave aleatoria"
+    },
+    "pixPlaceholders": {
+      "CPF": "000.000.000-00",
+      "CNPJ": "00.000.000/0000-00",
+      "EMAIL": "nombre@correo.com",
+      "PHONE": "(11) 98765-4321",
+      "EVP": "123e4567-e89b-12d3-a456-…"
+    },
+    "withdrawNote": "El monto se reserva de tu saldo y nuestro equipo envía el pago a esta clave, normalmente en menos de 24 horas. La clave debe estar a tu nombre.",
+    "withdrawPending": "En proceso: nuestro equipo enviará el pago a {destination}.",
+    "depositsUnavailable": "Los depósitos en esta moneda todavía no están disponibles.",
+    "depositNote": "Los depósitos se acreditan cuando nuestro equipo confirma el pago. Las ganancias se acreditan automáticamente."
   },
   "bets": {
     "title": "Mis apuestas",
@@ -288,7 +319,8 @@
       "payments": "Pagos",
       "users": "Jugadores",
       "kyc": "KYC",
-      "banners": "Banners"
+      "banners": "Banners",
+      "settings": "Configuración"
     },
     "overview": "Resumen",
     "kpi": {
@@ -366,7 +398,17 @@
       "approve": "Aprobar",
       "reject": "Rechazar",
       "note": "Aprueba un depósito solo cuando el dinero haya llegado. Rechazar un retiro devuelve los fondos al jugador.",
-      "recent": "Recientes"
+      "recent": "Recientes",
+      "noteLabel": "Nota (obligatoria para rechazar)",
+      "notePlaceholder": "p. ej. ID E2E del PIX, o motivo del rechazo",
+      "depositsTitle": "Depósitos por confirmar ({count})",
+      "depositsHelp": "Busca en tu banco una transferencia con este monto y referencia, y confirma: el saldo se acredita al jugador al instante.",
+      "viewReceipt": "Ver comprobante",
+      "noReceipt": "El jugador todavía no envió comprobante.",
+      "confirmDeposit": "Confirmar depósito",
+      "withdrawalsTitle": "Retiros por pagar ({count})",
+      "withdrawalsHelp": "Envía el PIX desde tu banco a esta clave y márcalo como pagado. Rechazar devuelve el monto al saldo del jugador.",
+      "markPaid": "Marcar como pagado"
     },
     "users": {
       "user": "Jugador",
@@ -424,6 +466,16 @@
       "activate": "Activar",
       "delete": "Eliminar",
       "empty": "Aún no hay banners. Los espacios de publicidad no se muestran hasta que agregues uno."
+    },
+    "settings": {
+      "saved": "Configuración guardada.",
+      "intro": "A dónde envían los jugadores sus depósitos. Cada depósito recibe un código PIX “copia e cola” y un QR con el monto exacto y su referencia; lo confirmas en Pagos cuando llega el dinero.",
+      "beneficiary": "Nombre del beneficiario",
+      "city": "Ciudad",
+      "bank": "Banco (opcional)",
+      "pixHint": "El nombre y la ciudad aparecen en la app del banco del jugador (máx. 25 y 15 caracteres). Deja la clave vacía para desactivar los depósitos PIX.",
+      "speiHint": "Deja la CLABE vacía para desactivar los depósitos SPEI manuales.",
+      "save": "Guardar configuración"
     }
   },
   "errors": {
@@ -484,7 +536,11 @@
     "invalid_link": "El enlace debe empezar con https:// o /.",
     "banner_image_missing": "Agrega la imagen para computadora.",
     "banner_headline_missing": "Agrega un título.",
-    "invalid_dates": "El fin debe ser posterior al inicio."
+    "invalid_dates": "El fin debe ser posterior al inicio.",
+    "too_many_pending": "Ya tienes {max} depósitos esperando confirmación.",
+    "receipt_type": "El comprobante debe ser una foto (JPG, PNG, WebP) o un PDF.",
+    "receipt_missing": "Escribe una nota o adjunta el comprobante.",
+    "pix_name_required": "Agrega el nombre del beneficiario de la clave PIX."
   },
   "kyc": {
     "title": "Verificación de identidad",

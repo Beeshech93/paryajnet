@@ -242,7 +242,38 @@
     "depositCreated": "Pagamento gerado — veja as instruções abaixo.",
     "withdrawCreated": "Saque solicitado.",
     "kycNeeded": "Verifique sua identidade para sacar. Leva 2 minutos.",
-    "verifyNow": "Verificar agora"
+    "verifyNow": "Verificar agora",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "step1": "Pague exatamente {amount}.",
+    "step2": "Inclua a referência na descrição da transferência.",
+    "step3": "Envie o seu comprovante. O saldo é creditado quando nossa equipe confirmar o pagamento.",
+    "receiptSent": "Comprovante enviado — estamos verificando seu pagamento.",
+    "receiptThanks": "Obrigado! Confirmaremos seu depósito em breve.",
+    "paidTitle": "Já pagou? Avise a gente",
+    "payerNote": "Nome do titular ou ID da transação",
+    "payerNotePlaceholder": "ex.: Maria Silva · E1234…",
+    "receipt": "Comprovante (foto ou PDF)",
+    "sendReceipt": "Enviar comprovante",
+    "pixKeyType": "Tipo de chave",
+    "pixTypes": {
+      "CPF": "CPF",
+      "CNPJ": "CNPJ",
+      "EMAIL": "E-mail",
+      "PHONE": "Celular",
+      "EVP": "Chave aleatória"
+    },
+    "pixPlaceholders": {
+      "CPF": "000.000.000-00",
+      "CNPJ": "00.000.000/0000-00",
+      "EMAIL": "nome@email.com",
+      "PHONE": "(11) 98765-4321",
+      "EVP": "123e4567-e89b-12d3-a456-…"
+    },
+    "withdrawNote": "O valor fica reservado do seu saldo e nossa equipe envia o pagamento para esta chave, normalmente em até 24 horas. A chave deve estar no seu nome.",
+    "withdrawPending": "Em andamento: nossa equipe enviará o pagamento para {destination}.",
+    "depositsUnavailable": "Depósitos nesta moeda ainda não estão disponíveis.",
+    "depositNote": "Os depósitos são creditados quando nossa equipe confirma o pagamento. Os prêmios são creditados automaticamente."
   },
   "bets": {
     "title": "Minhas apostas",
@@ -288,7 +319,8 @@
       "payments": "Pagamentos",
       "users": "Jogadores",
       "kyc": "KYC",
-      "banners": "Banners"
+      "banners": "Banners",
+      "settings": "Configurações"
     },
     "overview": "Resumo",
     "kpi": {
@@ -366,7 +398,17 @@
       "approve": "Aprovar",
       "reject": "Recusar",
       "note": "Aprove um depósito só depois que o dinheiro chegar. Recusar um saque devolve o valor ao jogador.",
-      "recent": "Recentes"
+      "recent": "Recentes",
+      "noteLabel": "Nota (obrigatória para recusar)",
+      "notePlaceholder": "ex.: ID E2E do PIX, ou motivo da recusa",
+      "depositsTitle": "Depósitos a confirmar ({count})",
+      "depositsHelp": "Procure no seu banco uma transferência com este valor e referência e confirme: o saldo é creditado ao jogador na hora.",
+      "viewReceipt": "Ver comprovante",
+      "noReceipt": "O jogador ainda não enviou comprovante.",
+      "confirmDeposit": "Confirmar depósito",
+      "withdrawalsTitle": "Saques a pagar ({count})",
+      "withdrawalsHelp": "Envie o PIX do seu banco para esta chave e marque como pago. Recusar devolve o valor ao saldo do jogador.",
+      "markPaid": "Marcar como pago"
     },
     "users": {
       "user": "Jogador",
@@ -424,6 +466,16 @@
       "activate": "Ativar",
       "delete": "Excluir",
       "empty": "Ainda não há banners. Os espaços publicitários ficam ocultos até você adicionar um."
+    },
+    "settings": {
+      "saved": "Configurações salvas.",
+      "intro": "Para onde os jogadores enviam seus depósitos. Cada depósito recebe um código PIX copia e cola e um QR com o valor exato e a referência; você confirma em Pagamentos quando o dinheiro chegar.",
+      "beneficiary": "Nome do recebedor",
+      "city": "Cidade",
+      "bank": "Banco (opcional)",
+      "pixHint": "Nome e cidade aparecem no app do banco do jogador (máx. 25 e 15 caracteres). Deixe a chave vazia para desativar depósitos PIX.",
+      "speiHint": "Deixe a CLABE vazia para desativar depósitos SPEI manuais.",
+      "save": "Salvar configurações"
     }
   },
   "errors": {
@@ -484,7 +536,11 @@
     "invalid_link": "O link deve começar com https:// ou /.",
     "banner_image_missing": "Adicione a imagem para computador.",
     "banner_headline_missing": "Adicione um título.",
-    "invalid_dates": "O fim deve ser depois do início."
+    "invalid_dates": "O fim deve ser depois do início.",
+    "too_many_pending": "Você já tem {max} depósitos aguardando confirmação.",
+    "receipt_type": "O comprovante deve ser uma foto (JPG, PNG, WebP) ou PDF.",
+    "receipt_missing": "Escreva uma nota ou anexe o comprovante.",
+    "pix_name_required": "Informe o nome do recebedor da chave PIX."
   },
   "kyc": {
     "title": "Verificação de identidade",

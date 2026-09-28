@@ -1,7 +1,11 @@
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocalTime } from "@/components/LocalTime";
+import { DepositInstructions } from "@/components/wallet/DepositInstructions";
 import { DepositForm, SimulateButton, WithdrawForm } from "@/components/wallet/WalletForms";
+import { availableDepositMethods } from "@/lib/payment-providers";
+import { withdrawalsRequireKyc } from "@/lib/payments";
+import { formatPixKey } from "@/lib/pix";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { CURRENCY_LIMITS, formatMoney } from "@/lib/money";
@@ -25,11 +29,18 @@ export default async function WalletPage({ params }: { params: Promise<{ locale:
   const currency = await getActiveCurrency(user, locale);
   const wallet = await getOrCreateWallet(user.id, currency);
   const limits = CURRENCY_LIMITS[currency];
-  const [wallets, payments, transactions] = await Promise.all([
+  const [wallets, payments, transactions, depositMethods] = await Promise.all([
     prisma.wallet.findMany({ where: { userId: user.id }, orderBy: { currency: "asc" } }),
-    prisma.payment.findMany({ where: { walletId: wallet.id }, orderBy: { createdAt: "desc" }, take: 10 }),
+    prisma.payment.findMany({
+      where: { walletId: wallet.id },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      omit: { receipt: true },
+    }),
     prisma.transaction.findMany({ where: { walletId: wallet.id }, orderBy: { createdAt: "desc" }, take: 25 }),
+    availableDepositMethods(limits.depositMethods),
   ]);
+  const canWithdraw = !withdrawalsRequireKyc() || user.kycStatus === "VERIFIED";
 
   return (
     <div className="space-y-8">
@@ -60,14 +71,19 @@ export default async function WalletPage({ params }: { params: Promise<{ locale:
               max: formatMoney(limits.maxDeposit, currency, locale),
             })}
           </p>
-          <DepositForm methods={limits.depositMethods} currency={currency} />
+          {depositMethods.length > 0 ? (
+            <DepositForm methods={depositMethods} currency={currency} />
+          ) : (
+            <p className="mt-4 rounded-xl bg-surface-2 p-4 text-sm text-muted">{t("depositsUnavailable")}</p>
+          )}
+          <p className="mt-3 text-xs text-muted">{t("depositNote")}</p>
         </section>
         <section className="card p-5">
           <h2 className="font-display text-lg font-bold">{t("withdraw")}</h2>
           <p className="text-xs text-muted">
             {t("withdrawMin", { min: formatMoney(limits.minWithdrawal, currency, locale) })}
           </p>
-          {user.kycStatus === "VERIFIED" ? (
+          {canWithdraw ? (
             <WithdrawForm methods={limits.withdrawalMethods} currency={currency} />
           ) : (
             <div className="mt-4 rounded-xl bg-gold/10 p-4 text-sm">
@@ -100,23 +116,34 @@ export default async function WalletPage({ params }: { params: Promise<{ locale:
                     </span>
                     <span className="ml-auto font-bold tabular-nums">{formatMoney(p.amount, currency, locale)}</span>
                   </div>
+                  {p.reference && <p className="mt-1 font-mono text-xs text-muted">#{p.reference}</p>}
                   {p.kind === "DEPOSIT" && p.status === "PENDING" && (
-                    <div className="mt-3 space-y-2 rounded-xl bg-surface-2 p-3">
-                      <p className="text-xs text-muted">{t(`instructions.${p.method}`)}</p>
-                      {info.barcodeUrl && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={info.barcodeUrl} alt={t("fields.reference")} className="h-16 rounded bg-white p-1" />
+                    <>
+                      <DepositInstructions
+                        paymentId={p.id}
+                        method={p.method}
+                        amount={formatMoney(p.amount, currency, locale)}
+                        info={info}
+                        receiptSent={!!p.receiptMime || !!p.payerNote}
+                        payerNote={p.payerNote}
+                      />
+                      {p.provider === "mock" && process.env.NODE_ENV !== "production" && (
+                        <SimulateButton paymentId={p.id} />
                       )}
-                      {Object.entries(info)
-                        .filter(([k, v]) => k !== "expiresAt" && k !== "barcodeUrl" && v)
-                        .map(([k, v]) => (
-                          <div key={k}>
-                            <p className="label">{t.has(`fields.${k}`) ? t(`fields.${k}`) : k}</p>
-                            <p className="font-mono text-xs break-all select-all">{v}</p>
-                          </div>
-                        ))}
-                      {p.provider === "mock" && <SimulateButton paymentId={p.id} />}
-                    </div>
+                    </>
+                  )}
+                  {p.kind === "WITHDRAWAL" && p.status === "PENDING" && (
+                    <p className="mt-2 text-xs text-muted">
+                      {t("withdrawPending", {
+                        destination: info.pixKey ? formatPixKey(info.pixKeyType, info.pixKey) : (info.clabe ?? ""),
+                      })}
+                    </p>
+                  )}
+                  {p.status === "REJECTED" && p.adminNote && (
+                    <p className="mt-2 rounded-lg bg-danger/10 p-2 text-xs text-danger">{p.adminNote}</p>
+                  )}
+                  {p.status === "COMPLETED" && p.kind === "WITHDRAWAL" && p.adminNote && (
+                    <p className="mt-2 text-xs text-muted">{p.adminNote}</p>
                   )}
                 </div>
               );

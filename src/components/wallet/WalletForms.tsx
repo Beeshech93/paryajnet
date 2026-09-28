@@ -22,9 +22,12 @@ export function DepositForm({ methods, currency }: { methods: string[]; currency
   );
 }
 
+const PIX_TYPES = ["CPF", "PHONE", "EMAIL", "EVP", "CNPJ"] as const;
+
 export function WithdrawForm({ methods, currency }: { methods: string[]; currency: string }) {
   const t = useTranslations("wallet");
   const [method, setMethod] = useState(methods[0]);
+  const [pixType, setPixType] = useState<string>("CPF");
   return (
     <ActionForm action={withdrawAction} success={t("withdrawCreated")} className="mt-4 space-y-3">
       <MethodPicker methods={methods} onChange={setMethod} />
@@ -34,19 +37,62 @@ export function WithdrawForm({ methods, currency }: { methods: string[]; currenc
         </label>
         <input id="wamount" name="amount" inputMode="decimal" required className="input tabular-nums" />
       </div>
-      <div>
-        <label className="label" htmlFor="destination">
-          {method === "PIX" ? t("fields.pixKey") : t("fields.clabe")}
-        </label>
-        <input
-          id="destination"
-          name="destination"
-          required
-          className="input font-mono"
-          inputMode={method === "SPEI" ? "numeric" : "text"}
-          maxLength={method === "SPEI" ? 18 : 77}
-        />
-      </div>
+      {method === "PIX" ? (
+        <div className="grid grid-cols-[130px_1fr] gap-2">
+          <div>
+            <label className="label" htmlFor="pixKeyType">
+              {t("pixKeyType")}
+            </label>
+            <select
+              id="pixKeyType"
+              name="pixKeyType"
+              value={pixType}
+              onChange={(e) => setPixType(e.target.value)}
+              className="input"
+            >
+              {PIX_TYPES.map((k) => (
+                <option key={k} value={k}>
+                  {t(`pixTypes.${k}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label" htmlFor="destination">
+              {t("fields.pixKey")}
+            </label>
+            <input
+              id="destination"
+              name="destination"
+              required
+              className="input font-mono"
+              inputMode={
+                pixType === "CPF" || pixType === "CNPJ" || pixType === "PHONE"
+                  ? "numeric"
+                  : pixType === "EMAIL"
+                    ? "email"
+                    : "text"
+              }
+              placeholder={t(`pixPlaceholders.${pixType}`)}
+            />
+          </div>
+        </div>
+      ) : (
+        <div>
+          <label className="label" htmlFor="destination">
+            {t("fields.clabe")}
+          </label>
+          <input
+            id="destination"
+            name="destination"
+            required
+            className="input font-mono"
+            inputMode="numeric"
+            maxLength={18}
+          />
+        </div>
+      )}
+      <p className="text-xs text-muted">{t("withdrawNote")}</p>
       <SubmitButton className="btn-ghost w-full">{t("withdrawCta")}</SubmitButton>
     </ActionForm>
   );

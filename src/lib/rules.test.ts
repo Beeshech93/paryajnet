@@ -202,3 +202,34 @@ test("borlette lots come from Pick 3 and Pick 4", () => {
   assert.equal(resultFromPicks("34", "1285"), null);
   assert.equal(resultFromPicks("347", "12a5"), null);
 });
+
+test("PIX BR Code matches the Banco Central example and validates keys", async () => {
+  const { crc16, normalizePixKey, pixBrCode, isValidCnpj } = await import("./pix");
+  // Example from the BCB "Manual de Padrões para Iniciação do Pix".
+  const body =
+    "00020126580014br.gov.bcb.pix0136123e4567-e12b-12d1-a456-4266554400005204000053039865802BR5913Fulano de Tal6008BRASILIA62070503***6304";
+  assert.equal(crc16(body), "1D3D");
+  const code = pixBrCode({ key: "123e4567-e12b-12d1-a456-426655440000", name: "Fulano de Tal", city: "BRASILIA" });
+  assert.equal(code, body + "1D3D");
+  const withAmount = pixBrCode({
+    key: "a@b.com",
+    name: "São João",
+    city: "Brasília",
+    amount: "100.50",
+    txid: "PJ-7K3M9Q",
+  });
+  assert.match(withAmount, /5406100\.50/);
+  assert.match(withAmount, /5908Sao Joao/);
+  assert.match(withAmount, /62120508PJ7K3M9Q/);
+  assert.equal(withAmount.slice(-4), crc16(withAmount.slice(0, -4)));
+
+  assert.equal(normalizePixKey("CPF", "529.982.247-25"), "52998224725");
+  assert.equal(normalizePixKey("CPF", "529.982.247-24"), null);
+  assert.equal(isValidCnpj("11222333000181"), true);
+  assert.equal(normalizePixKey("CNPJ", "11.222.333/0001-81"), "11222333000181");
+  assert.equal(normalizePixKey("CNPJ", "11.222.333/0001-80"), null);
+  assert.equal(normalizePixKey("EMAIL", " Jogador@Mail.com "), "jogador@mail.com");
+  assert.equal(normalizePixKey("PHONE", "(11) 98765-4321"), "+5511987654321");
+  assert.equal(normalizePixKey("PHONE", "123"), null);
+  assert.equal(normalizePixKey("EVP", "123E4567-E12B-12D1-A456-426655440000"), "123e4567-e12b-12d1-a456-426655440000");
+});

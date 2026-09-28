@@ -8,6 +8,8 @@ import { Decimal } from "@/lib/money";
 import { approveWithdrawal, confirmDeposit, rejectDeposit, rejectWithdrawal } from "@/lib/payments";
 import { BANNER_LOCALES, BANNER_THEMES, normalizeLink, PLACEMENTS, readImage } from "@/lib/banners";
 import { reviewKyc } from "@/lib/kyc";
+import { normalizePixKey } from "@/lib/pix";
+import { savePaymentSettings, type PaymentSettings } from "@/lib/settings";
 import { basketballMarkets, footballMarkets } from "@/lib/pricing";
 import {
   cancelEvent,
@@ -200,13 +202,46 @@ export async function cancelDrawAction(_prev: ActionResult | null, form: FormDat
 export async function paymentDecisionAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
   return asAdmin(async () => {
     const id = String(form.get("paymentId"));
-    const decision = String(form.get("decision"));
+    const approve = String(form.get("decision")) === "approve";
+    const note =
+      String(form.get("note") ?? "")
+        .trim()
+        .slice(0, 300) || null;
     const payment = await prisma.payment.findUniqueOrThrow({ where: { id } });
+    if (!approve && !note) throw new AppError("note_required");
     if (payment.kind === "DEPOSIT") {
-      await (decision === "approve" ? confirmDeposit(id) : rejectDeposit(id));
+      await (approve ? confirmDeposit(id, note) : rejectDeposit(id, note));
     } else {
-      await (decision === "approve" ? approveWithdrawal(id) : rejectWithdrawal(id));
+      await (approve ? approveWithdrawal(id, note) : rejectWithdrawal(id, note));
     }
+  });
+}
+
+export async function savePaymentSettingsAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const get = (k: string) => String(form.get(k) ?? "").trim();
+    const values: PaymentSettings = {};
+    const keyType = get("pix.keyType");
+    const rawKey = get("pix.key");
+    if (rawKey) {
+      const key = normalizePixKey(keyType, rawKey);
+      if (!key) throw new AppError("invalid_pix_key");
+      values["pix.key"] = key;
+      values["pix.keyType"] = keyType;
+    } else {
+      values["pix.key"] = "";
+      values["pix.keyType"] = "";
+    }
+    values["pix.name"] = get("pix.name").slice(0, 25);
+    values["pix.city"] = get("pix.city").slice(0, 15);
+    values["pix.bank"] = get("pix.bank").slice(0, 60);
+    const clabe = get("spei.clabe").replace(/\s/g, "");
+    if (clabe && !/^\d{18}$/.test(clabe)) throw new AppError("invalid_clabe");
+    values["spei.clabe"] = clabe;
+    values["spei.name"] = get("spei.name").slice(0, 60);
+    values["spei.bank"] = get("spei.bank").slice(0, 60);
+    if (values["pix.key"] && !values["pix.name"]) throw new AppError("pix_name_required");
+    await savePaymentSettings(values);
   });
 }
 

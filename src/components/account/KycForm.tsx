@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { submitKycAction } from "@/app/actions/account";
-import { FormMessage, SubmitButton } from "@/components/ActionForm";
+import { FormMessage } from "@/components/ActionForm";
 
 const MAX_SIDE = 1600;
 
@@ -23,7 +23,8 @@ async function shrink(file: File): Promise<File> {
 export function KycForm({ defaultType, defaultName }: { defaultType: "CPF" | "CURP"; defaultName: string }) {
   const t = useTranslations("kyc");
   const [type, setType] = useState<string>(defaultType);
-  const [state, formAction] = useActionState(
+  const [, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(
     async (prev: Awaited<ReturnType<typeof submitKycAction>> | null, form: FormData) => {
       for (const key of ["DOCUMENT_FRONT", "DOCUMENT_BACK", "SELFIE"]) {
         const f = form.get(key);
@@ -52,7 +53,15 @@ export function KycForm({ defaultType, defaultName }: { defaultType: "CPF" | "CU
   );
 
   return (
-    <form action={formAction} className="mt-4 space-y-4">
+    <form
+      className="mt-4 space-y-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        // Not <form action>: React would clear the chosen photos after a failed attempt.
+        const data = new FormData(e.currentTarget);
+        startTransition(() => formAction(data));
+      }}
+    >
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label className="label" htmlFor="fullName">
@@ -97,7 +106,9 @@ export function KycForm({ defaultType, defaultName }: { defaultType: "CPF" | "CU
         {fileInput("SELFIE", t("selfie"), true, "user")}
       </div>
       <p className="text-xs text-muted">{t("privacy")}</p>
-      <SubmitButton>{t("submit")}</SubmitButton>
+      <button type="submit" className="btn-primary" disabled={isPending}>
+        {isPending ? "…" : t("submit")}
+      </button>
       <FormMessage state={state} success={t("submitted")} />
     </form>
   );
