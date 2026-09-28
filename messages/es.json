@@ -12,7 +12,9 @@
     "account": "Cuenta",
     "logout": "Cerrar sesión",
     "login": "Entrar",
-    "register": "Registrarse"
+    "register": "Registrarse",
+    "home": "Inicio",
+    "betsShort": "Apuestas"
   },
   "footer": {
     "responsible": "El juego puede causar adicción. Juega con responsabilidad. Solo para mayores de 18 años. Puedes fijar límites de depósito o tomar un descanso desde tu cuenta."

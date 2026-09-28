@@ -12,7 +12,9 @@
     "account": "Conta",
     "logout": "Sair",
     "login": "Entrar",
-    "register": "Cadastrar"
+    "register": "Cadastrar",
+    "home": "Início",
+    "betsShort": "Apostas"
   },
   "footer": {
     "responsible": "Jogos de aposta podem causar dependência. Jogue com responsabilidade. Proibido para menores de 18 anos. Defina limites de depósito ou faça uma pausa nas configurações da conta."

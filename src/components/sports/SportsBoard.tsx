@@ -256,7 +256,7 @@ export function SportsBoard({
       {slip.length > 0 && (
         <a
           href="#slip"
-          className="fixed inset-x-4 bottom-4 z-40 flex items-center justify-between rounded-2xl bg-brand px-5 py-3.5 text-brand-ink shadow-pop lg:hidden"
+          className="fixed inset-x-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 md:bottom-4 flex items-center justify-between rounded-2xl bg-brand px-5 py-3.5 text-brand-ink shadow-pop lg:hidden"
         >
           <span className="flex items-center gap-2 font-semibold">
             <span className="flex size-6 items-center justify-center rounded-full bg-danger text-xs font-bold text-white">

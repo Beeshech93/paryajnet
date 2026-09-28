@@ -101,7 +101,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="min-w-0 lg:col-span-2">
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="font-display text-xl font-bold">{t("upcoming")}</h2>
             <Link href="/sports" className="text-sm text-brand-strong">
@@ -110,8 +110,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           </div>
           <div className="space-y-2">
             {events.map((e) => (
-              <Link key={e.id} href="/sports" className="card flex items-center gap-4 p-4 hover:border-brand/50">
-                <div className="min-w-0 flex-1">
+              <Link
+                key={e.id}
+                href="/sports"
+                className="card flex flex-col gap-3 p-4 hover:border-brand/50 sm:flex-row sm:items-center sm:gap-4"
+              >
+                <div className="w-full min-w-0 flex-1">
                   <p className="text-xs text-muted">
                     {e.league} · <LocalTime value={e.startsAt} />
                   </p>
@@ -119,7 +123,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                     {e.homeTeam} — {e.awayTeam}
                   </p>
                 </div>
-                <div className="flex gap-1.5 text-sm font-bold tabular-nums">
+                <div className="grid grid-flow-col gap-1.5 text-sm font-bold tabular-nums sm:flex">
                   {e.markets[0]?.selections.map((s) => (
                     <span key={s.id} className="rounded-lg bg-surface-2 px-2.5 py-1.5">
                       <span className="mr-1 text-xs font-medium text-muted">{s.code}</span>

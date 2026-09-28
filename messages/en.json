@@ -12,7 +12,9 @@
     "account": "Account",
     "logout": "Log out",
     "login": "Log in",
-    "register": "Sign up"
+    "register": "Sign up",
+    "home": "Home",
+    "betsShort": "Bets"
   },
   "footer": {
     "responsible": "Gambling can be addictive. Play responsibly. Only for people aged 18 and over. Set deposit limits or take a break from your account settings."

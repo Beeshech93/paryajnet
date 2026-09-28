@@ -12,7 +12,9 @@
     "account": "Compte",
     "logout": "Se déconnecter",
     "login": "Connexion",
-    "register": "S'inscrire"
+    "register": "S'inscrire",
+    "home": "Accueil",
+    "betsShort": "Paris"
   },
   "footer": {
     "responsible": "Les jeux d'argent peuvent créer une dépendance. Jouez de manière responsable. Réservé aux personnes de 18 ans et plus. Fixez des limites de dépôt ou faites une pause depuis votre compte."
