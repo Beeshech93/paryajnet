@@ -98,7 +98,7 @@ export function CasinoGames({
                 setGame(g);
                 setLast(null);
               }}
-              className={`chip border px-4 py-2 text-sm ${game === g ? "border-casino bg-casino text-bg" : "border-line text-muted"}`}
+              className={`chip border px-4 py-2 text-sm ${game === g ? "border-casino bg-casino text-white" : "border-line text-muted"}`}
             >
               {t(`games.${g}`)}
             </button>
@@ -109,7 +109,7 @@ export function CasinoGames({
           <div className="relative flex h-56 flex-col items-center justify-center bg-gradient-to-b from-casino/10 to-transparent">
             <p
               key={last ? `${last.outcome}-${nonce}` : "idle"}
-              className={`font-display text-6xl font-bold tabular-nums transition ${last ? (last.won ? "text-brand" : "text-danger") : "text-muted"}`}
+              className={`font-display text-6xl font-bold tabular-nums transition ${last ? (last.won ? "text-brand-strong" : "text-danger") : "text-muted"}`}
             >
               {last
                 ? game === "DICE"
@@ -197,11 +197,7 @@ export function CasinoGames({
             </div>
 
             {fairness ? (
-              <button
-                onClick={play}
-                disabled={pending}
-                className="btn w-full bg-casino py-3 text-base text-bg hover:brightness-110"
-              >
+              <button onClick={play} disabled={pending} className="btn-accent w-full py-3 text-base">
                 {pending ? "…" : t("play")}
               </button>
             ) : (
@@ -228,7 +224,7 @@ export function CasinoGames({
                       / {r.game === "DICE" ? "<" : "≥"} {formatNumber(r.target, locale)}
                     </span>
                   </span>
-                  <span className={`font-bold tabular-nums ${r.won ? "text-brand" : "text-muted"}`}>
+                  <span className={`font-bold tabular-nums ${r.won ? "text-brand-strong" : "text-muted"}`}>
                     {r.won
                       ? `+${formatMoneyClient(r.payout, r.currency, locale)}`
                       : `-${formatMoneyClient(r.stake, r.currency, locale)}`}

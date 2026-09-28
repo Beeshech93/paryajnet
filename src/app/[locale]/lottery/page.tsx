@@ -52,7 +52,7 @@ export default async function LotteryPage({ params }: { params: Promise<{ locale
                 <li key={p.name}>
                   <div className="flex justify-between font-semibold">
                     <span>{p.name}</span>
-                    <span className="text-gold tabular-nums">{p.pays}</span>
+                    <span className="text-gold-strong tabular-nums">{p.pays}</span>
                   </div>
                   <p className="text-xs text-muted">{p.rule}</p>
                 </li>
@@ -76,7 +76,7 @@ export default async function LotteryPage({ params }: { params: Promise<{ locale
                     </div>
                     <div className="flex gap-1 font-display font-bold tabular-nums">
                       <span
-                        className="rounded-full bg-gold px-2 py-1 text-bg"
+                        className="rounded-full bg-gold px-2 py-1 text-ink"
                         title={`${t("types.LOTO3")}: ${d.first}`}
                       >
                         {l1}

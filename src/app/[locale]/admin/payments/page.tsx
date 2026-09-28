@@ -31,7 +31,9 @@ export default async function AdminPayments() {
             const dest = p.kind === "WITHDRAWAL" ? (info.pixKey ?? info.clabe) : p.providerRef;
             return (
               <div key={p.id} className="card flex flex-wrap items-center gap-3 p-4 text-sm">
-                <span className={`chip ${p.kind === "WITHDRAWAL" ? "bg-gold/15 text-gold" : "bg-brand/15 text-brand"}`}>
+                <span
+                  className={`chip ${p.kind === "WITHDRAWAL" ? "bg-gold/15 text-gold-strong" : "bg-brand/15 text-brand-strong"}`}
+                >
                   {tw(`kind.${p.kind}`)}
                 </span>
                 <div className="min-w-0 flex-1">

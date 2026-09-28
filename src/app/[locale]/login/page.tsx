@@ -34,7 +34,7 @@ export default function LoginPage() {
       </ActionForm>
       <p className="mt-4 text-center text-sm text-muted">
         {t("noAccount")}{" "}
-        <Link href="/register" className="text-brand">
+        <Link href="/register" className="text-brand-strong">
           {t("registerCta")}
         </Link>
       </p>

@@ -23,33 +23,71 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   ]);
 
   const verticals = [
-    { href: "/sports", title: t("sportsTitle"), body: t("sportsBody"), accent: "text-brand", icon: "⚽" },
-    { href: "/lottery", title: t("lotteryTitle"), body: t("lotteryBody"), accent: "text-gold", icon: "🎟️" },
-    { href: "/casino", title: t("casinoTitle"), body: t("casinoBody"), accent: "text-casino", icon: "🎲" },
+    {
+      href: "/sports",
+      title: t("sportsTitle"),
+      body: t("sportsBody"),
+      accent: "text-brand-strong",
+      bar: "bg-brand",
+      tint: "bg-brand/15",
+      icon: "⚽",
+    },
+    {
+      href: "/lottery",
+      title: t("lotteryTitle"),
+      body: t("lotteryBody"),
+      accent: "text-gold-strong",
+      bar: "bg-gold",
+      tint: "bg-gold/25",
+      icon: "🎟️",
+    },
+    {
+      href: "/casino",
+      title: t("casinoTitle"),
+      body: t("casinoBody"),
+      accent: "text-danger",
+      bar: "bg-casino",
+      tint: "bg-casino/15",
+      icon: "🎲",
+    },
   ];
 
   return (
     <div className="space-y-10">
-      <section className="relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-surface-2 via-surface to-bg p-8 sm:p-12">
-        <div className="absolute -top-24 -right-24 size-72 rounded-full bg-brand/20 blur-3xl" aria-hidden />
-        <p className="text-sm font-semibold text-brand">{t("kicker")}</p>
-        <h1 className="mt-2 max-w-2xl font-display text-4xl font-bold tracking-tight sm:text-5xl">{t("title")}</h1>
-        <p className="mt-4 max-w-xl text-muted">{t("subtitle")}</p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/sports" className="btn-primary">
-            {t("ctaSports")}
-          </Link>
-          <Link href="/register" className="btn-ghost">
-            {t("ctaRegister")}
-          </Link>
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-300 via-sky-400 to-blue-500 p-8 text-brand-ink shadow-pop sm:p-12">
+        <div className="absolute -top-24 -right-24 size-64 rounded-full bg-gold sm:size-80" aria-hidden />
+        <div className="absolute -right-6 -bottom-10 size-32 rounded-full border-[14px] border-danger" aria-hidden />
+        <div
+          className="absolute top-16 right-44 hidden size-16 rotate-12 rounded-2xl bg-white/50 lg:block"
+          aria-hidden
+        />
+        <div className="relative">
+          <p className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-bold tracking-wide uppercase">
+            <span className="size-2 rounded-full bg-danger" /> {t("kicker")}
+          </p>
+          <h1 className="mt-4 max-w-2xl font-display text-4xl font-bold tracking-tight sm:text-6xl">{t("title")}</h1>
+          <p className="mt-4 max-w-xl text-base font-medium text-brand-ink/80">{t("subtitle")}</p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/sports" className="btn-accent px-6 py-3 text-base">
+              {t("ctaSports")}
+            </Link>
+            <Link href="/register" className="btn bg-white px-6 py-3 text-base text-ink shadow-sm hover:bg-sky-50">
+              {t("ctaRegister")}
+            </Link>
+          </div>
+          <p className="mt-6 text-xs font-medium text-brand-ink/70">{t("payments")}</p>
         </div>
-        <p className="mt-6 text-xs text-muted">{t("payments")}</p>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-3">
         {verticals.map((v) => (
-          <Link key={v.href} href={v.href} className="card group p-6 transition hover:border-brand/50">
-            <div className="text-3xl">{v.icon}</div>
+          <Link
+            key={v.href}
+            href={v.href}
+            className="card group relative overflow-hidden p-6 transition hover:-translate-y-0.5 hover:shadow-pop"
+          >
+            <span className={`absolute inset-x-0 top-0 h-1.5 ${v.bar}`} aria-hidden />
+            <div className={`flex size-12 items-center justify-center rounded-2xl text-2xl ${v.tint}`}>{v.icon}</div>
             <h2 className={`mt-3 font-display text-lg font-bold ${v.accent}`}>{v.title}</h2>
             <p className="mt-1 text-sm text-muted">{v.body}</p>
           </Link>
@@ -60,7 +98,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         <div className="lg:col-span-2">
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="font-display text-xl font-bold">{t("upcoming")}</h2>
-            <Link href="/sports" className="text-sm text-brand">
+            <Link href="/sports" className="text-sm text-brand-strong">
               {t("seeAll")}
             </Link>
           </div>
@@ -92,7 +130,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <h2 className="mb-3 font-display text-xl font-bold">{t("nextDraw")}</h2>
           {draw ? (
             <Link href="/lottery" className="card block p-6 hover:border-gold/50">
-              <p className="font-display text-2xl font-bold text-gold">{draw.name}</p>
+              <p className="font-display text-2xl font-bold text-gold-strong">{draw.name}</p>
               <p className="mt-1 text-sm text-muted">
                 {t("closes")} <LocalTime value={draw.closesAt} />
               </p>

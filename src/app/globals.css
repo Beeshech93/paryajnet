@@ -1,24 +1,36 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0a0e1a;
-  --color-surface: #111827;
-  --color-surface-2: #182236;
-  --color-line: #243049;
-  --color-ink: #e8edf7;
-  --color-muted: #8b98b3;
-  --color-brand: #22d37f;
-  --color-brand-ink: #03170d;
-  --color-gold: #f5c542;
-  --color-casino: #a78bfa;
-  --color-danger: #f0506e;
+  /* Surfaces: light, airy blue */
+  --color-bg: #eef6fd;
+  --color-surface: #ffffff;
+  --color-surface-2: #e7f2fc;
+  --color-line: #d2e5f5;
+  --color-ink: #0b2540;
+  --color-muted: #587089;
+
+  /* Light blue: primary, sports */
+  --color-brand: #38bdf8;
+  --color-brand-ink: #062a45;
+  --color-brand-strong: #0369a1; /* blue for text on white */
+
+  /* Yellow: odds, lottery, highlights */
+  --color-gold: #facc15;
+  --color-gold-strong: #a16207; /* yellow-family text on white */
+
+  /* Red: casino, live, key calls to action */
+  --color-casino: #ef4444;
+  --color-danger: #dc2626;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display), var(--font-inter), ui-sans-serif, sans-serif;
+
+  --shadow-card: 0 1px 2px rgb(11 37 64 / 0.04), 0 4px 16px rgb(11 37 64 / 0.06);
+  --shadow-pop: 0 10px 30px rgb(3 105 161 / 0.18);
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -27,7 +39,7 @@ body {
 }
 
 @utility card {
-  @apply rounded-2xl border border-line bg-surface;
+  @apply rounded-2xl border border-line bg-surface shadow-card;
 }
 
 @utility btn {
@@ -35,11 +47,17 @@ body {
 }
 
 @utility btn-primary {
-  @apply btn bg-brand text-brand-ink hover:brightness-110;
+  @apply btn bg-brand text-brand-ink shadow-sm hover:bg-sky-300;
 }
 
+@utility btn-accent {
+  @apply btn bg-danger text-white shadow-sm hover:bg-red-500;
+}
+@utility btn-gold {
+  @apply btn bg-gold text-ink shadow-sm hover:bg-yellow-300;
+}
 @utility btn-ghost {
-  @apply btn border border-line text-ink hover:bg-surface-2;
+  @apply btn border border-line bg-surface text-ink hover:bg-surface-2;
 }
 
 @utility btn-danger {
@@ -47,7 +65,7 @@ body {
 }
 
 @utility input {
-  @apply w-full rounded-xl border border-line bg-bg px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted/60 focus:border-brand;
+  @apply w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted/60 focus:border-brand focus:ring-4 focus:ring-brand/20;
 }
 
 @utility label {
@@ -55,7 +73,7 @@ body {
 }
 
 @utility odds-btn {
-  @apply flex min-w-0 flex-1 flex-col items-center rounded-xl border border-line bg-surface-2 px-2 py-2 text-sm transition hover:border-brand/60;
+  @apply flex min-w-0 flex-1 flex-col items-center rounded-xl border border-transparent bg-surface-2 px-2 py-2 text-sm transition hover:border-brand hover:bg-sky-100;
   &[data-active="true"] {
     @apply border-brand bg-brand text-brand-ink;
   }

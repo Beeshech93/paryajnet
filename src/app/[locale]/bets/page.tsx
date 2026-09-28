@@ -12,9 +12,9 @@ export async function generateMetadata() {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  OPEN: "bg-gold/15 text-gold",
-  PENDING: "bg-gold/15 text-gold",
-  WON: "bg-brand/15 text-brand",
+  OPEN: "bg-gold/15 text-gold-strong",
+  PENDING: "bg-gold/15 text-gold-strong",
+  WON: "bg-brand/15 text-brand-strong",
   LOST: "bg-danger/15 text-danger",
   VOID: "bg-surface-2 text-muted",
 };
@@ -112,7 +112,7 @@ export default async function BetsPage({
                 </span>
                 <span className="ml-auto">
                   {b.status === "OPEN" ? ts("potentialWin") : t("payout")}:{" "}
-                  <b className="text-brand tabular-nums">
+                  <b className="text-brand-strong tabular-nums">
                     {formatMoney(b.payout ?? b.potentialWin, b.currency, locale)}
                   </b>
                 </span>
@@ -137,7 +137,7 @@ export default async function BetsPage({
                   <LocalTime value={tk.draw.closesAt} />
                 </span>
                 {tk.draw.first && (
-                  <span className="ml-auto font-display font-bold tracking-wider text-gold">
+                  <span className="ml-auto font-display font-bold tracking-wider text-gold-strong">
                     {tk.draw.first} · {tk.draw.second} · {tk.draw.third}
                   </span>
                 )}
@@ -149,7 +149,7 @@ export default async function BetsPage({
                     <span className="flex-1 font-display font-bold tracking-widest">{l.numbers}</span>
                     <span className="text-xs tabular-nums">{formatMoney(l.stake, tk.currency, locale)}</span>
                     {l.payout && l.payout.gt(0) && (
-                      <span className="text-xs font-bold text-brand tabular-nums">
+                      <span className="text-xs font-bold text-brand-strong tabular-nums">
                         +{formatMoney(l.payout, tk.currency, locale)}
                       </span>
                     )}
@@ -163,7 +163,7 @@ export default async function BetsPage({
                 {tk.payout && (
                   <span className="ml-auto">
                     {t("payout")}:{" "}
-                    <b className="text-brand tabular-nums">{formatMoney(tk.payout, tk.currency, locale)}</b>
+                    <b className="text-brand-strong tabular-nums">{formatMoney(tk.payout, tk.currency, locale)}</b>
                   </span>
                 )}
               </div>
@@ -192,7 +192,7 @@ export default async function BetsPage({
                     / {r.game === "DICE" ? "<" : "≥"} {formatOdds(r.target, locale)} · nonce {r.nonce}
                   </span>
                 </span>
-                <span className={`font-bold tabular-nums ${r.won ? "text-brand" : "text-muted"}`}>
+                <span className={`font-bold tabular-nums ${r.won ? "text-brand-strong" : "text-muted"}`}>
                   {r.won
                     ? `+${formatMoney(r.payout, r.currency, locale)}`
                     : `-${formatMoney(r.stake, r.currency, locale)}`}

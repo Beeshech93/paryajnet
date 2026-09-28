@@ -163,7 +163,7 @@ export function SportsBoard({
             {open && <MarketGrid e={e} markets={extra} />}
             <button
               onClick={() => setExpanded((x) => ({ ...x, [e.id]: !open }))}
-              className="mt-3 text-xs font-semibold text-brand"
+              className="mt-3 text-xs font-semibold text-brand-strong"
             >
               {open ? t("fewerMarkets") : t("moreMarkets", { count: extra.length })}
             </button>
@@ -253,7 +253,24 @@ export function SportsBoard({
         ))}
       </div>
 
-      <aside className="lg:sticky lg:top-20 lg:self-start">
+      {slip.length > 0 && (
+        <a
+          href="#slip"
+          className="fixed inset-x-4 bottom-4 z-40 flex items-center justify-between rounded-2xl bg-ink px-5 py-3.5 text-white shadow-pop lg:hidden"
+        >
+          <span className="flex items-center gap-2 font-semibold">
+            <span className="flex size-6 items-center justify-center rounded-full bg-danger text-xs font-bold">
+              {slip.length}
+            </span>
+            {t("slip")}
+          </span>
+          <span className="rounded-lg bg-gold px-2 py-0.5 font-bold text-ink tabular-nums">
+            {formatNumber(totalOdds, locale)}
+          </span>
+        </a>
+      )}
+
+      <aside id="slip" className="scroll-mt-24 pb-20 lg:sticky lg:top-20 lg:self-start lg:pb-0">
         <div className="card p-4">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-bold">{t("slip")}</h2>
@@ -289,12 +306,12 @@ export function SportsBoard({
                   {l.newOdds ? (
                     <>
                       <span className="block text-xs text-muted line-through">{formatNumber(l.odds, locale)}</span>
-                      <span className={Number(l.newOdds) > Number(l.odds) ? "text-brand" : "text-danger"}>
+                      <span className={Number(l.newOdds) > Number(l.odds) ? "text-brand-strong" : "text-danger"}>
                         {formatNumber(l.newOdds, locale)}
                       </span>
                     </>
                   ) : (
-                    <span className="text-gold">{formatNumber(l.odds, locale)}</span>
+                    <span className="rounded-md bg-gold px-1.5 py-0.5 text-ink">{formatNumber(l.odds, locale)}</span>
                   )}
                 </span>
                 <button
@@ -334,7 +351,7 @@ export function SportsBoard({
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted">{t("potentialWin")}</span>
-                <span className="font-bold text-brand tabular-nums">
+                <span className="font-bold text-brand-strong tabular-nums">
                   {formatMoneyClient(potential, currency, locale)}
                 </span>
               </div>
@@ -346,11 +363,11 @@ export function SportsBoard({
                   {t("loginToBet")}
                 </Link>
               ) : changed || unavailable ? (
-                <button onClick={acceptChanges} className="btn w-full bg-gold text-bg">
+                <button onClick={acceptChanges} className="btn-gold w-full py-3">
                   {t("acceptChanges")}
                 </button>
               ) : (
-                <button onClick={submit} disabled={pending} className="btn-primary w-full">
+                <button onClick={submit} disabled={pending} className="btn-accent w-full py-3 text-base">
                   {pending ? t("placing") : t("placeBet")}
                 </button>
               )}

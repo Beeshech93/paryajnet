@@ -40,7 +40,7 @@ export default async function AdminKyc() {
                 <div>
                   <p className="label">{s.documentType}</p>
                   <p className="font-mono">{s.documentNumber}</p>
-                  <p className="text-xs text-brand">{t("kyc.checksumOk")}</p>
+                  <p className="text-xs text-brand-strong">{t("kyc.checksumOk")}</p>
                 </div>
                 <div>
                   <p className="label">{t("kyc.birthDate")}</p>

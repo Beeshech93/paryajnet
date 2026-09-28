@@ -13,8 +13,8 @@ export async function generateMetadata() {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  PENDING: "bg-gold/15 text-gold",
-  COMPLETED: "bg-brand/15 text-brand",
+  PENDING: "bg-gold/15 text-gold-strong",
+  COMPLETED: "bg-brand/15 text-brand-strong",
   REJECTED: "bg-danger/15 text-danger",
 };
 
@@ -135,7 +135,9 @@ export default async function WalletPage({ params }: { params: Promise<{ locale:
                 <LocalTime value={tx.createdAt} />
               </span>
               <span className="flex-1">{t(`txType.${tx.type}`)}</span>
-              <span className={`font-semibold tabular-nums ${tx.amount.isNegative() ? "text-ink" : "text-brand"}`}>
+              <span
+                className={`font-semibold tabular-nums ${tx.amount.isNegative() ? "text-ink" : "text-brand-strong"}`}
+              >
                 {tx.amount.isNegative() ? "" : "+"}
                 {formatMoney(tx.amount, currency, locale)}
               </span>

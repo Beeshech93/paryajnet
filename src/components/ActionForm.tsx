@@ -32,7 +32,7 @@ export function ActionForm({ action, children, className, success, resetOnSucces
 export function FormMessage({ state, success }: { state: ActionResult<unknown> | null; success?: string }) {
   const t = useTranslations("errors");
   if (!state) return null;
-  if (state.ok) return success ? <p className="mt-2 text-sm text-brand">{success}</p> : null;
+  if (state.ok) return success ? <p className="mt-2 text-sm text-brand-strong">{success}</p> : null;
   return (
     <p role="alert" className="mt-2 text-sm text-danger">
       {t.has(state.error) ? t(state.error, state.params) : t("unexpected")}

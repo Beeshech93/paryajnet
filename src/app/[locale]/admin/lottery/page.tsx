@@ -53,7 +53,7 @@ export default async function AdminLottery() {
                   {Object.entries(stakes).map(([c, v]) => ` · ${formatMoney(v, c, locale)}`)}
                 </span>
                 {d.first && (
-                  <span className="ml-auto font-display font-bold text-gold">
+                  <span className="ml-auto font-display font-bold text-gold-strong">
                     {d.first} · {d.second} · {d.third}
                   </span>
                 )}

@@ -15,10 +15,16 @@ export async function Header() {
     : null;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-bg/90 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
-        <Link href="/" className="font-display text-xl font-bold tracking-tight">
-          Paryaj<span className="text-brand">Net</span>
+        <Link href="/" className="flex items-center gap-2 font-display text-xl font-bold tracking-tight">
+          <span className="relative flex size-8 items-center justify-center rounded-xl bg-brand shadow-pop" aria-hidden>
+            <span className="absolute -top-1 -right-1 size-3 rounded-full bg-gold ring-2 ring-white" />
+            <span className="text-sm font-black text-brand-ink">P</span>
+          </span>
+          <span>
+            Paryaj<span className="text-danger">Net</span>
+          </span>
         </Link>
         <NavLinks isAdmin={user?.role === "ADMIN"} />
         <div className="ml-auto flex items-center gap-2">
@@ -26,11 +32,14 @@ export async function Header() {
           <LocaleSwitcher />
           {user ? (
             <>
-              <Link href="/wallet" className="rounded-lg bg-surface-2 px-3 py-1.5 text-sm font-bold tabular-nums">
+              <Link
+                href="/wallet"
+                className="rounded-full bg-gold px-3 py-1.5 text-sm font-bold text-ink tabular-nums shadow-sm"
+              >
                 {formatMoney(wallet?.balance ?? 0, currency, locale)}
               </Link>
               <details className="relative">
-                <summary className="flex size-9 cursor-pointer list-none items-center justify-center rounded-full bg-brand font-bold text-brand-ink">
+                <summary className="flex size-9 cursor-pointer list-none items-center justify-center rounded-full bg-gradient-to-br from-brand to-sky-500 font-bold text-white shadow-sm">
                   {user.name.slice(0, 1).toUpperCase()}
                 </summary>
                 <div className="card absolute right-0 mt-2 w-48 p-1 text-sm shadow-xl">
@@ -56,7 +65,7 @@ export async function Header() {
               <Link href="/login" className="btn-ghost py-1.5">
                 {t("login")}
               </Link>
-              <Link href="/register" className="btn-primary py-1.5">
+              <Link href="/register" className="btn-accent py-1.5">
                 {t("register")}
               </Link>
             </>

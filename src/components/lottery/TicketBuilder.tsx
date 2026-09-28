@@ -97,7 +97,7 @@ export function TicketBuilder({
                 setType(ty);
                 setNumbers("");
               }}
-              className={`chip border px-3 py-1.5 ${type === ty ? "border-gold bg-gold text-bg" : "border-line text-muted"}`}
+              className={`chip border px-3 py-1.5 ${type === ty ? "border-gold bg-gold text-ink" : "border-line text-muted"}`}
             >
               {t(`types.${ty}`)}
             </button>
@@ -178,7 +178,7 @@ export function TicketBuilder({
             {t("total")}: <span className="font-bold tabular-nums">{formatMoneyClient(total, currency, locale)}</span>
           </p>
           {signedIn ? (
-            <button className="btn-primary bg-gold" onClick={buy} disabled={pending}>
+            <button className="btn-gold" onClick={buy} disabled={pending}>
               {pending ? "…" : t("buy")}
             </button>
           ) : (

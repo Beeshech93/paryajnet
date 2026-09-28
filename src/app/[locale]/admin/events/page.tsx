@@ -69,7 +69,7 @@ export default async function AdminEvents() {
                     {e.externalId && ` · feed:${e.externalId}`}
                   </p>
                   {!isLive && e.startsAt < now && (
-                    <span className="chip bg-gold/15 text-gold">{t("events.started")}</span>
+                    <span className="chip bg-gold/15 text-gold-strong">{t("events.started")}</span>
                   )}
                   {suspended > 0 && (
                     <span className="chip bg-danger/15 text-danger">
@@ -148,7 +148,7 @@ export default async function AdminEvents() {
                 </div>
 
                 <details className="mt-3">
-                  <summary className="cursor-pointer text-xs font-semibold text-brand">
+                  <summary className="cursor-pointer text-xs font-semibold text-brand-strong">
                     {t("events.markets", { count: e.markets.length })}
                   </summary>
                   <div className="mt-3 grid gap-3 lg:grid-cols-3">
@@ -161,7 +161,7 @@ export default async function AdminEvents() {
                             <ActionForm action={toggleMarketAction}>
                               <input type="hidden" name="marketId" value={m.id} />
                               <button
-                                className={`chip ${m.status === "OPEN" ? "bg-brand/15 text-brand" : "bg-danger/15 text-danger"}`}
+                                className={`chip ${m.status === "OPEN" ? "bg-brand/15 text-brand-strong" : "bg-danger/15 text-danger"}`}
                               >
                                 {m.status === "OPEN" ? t("events.open_") : t("events.suspended")}
                               </button>
@@ -188,7 +188,7 @@ export default async function AdminEvents() {
                               <span className="w-8 text-right text-[11px] text-muted" title={t("events.legs")}>
                                 {legCount.get(s.id) ?? 0}
                               </span>
-                              <button className="text-xs text-brand" aria-label={t("save")}>
+                              <button className="text-xs text-brand-strong" aria-label={t("save")}>
                                 ✓
                               </button>
                             </ActionForm>

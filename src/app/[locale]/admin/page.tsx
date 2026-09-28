@@ -63,7 +63,7 @@ export default async function AdminOverview() {
         {kpis.map((k) => (
           <div key={k.label} className="card p-4">
             <p className="text-xs text-muted">{k.label}</p>
-            <p className={`mt-1 font-display text-3xl font-bold tabular-nums ${k.alert ? "text-gold" : ""}`}>
+            <p className={`mt-1 font-display text-3xl font-bold tabular-nums ${k.alert ? "text-gold-strong" : ""}`}>
               {k.value}
             </p>
           </div>

@@ -23,8 +23,8 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
   const lastKyc = await prisma.kycSubmission.findFirst({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
   const KYC_STYLE: Record<string, string> = {
     NONE: "bg-surface-2 text-muted",
-    PENDING: "bg-gold/15 text-gold",
-    VERIFIED: "bg-brand/15 text-brand",
+    PENDING: "bg-gold/15 text-gold-strong",
+    VERIFIED: "bg-brand/15 text-brand-strong",
     REJECTED: "bg-danger/15 text-danger",
   };
 

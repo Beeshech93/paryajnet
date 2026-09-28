@@ -66,7 +66,7 @@ export default function RegisterPage() {
       </ActionForm>
       <p className="mt-4 text-center text-sm text-muted">
         {t("haveAccount")}{" "}
-        <Link href="/login" className="text-brand">
+        <Link href="/login" className="text-brand-strong">
           {t("loginCta")}
         </Link>
       </p>

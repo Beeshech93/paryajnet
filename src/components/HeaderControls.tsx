@@ -38,7 +38,7 @@ export function CurrencySwitcher({ current }: { current: string }) {
           key={c}
           type="button"
           onClick={() => start(() => setCurrencyAction(c))}
-          className={`rounded-md px-2 py-1 transition ${c === current ? "bg-brand text-brand-ink" : "text-muted hover:text-ink"}`}
+          className={`rounded-md px-2 py-1 transition ${c === current ? "bg-brand text-brand-ink shadow-sm" : "text-muted hover:text-ink"}`}
         >
           {c}
         </button>
@@ -64,7 +64,7 @@ export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
           <Link
             key={l.href}
             href={l.href}
-            className={`rounded-lg px-3 py-2 whitespace-nowrap transition ${active ? "bg-surface-2 text-ink" : "text-muted hover:text-ink"}`}
+            className={`rounded-full px-4 py-2 whitespace-nowrap transition ${active ? "bg-brand/15 text-brand-strong" : "text-muted hover:bg-surface-2 hover:text-ink"}`}
           >
             {l.label}
           </Link>
