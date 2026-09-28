@@ -1,7 +1,9 @@
+import { after } from "next/server";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SportsBoard, type BoardEvent } from "@/components/sports/SportsBoard";
 import { prisma } from "@/lib/db";
+import { autoSync } from "@/lib/sports-sync";
 import { LIMITS } from "@/lib/money";
 
 export async function generateMetadata() {
@@ -9,8 +11,13 @@ export async function generateMetadata() {
   return { title: t("sports") };
 }
 
+// Leaves room for the background odds/results sync scheduled with after().
+export const maxDuration = 60;
+
 export default async function SportsPage({ params }: { params: Promise<{ locale: string }> }) {
   setRequestLocale((await params).locale);
+  // Refresh real odds/results in the background when their interval has passed.
+  after(autoSync);
   const t = await getTranslations("sports");
 
   const events = await prisma.event.findMany({

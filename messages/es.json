@@ -167,7 +167,8 @@
       "banners": "Banners",
       "settings": "Configuración",
       "orders": "Servicios",
-      "whatsapp": "WhatsApp"
+      "whatsapp": "WhatsApp",
+      "sportsData": "Datos deportivos"
     },
     "overview": "Resumen",
     "kpi": {
@@ -384,6 +385,31 @@
         "not_configured": "Sin configurar",
         "error": "Error"
       }
+    },
+    "sportsData": {
+      "title": "Datos deportivos reales",
+      "connected": "The Odds API conectado",
+      "notConfigured": "Sin configurar",
+      "quota": "{remaining} créditos de la API restantes este mes",
+      "intro": "Partidos, cuotas (mediana de casas europeas menos tu margen), marcadores en vivo y resultados vienen de The Odds API. Los partidos terminados liquidan automáticamente los servicios confirmados.",
+      "setup": "Crea una clave gratis en the-odds-api.com y agrégala en Vercel → Settings → Environment Variables; luego vuelve a desplegar:",
+      "lastOdds": "Última actualización de cuotas",
+      "lastScores": "Última revisión de resultados",
+      "games": "{count, plural, one {# partido próximo} other {# partidos próximos}}",
+      "syncOdds": "Actualizar cuotas ahora",
+      "syncScores": "Revisar resultados ahora",
+      "synced": "Listo.",
+      "leagues": "Ligas",
+      "outOfSeason": "Seleccionadas pero fuera de temporada ahora: {leagues}",
+      "margin": "Margen de la casa (%)",
+      "oddsHours": "Actualizar cuotas cada (horas)",
+      "scoresMinutes": "Revisar resultados cada (minutos)",
+      "costHint": "Cada actualización de cuotas cuesta unos {credits} créditos (≈ {monthly}/mes con este intervalo). Los resultados solo gastan créditos mientras hay partidos en curso. El plan gratis tiene 500 créditos al mes.",
+      "save": "Guardar",
+      "saved": "Guardado.",
+      "demo": "{count, plural, one {# partido de demostración} other {# partidos de demostración}} (no vienen de la API) todavía se muestran a los clientes.",
+      "removeDemo": "Eliminar partidos de demostración",
+      "demoRemoved": "Partidos de demostración eliminados."
     }
   },
   "errors": {
@@ -459,7 +485,8 @@
     "order_not_payable": "Este servicio no tiene premio por pagar.",
     "payout_key_missing": "Primero agrega la clave PIX del cliente.",
     "whatsapp_not_configured": "El agente de WhatsApp no está configurado (EVOLUTION_API_URL / EVOLUTION_API_KEY).",
-    "whatsapp_token_missing": "Primero define EVOLUTION_WEBHOOK_TOKEN."
+    "whatsapp_token_missing": "Primero define EVOLUTION_WEBHOOK_TOKEN.",
+    "odds_api_key_missing": "Primero define ODDS_API_KEY."
   },
   "ads": {
     "label": "Publicidad"

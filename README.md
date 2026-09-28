@@ -46,7 +46,7 @@ Then in **Admin → Configuración** enter your PIX key (it goes into every paym
 
 | Area | |
 | --- | --- |
-| Sports | Football: 1X2, double chance, goals 1.5/2.5/3.5, handicap, BTTS, correct score (Poisson pricing from 1X2 + O/U 2.5). Basketball: winner, spread, total. Singles and accumulators. Live scores and admin live console. Odds feed at `POST /api/feed`. |
+| Sports | **Real data from [The Odds API](https://the-odds-api.com)** (`ODDS_API_KEY`): games and odds (median of European bookmakers minus the house margin), live scores and results, which settle confirmed services automatically. Leagues, margin and update intervals in `/admin/sports-data`; syncs run after page views and by cron, throttled to protect the API quota. Football: 1X2 and totals from bookmakers, plus double chance, BTTS, handicaps and correct score derived with a Poisson model. Basketball: winner, spread, total. Games can also be created by hand or pushed to `POST /api/feed`. |
 | Lottery | Borlette on the official NY (2:30 pm / 10:30 pm), FL (1:30 pm / 9:45 pm), GA (12:29 pm / 6:59 pm / 11:34 pm) draws, Eastern Time, created automatically. Lot 1 = last two digits of Pick 3; lots 2–3 = the pairs of Pick 4. Borlette 50×/20×/10×, Loto 3 500×, Mariage 1000×. Results by hand or `POST /api/lottery/results`. |
 | Services | `Order` model: bet or ticket, customer name + WhatsApp, amount, deadline, receipt, payout and PIX key, status history. |
 | WhatsApp agent | `src/lib/agent.ts` + `src/lib/evolution.ts`. Webhook `POST /api/whatsapp/webhook?token=…`. Every message is logged (Admin → WhatsApp). Works without Evolution (messages logged as `SKIPPED`). Setup: [evolution/README.md](evolution/README.md). |

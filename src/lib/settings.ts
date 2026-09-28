@@ -19,3 +19,26 @@ export async function savePaymentSettings(values: PaymentSettings) {
     ),
   );
 }
+
+// ---------- Generic settings ----------
+
+export async function getSetting(key: string): Promise<string | null> {
+  return (await prisma.setting.findUnique({ where: { key } }))?.value ?? null;
+}
+
+export async function setSetting(key: string, value: string) {
+  await prisma.setting.upsert({ where: { key }, create: { key, value }, update: { value } });
+}
+
+/** Take a short-lived lock stored in settings; returns false if someone else holds it. */
+export async function tryLock(key: string, ttlMs: number): Promise<boolean> {
+  const now = Date.now();
+  const current = Number(await getSetting(key));
+  if (current && now - current < ttlMs) return false;
+  await setSetting(key, String(now));
+  return true;
+}
+
+export async function unlock(key: string) {
+  await prisma.setting.deleteMany({ where: { key } });
+}

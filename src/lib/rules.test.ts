@@ -253,3 +253,133 @@ test("Evolution API webhook messages are parsed and filtered", async () => {
   );
   assert.equal(parseEvolutionMessage({ event: "connection.update", data: {} }), null);
 });
+
+test("The Odds API events become our markets (consensus odds, lines, margin)", async () => {
+  const { consensusPrice, marketsFromApi, scoreOf } = await import("./odds-api");
+  assert.equal(consensusPrice([2.1, 2.2, 2.3], 0), 2.2);
+  assert.equal(consensusPrice([2.0, 2.2], 0), 2.1);
+  assert.equal(consensusPrice([3.0], 5), 2.9); // 1 + 2 × 0.95
+  assert.equal(consensusPrice([], 0), null);
+
+  const book = (h: number, d: number, a: number, over: number, under: number, point = 2.5) => ({
+    key: "b",
+    markets: [
+      {
+        key: "h2h",
+        outcomes: [
+          { name: "Flamengo", price: h },
+          { name: "Draw", price: d },
+          { name: "Palmeiras", price: a },
+        ],
+      },
+      {
+        key: "totals",
+        outcomes: [
+          { name: "Over", price: over, point },
+          { name: "Under", price: under, point },
+        ],
+      },
+    ],
+  });
+  const soccer = {
+    id: "e1",
+    sport_key: "soccer_brazil_campeonato",
+    sport_title: "Brasileirão Série A",
+    commence_time: "2026-10-04T19:00:00Z",
+    home_team: "Flamengo",
+    away_team: "Palmeiras",
+    bookmakers: [
+      book(2.2, 3.3, 3.2, 2.0, 1.8),
+      book(2.3, 3.2, 3.1, 2.05, 1.78),
+      book(2.25, 3.25, 3.3, 1.95, 1.85),
+      book(2.2, 3.3, 3.2, 1.5, 2.5, 1.5),
+    ],
+  };
+  const markets = marketsFromApi(soccer, 0);
+  const one = markets.find((m) => m.type === "1X2")!;
+  assert.deepEqual(one.selections, [
+    { code: "1", odds: 2.22 }, // median of 2.2, 2.3, 2.25, 2.2
+    { code: "X", odds: 3.27 },
+    { code: "2", odds: 3.2 },
+  ]);
+  const ou25 = markets.filter((m) => m.type === "OU" && m.line === 2.5);
+  assert.equal(ou25.length, 1, "bookmaker 2.5 total replaces the model's");
+  assert.deepEqual(ou25[0].selections, [
+    { code: "OVER", odds: 2 },
+    { code: "UNDER", odds: 1.8 },
+  ]);
+  // The 1.5 line has only one bookmaker, so it comes from the model instead.
+  assert.ok(markets.some((m) => m.type === "OU" && m.line === 1.5));
+  assert.ok(
+    ["DC", "BTTS", "HCP", "CS"].every((t) => markets.some((m) => m.type === t)),
+    "derived markets",
+  );
+
+  const nba = {
+    id: "e2",
+    sport_key: "basketball_nba",
+    sport_title: "NBA",
+    commence_time: "2026-10-04T23:00:00Z",
+    home_team: "Lakers",
+    away_team: "Celtics",
+    bookmakers: [1, 2].map(() => ({
+      key: "b",
+      markets: [
+        {
+          key: "h2h",
+          outcomes: [
+            { name: "Lakers", price: 2.3 },
+            { name: "Celtics", price: 1.65 },
+          ],
+        },
+        {
+          key: "spreads",
+          outcomes: [
+            { name: "Lakers", price: 1.91, point: 4.5 },
+            { name: "Celtics", price: 1.91, point: -4.5 },
+          ],
+        },
+        {
+          key: "totals",
+          outcomes: [
+            { name: "Over", price: 1.9, point: 226.5 },
+            { name: "Under", price: 1.9, point: 226.5 },
+          ],
+        },
+      ],
+    })),
+  };
+  assert.deepEqual(
+    marketsFromApi(nba, 0).map((m) => `${m.type}:${m.line}`),
+    ["ML:null", "HCP:4.5", "OU:226.5"],
+  );
+  assert.deepEqual(marketsFromApi({ ...soccer, bookmakers: [] }, 0), []);
+
+  assert.deepEqual(
+    scoreOf({
+      id: "x",
+      sport_key: "s",
+      commence_time: "",
+      completed: true,
+      home_team: "A",
+      away_team: "B",
+      scores: [
+        { name: "B", score: "1" },
+        { name: "A", score: "2" },
+      ],
+    }),
+    { home: 2, away: 1 },
+  );
+  assert.equal(
+    scoreOf({
+      id: "x",
+      sport_key: "s",
+      commence_time: "",
+      completed: false,
+      home_team: "A",
+      away_team: "B",
+      scores: null,
+    }),
+    null,
+  );
+});

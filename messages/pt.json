@@ -167,7 +167,8 @@
       "banners": "Banners",
       "settings": "Configurações",
       "orders": "Serviços",
-      "whatsapp": "WhatsApp"
+      "whatsapp": "WhatsApp",
+      "sportsData": "Dados esportivos"
     },
     "overview": "Resumo",
     "kpi": {
@@ -384,6 +385,31 @@
         "not_configured": "Não configurado",
         "error": "Erro"
       }
+    },
+    "sportsData": {
+      "title": "Dados esportivos reais",
+      "connected": "The Odds API conectado",
+      "notConfigured": "Não configurado",
+      "quota": "{remaining} créditos da API restantes neste mês",
+      "intro": "Jogos, odds (mediana de casas europeias menos sua margem), placares ao vivo e resultados vêm da The Odds API. Jogos encerrados liquidam automaticamente os serviços confirmados.",
+      "setup": "Crie uma chave grátis em the-odds-api.com e adicione na Vercel → Settings → Environment Variables; depois faça um novo deploy:",
+      "lastOdds": "Última atualização de odds",
+      "lastScores": "Última verificação de resultados",
+      "games": "{count, plural, one {# próximo jogo} other {# próximos jogos}}",
+      "syncOdds": "Atualizar odds agora",
+      "syncScores": "Verificar resultados agora",
+      "synced": "Pronto.",
+      "leagues": "Ligas",
+      "outOfSeason": "Selecionadas mas fora de temporada agora: {leagues}",
+      "margin": "Margem da casa (%)",
+      "oddsHours": "Atualizar odds a cada (horas)",
+      "scoresMinutes": "Verificar resultados a cada (minutos)",
+      "costHint": "Cada atualização de odds custa cerca de {credits} créditos (≈ {monthly}/mês neste intervalo). Os resultados só gastam créditos enquanto há jogos em andamento. O plano grátis tem 500 créditos por mês.",
+      "save": "Salvar",
+      "saved": "Salvo.",
+      "demo": "{count, plural, one {# jogo de demonstração} other {# jogos de demonstração}} (fora da API) ainda aparecem para os clientes.",
+      "removeDemo": "Remover jogos de demonstração",
+      "demoRemoved": "Jogos de demonstração removidos."
     }
   },
   "errors": {
@@ -459,7 +485,8 @@
     "order_not_payable": "Este serviço não tem prêmio a pagar.",
     "payout_key_missing": "Primeiro adicione a chave PIX do cliente.",
     "whatsapp_not_configured": "O agente do WhatsApp não está configurado (EVOLUTION_API_URL / EVOLUTION_API_KEY).",
-    "whatsapp_token_missing": "Primeiro defina EVOLUTION_WEBHOOK_TOKEN."
+    "whatsapp_token_missing": "Primeiro defina EVOLUTION_WEBHOOK_TOKEN.",
+    "odds_api_key_missing": "Primeiro defina ODDS_API_KEY."
   },
   "ads": {
     "label": "Publicidade"

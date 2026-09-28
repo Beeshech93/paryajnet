@@ -12,6 +12,7 @@ import { confirmOrder, markPaid, rejectOrder, setPayoutKey } from "@/lib/orders"
 import { sendPaymentInfo, sendText } from "@/lib/agent";
 import { evolution, evolutionConfig } from "@/lib/evolution";
 import { normalizeBrPhone } from "@/lib/orders-rules";
+import { saveSportsDataConfig, syncOdds, syncScores } from "@/lib/sports-sync";
 import { basketballMarkets, footballMarkets } from "@/lib/pricing";
 import {
   cancelEvent,
@@ -352,5 +353,50 @@ export async function whatsappTestAction(_prev: ActionResult | null, form: FormD
 export async function whatsappLogoutAction(_prev: ActionResult | null, _form: FormData): Promise<ActionResult> {
   return asAdmin(async () => {
     await evolution.logout(evo());
+  });
+}
+
+// ---------- Real sports data (The Odds API) ----------
+
+export async function saveSportsDataAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const sports = form
+      .getAll("sports")
+      .map(String)
+      .filter((s) => /^[a-z0-9_]+$/.test(s));
+    const num = (k: string, min: number, max: number) => {
+      const n = Number(String(form.get(k) ?? "").replace(",", "."));
+      if (!Number.isFinite(n) || n < min || n > max) throw new AppError("invalid_form");
+      return n;
+    };
+    await saveSportsDataConfig({
+      sports,
+      marginPct: num("marginPct", 0, 20),
+      oddsHours: num("oddsHours", 1, 168),
+      scoresMinutes: num("scoresMinutes", 5, 1440),
+    });
+  });
+}
+
+export async function syncOddsNowAction(_prev: ActionResult | null, _form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const r = await syncOdds({ force: true });
+    if ("skipped" in r && r.skipped === "no_key") throw new AppError("odds_api_key_missing");
+  });
+}
+
+export async function syncScoresNowAction(_prev: ActionResult | null, _form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const r = await syncScores({ force: true });
+    if ("skipped" in r && r.skipped === "no_key") throw new AppError("odds_api_key_missing");
+  });
+}
+
+/** Remove the demo games created by the seed (only those without services). */
+export async function removeDemoEventsAction(_prev: ActionResult | null, _form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    await prisma.event.deleteMany({
+      where: { externalId: null, markets: { none: { selections: { some: { legs: { some: {} } } } } } },
+    });
   });
 }

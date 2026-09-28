@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocalTime } from "@/components/LocalTime";
@@ -5,11 +6,17 @@ import { AdSlot } from "@/components/ads/AdSlot";
 import { HeroBanner } from "@/components/home/HeroBanner";
 import { StateBadge } from "@/components/lottery/StateBadge";
 import { prisma } from "@/lib/db";
+import { autoSync } from "@/lib/sports-sync";
 import { ensureUpcomingDraws } from "@/lib/lottery";
 import { formatOdds } from "@/lib/money";
 
+// Leaves room for the background odds/results sync scheduled with after().
+export const maxDuration = 60;
+
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   setRequestLocale((await params).locale);
+  // Refresh real odds/results in the background when their interval has passed.
+  after(autoSync);
   const [t, tl, locale] = await Promise.all([getTranslations("home"), getTranslations("lottery"), getLocale()]);
   await ensureUpcomingDraws();
   const heroMarkets = {

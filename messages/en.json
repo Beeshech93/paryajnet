@@ -167,7 +167,8 @@
       "banners": "Banners",
       "settings": "Settings",
       "orders": "Services",
-      "whatsapp": "WhatsApp"
+      "whatsapp": "WhatsApp",
+      "sportsData": "Sports data"
     },
     "overview": "Overview",
     "kpi": {
@@ -384,6 +385,31 @@
         "not_configured": "Not configured",
         "error": "Error"
       }
+    },
+    "sportsData": {
+      "title": "Real sports data",
+      "connected": "The Odds API connected",
+      "notConfigured": "Not configured",
+      "quota": "{remaining} API credits left this month",
+      "intro": "Games, odds (median of European bookmakers minus your margin), live scores and results come from The Odds API. Finished games settle confirmed services automatically.",
+      "setup": "Create a free key at the-odds-api.com and add it in Vercel → Settings → Environment Variables, then redeploy:",
+      "lastOdds": "Last odds update",
+      "lastScores": "Last results check",
+      "games": "{count, plural, one {# upcoming game} other {# upcoming games}}",
+      "syncOdds": "Update odds now",
+      "syncScores": "Check results now",
+      "synced": "Done.",
+      "leagues": "Leagues",
+      "outOfSeason": "Selected but not in season now: {leagues}",
+      "margin": "House margin (%)",
+      "oddsHours": "Update odds every (hours)",
+      "scoresMinutes": "Check results every (minutes)",
+      "costHint": "Each odds update costs about {credits} credits (≈ {monthly}/month at this interval). Results only use credits while games are in progress. The free plan has 500 credits a month.",
+      "save": "Save",
+      "saved": "Saved.",
+      "demo": "{count, plural, one {# demo game} other {# demo games}} (not from the API) are still shown to customers.",
+      "removeDemo": "Remove demo games",
+      "demoRemoved": "Demo games removed."
     }
   },
   "errors": {
@@ -459,7 +485,8 @@
     "order_not_payable": "This service has no payout to send.",
     "payout_key_missing": "Add the customer's PIX key first.",
     "whatsapp_not_configured": "The WhatsApp agent is not configured (EVOLUTION_API_URL / EVOLUTION_API_KEY).",
-    "whatsapp_token_missing": "Set EVOLUTION_WEBHOOK_TOKEN first."
+    "whatsapp_token_missing": "Set EVOLUTION_WEBHOOK_TOKEN first.",
+    "odds_api_key_missing": "Set ODDS_API_KEY first."
   },
   "ads": {
     "label": "Advertisement"
