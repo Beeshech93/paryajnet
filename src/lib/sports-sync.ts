@@ -34,6 +34,9 @@ export async function saveSportsDataConfig(c: SportsDataConfig) {
   ]);
 }
 
+/** Wait this long before retrying after a run where every league failed. */
+const RETRY_MS = 15 * 60_000;
+
 const externalId = (sportKey: string, id: string) => `oddsapi:${sportKey}:${id}`;
 
 async function recordQuota(remaining: number | null) {
@@ -46,8 +49,12 @@ export async function syncOdds({ force = false } = {}) {
   const cfg = await sportsDataConfig();
   const last = Number(await getSetting("odds.lastOddsSync"));
   if (!force && last && Date.now() - last < cfg.oddsHours * 3_600_000) return { skipped: "fresh" as const };
+  // After a failed run (bad key, API down) retry sooner instead of waiting a full interval.
+  const failed = Number(await getSetting("odds.lastOddsFailure"));
+  if (!force && failed && Date.now() - failed < RETRY_MS) return { skipped: "retry_later" as const };
   if (!(await tryLock("odds.lockOdds", 5 * 60_000))) return { skipped: "running" as const };
   const summary: Record<string, string> = {};
+  let succeeded = 0;
   try {
     for (const sportKey of cfg.sports) {
       const sport = sportOf(sportKey);
@@ -71,11 +78,12 @@ export async function syncOdds({ force = false } = {}) {
         const results = await ingestFeed({ events });
         const errors = results.filter((r) => r.action === "error").length;
         summary[sportKey] = `${events.length} games${errors ? `, ${errors} errors` : ""}`;
+        succeeded++;
       } catch (err) {
         summary[sportKey] = `error: ${String(err).slice(0, 120)}`;
       }
     }
-    await setSetting("odds.lastOddsSync", String(Date.now()));
+    await setSetting(succeeded > 0 || cfg.sports.length === 0 ? "odds.lastOddsSync" : "odds.lastOddsFailure", String(Date.now()));
     await setSetting("odds.lastOddsResult", JSON.stringify(summary));
     return { summary };
   } finally {
