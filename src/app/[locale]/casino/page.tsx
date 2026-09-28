@@ -1,3 +1,4 @@
+import { AdSlot } from "@/components/ads/AdSlot";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { CasinoGames } from "@/components/casino/CasinoGames";
 import { getCurrentUser } from "@/lib/auth";
@@ -24,6 +25,7 @@ export default async function CasinoPage({ params }: { params: Promise<{ locale:
     <div>
       <h1 className="font-display text-3xl font-bold">{t("title")}</h1>
       <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>
+      <AdSlot placement="CASINO" className="mt-5" />
       <CasinoGames
         key={fairness?.serverSeedHash ?? "guest"}
         currency={currency}

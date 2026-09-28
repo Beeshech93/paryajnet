@@ -291,3 +291,34 @@ model KycFile {
 
   submission KycSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 }
+
+// ---------- Advertising ----------
+
+model Banner {
+  id          String    @id @default(cuid())
+  title       String // internal name / alt text
+  kind        String    @default("IMAGE") // IMAGE | TEXT
+  placement   String // HOME | SPORTS | LOTTERY | CASINO
+  locale      String    @default("all") // all | pt | es | fr | en
+  linkUrl     String?
+  // IMAGE banners: wide desktop image (~4:1) and optional mobile image (~2:1).
+  imageMime   String?
+  image       Bytes?
+  mobileMime  String?
+  mobileImage Bytes?
+  // TEXT banners (house ads).
+  headline    String?
+  body        String?
+  cta         String?
+  theme       String    @default("blue") // blue | yellow | red
+  active      Boolean   @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  sort        Int       @default(0)
+  views       Int       @default(0)
+  clicks      Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([placement, active])
+}

@@ -136,6 +136,70 @@ async function main() {
     }
   }
 
+  // House ads for the advertising spaces (text banners, no image needed).
+  if ((await prisma.banner.count()) === 0) {
+    await prisma.banner.createMany({
+      data: [
+        {
+          title: "Borlette ES",
+          kind: "TEXT",
+          placement: "HOME",
+          locale: "es",
+          theme: "yellow",
+          headline: "Borlette: Nueva York, Florida y Georgia",
+          body: "Sorteos oficiales todos los días. Paga hasta 1000×.",
+          cta: "Jugar ahora",
+          linkUrl: "/es/lottery",
+        },
+        {
+          title: "Borlette PT",
+          kind: "TEXT",
+          placement: "HOME",
+          locale: "pt",
+          theme: "yellow",
+          headline: "Borlette: Nova York, Flórida e Geórgia",
+          body: "Sorteios oficiais todos os dias. Paga até 1000×.",
+          cta: "Jogar agora",
+          linkUrl: "/pt/lottery",
+        },
+        {
+          title: "Live ES",
+          kind: "TEXT",
+          placement: "HOME",
+          locale: "es",
+          theme: "red",
+          headline: "Apuestas en vivo",
+          body: "Momios que cambian minuto a minuto.",
+          cta: "Ver en vivo",
+          linkUrl: "/es/sports",
+          sort: 1,
+        },
+        {
+          title: "Live PT",
+          kind: "TEXT",
+          placement: "SPORTS",
+          locale: "pt",
+          theme: "red",
+          headline: "Apostas ao vivo",
+          body: "Odds que mudam minuto a minuto.",
+          cta: "Ver ao vivo",
+          linkUrl: "/pt/sports",
+        },
+        {
+          title: "Casino ES",
+          kind: "TEXT",
+          placement: "CASINO",
+          locale: "es",
+          theme: "blue",
+          headline: "Juego 100% verificable",
+          body: "Comprueba cada resultado con tu semilla.",
+          cta: null,
+          linkUrl: null,
+        },
+      ],
+    });
+  }
+
   console.log("Seed complete.");
 }
 

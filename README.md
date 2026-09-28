@@ -31,6 +31,7 @@ npm run dev                 # http://localhost:3000
 | Billetera | Una billetera por moneda, libro mayor inmutable (`Transaction`), débitos atómicos que nunca dejan saldo negativo. |
 | Pagos | Depósitos PIX (BRL), SPEI y OXXO (MXN); retiros PIX / SPEI con aprobación manual. Adaptadores de proveedor en `src/lib/payment-providers/`; webhook firmado en `POST /api/payments/webhook` (idempotente, retiene pagos con monto distinto). Proveedor **simulado** por defecto (`PAYMENTS_PROVIDER=mock`). |
 | Juego responsable | Verificación de 18+ en el registro, límite diario de depósito, autoexclusión (1 día a 1 año). |
+| Publicidad | Espacios de banner en inicio, deportes, lotería y casino (etiqueta "Publicidad"). Banners de **imagen** (computadora ~1200×300 y móvil opcional ~800×400) o de **texto** (título, texto, botón y color azul/amarillo/rojo). Rotación automática, idioma, fechas de inicio/fin, conteo de vistas (cuando el banner se ve en pantalla) y clics, CTR. Gestión en `/admin/banners`; un espacio sin banners activos no se muestra. |
 | Admin | `/admin`: KPIs y GGR por moneda, crear/editar/suspender/liquidar eventos, sorteos, aprobar pagos, lista de jugadores. |
 
 Límites por moneda (apuesta mín./máx., pago máximo, depósitos): `src/lib/money.ts`.

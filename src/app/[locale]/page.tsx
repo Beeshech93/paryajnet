@@ -1,6 +1,7 @@
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocalTime } from "@/components/LocalTime";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { StateBadge } from "@/components/lottery/StateBadge";
 import { prisma } from "@/lib/db";
 import { ensureUpcomingDraws } from "@/lib/lottery";
@@ -84,6 +85,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <p className="mt-6 text-xs font-medium text-brand-ink/70">{t("payments")}</p>
         </div>
       </section>
+
+      <AdSlot placement="HOME" />
 
       <section className="grid gap-4 sm:grid-cols-3">
         {verticals.map((v) => (

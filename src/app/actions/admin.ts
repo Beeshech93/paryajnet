@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { cancelDraw, settleDraw, settleWithPicks } from "@/lib/lottery";
 import { Decimal } from "@/lib/money";
 import { approveWithdrawal, confirmDeposit, rejectDeposit, rejectWithdrawal } from "@/lib/payments";
+import { BANNER_LOCALES, BANNER_THEMES, normalizeLink, PLACEMENTS, readImage } from "@/lib/banners";
 import { reviewKyc } from "@/lib/kyc";
 import { basketballMarkets, footballMarkets } from "@/lib/pricing";
 import {
@@ -206,5 +207,70 @@ export async function paymentDecisionAction(_prev: ActionResult | null, form: Fo
     } else {
       await (decision === "approve" ? approveWithdrawal(id) : rejectWithdrawal(id));
     }
+  });
+}
+
+const bannerSchema = z.object({
+  title: z.string().trim().min(1).max(100),
+  kind: z.enum(["IMAGE", "TEXT"]),
+  placement: z.enum(PLACEMENTS),
+  locale: z.enum(BANNER_LOCALES),
+  theme: z.enum(BANNER_THEMES).default("blue"),
+  headline: z.string().trim().max(80).optional(),
+  body: z.string().trim().max(160).optional(),
+  cta: z.string().trim().max(30).optional(),
+  linkUrl: z.string().optional(),
+  sort: z.coerce.number().int().min(0).max(999).default(0),
+  startsAt: z.string().optional(),
+  endsAt: z.string().optional(),
+});
+
+export async function createBannerAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const raw = Object.fromEntries([...form.entries()].filter(([, v]) => typeof v === "string"));
+    const parsed = bannerSchema.safeParse(raw);
+    if (!parsed.success) throw new AppError("invalid_form");
+    const d = parsed.data;
+    if (d.kind === "TEXT" && !d.headline) throw new AppError("banner_headline_missing");
+    const date = (v?: string) => (v ? new Date(v) : null);
+    const [startsAt, endsAt] = [date(d.startsAt), date(d.endsAt)];
+    if (startsAt && endsAt && endsAt <= startsAt) throw new AppError("invalid_dates");
+
+    const image = d.kind === "IMAGE" ? await readImage(form.get("image") as File | null, true) : null;
+    const mobile = d.kind === "IMAGE" ? await readImage(form.get("mobileImage") as File | null, false) : null;
+
+    await prisma.banner.create({
+      data: {
+        title: d.title,
+        kind: d.kind,
+        placement: d.placement,
+        locale: d.locale,
+        theme: d.theme,
+        headline: d.kind === "TEXT" ? d.headline : null,
+        body: d.kind === "TEXT" ? d.body || null : null,
+        cta: d.kind === "TEXT" ? d.cta || null : null,
+        linkUrl: normalizeLink(d.linkUrl ?? ""),
+        sort: d.sort,
+        startsAt,
+        endsAt,
+        imageMime: image?.mime,
+        image: image?.data,
+        mobileMime: mobile?.mime,
+        mobileImage: mobile?.data,
+      },
+    });
+  });
+}
+
+export async function toggleBannerAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const banner = await prisma.banner.findUniqueOrThrow({ where: { id: String(form.get("bannerId")) } });
+    await prisma.banner.update({ where: { id: banner.id }, data: { active: !banner.active } });
+  });
+}
+
+export async function deleteBannerAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    await prisma.banner.delete({ where: { id: String(form.get("bannerId")) } });
   });
 }

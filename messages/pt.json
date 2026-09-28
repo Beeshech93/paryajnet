@@ -281,7 +281,8 @@
       "lottery": "Sorteios",
       "payments": "Pagamentos",
       "users": "Jogadores",
-      "kyc": "KYC"
+      "kyc": "KYC",
+      "banners": "Banners"
     },
     "overview": "Resumo",
     "kpi": {
@@ -376,6 +377,47 @@
       "birthDate": "Data de nascimento",
       "note": "Nota para o jogador (obrigatória para recusar)",
       "notePlaceholder": "ex.: A foto está desfocada"
+    },
+    "banners": {
+      "new": "Novo banner",
+      "list": "Banners",
+      "created": "Banner criado.",
+      "kinds": {
+        "TEXT": "Texto",
+        "IMAGE": "Imagem"
+      },
+      "title": "Nome (interno / texto alternativo)",
+      "placement": "Posição",
+      "placements": {
+        "HOME": "Início",
+        "SPORTS": "Esportes",
+        "LOTTERY": "Loteria",
+        "CASINO": "Cassino"
+      },
+      "language": "Idioma",
+      "allLanguages": "Todos os idiomas",
+      "order": "Ordem",
+      "image": "Imagem para computador",
+      "imageHint": "Recomendado 1200×300 px (4:1). JPG, PNG, WebP ou GIF, máx. 1,5 MB.",
+      "mobileImage": "Imagem para celular (opcional)",
+      "mobileHint": "Recomendado 800×400 px (2:1). Exibida em celulares.",
+      "headline": "Título",
+      "body": "Texto",
+      "cta": "Botão",
+      "color": "Cor",
+      "link": "Link (opcional)",
+      "startsAt": "Início (opcional)",
+      "endsAt": "Fim (opcional)",
+      "create": "Criar banner",
+      "live": "No ar",
+      "scheduled": "Agendado / encerrado",
+      "paused": "Pausado",
+      "hasMobile": "com imagem para celular",
+      "stats": "{views} visualizações · {clicks} cliques · CTR {ctr}%",
+      "pause": "Pausar",
+      "activate": "Ativar",
+      "delete": "Excluir",
+      "empty": "Ainda não há banners. Os espaços publicitários ficam ocultos até você adicionar um."
     }
   },
   "errors": {
@@ -432,7 +474,11 @@
     "kyc_file_too_large": "Cada foto deve ter menos de {max} MB.",
     "note_required": "Adicione uma nota explicando a recusa.",
     "invalid_picks": "O Pick 3 deve ter 3 dígitos e o Pick 4, 4 dígitos.",
-    "draw_not_held": "Este sorteio ainda não aconteceu."
+    "draw_not_held": "Este sorteio ainda não aconteceu.",
+    "invalid_link": "O link deve começar com https:// ou /.",
+    "banner_image_missing": "Adicione a imagem para computador.",
+    "banner_headline_missing": "Adicione um título.",
+    "invalid_dates": "O fim deve ser depois do início."
   },
   "kyc": {
     "title": "Verificação de identidade",
@@ -464,5 +510,8 @@
       "DOCUMENT_BACK": "Verso",
       "SELFIE": "Selfie"
     }
+  },
+  "ads": {
+    "label": "Publicidade"
   }
 }

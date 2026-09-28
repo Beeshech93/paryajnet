@@ -281,7 +281,8 @@
       "lottery": "Draws",
       "payments": "Payments",
       "users": "Players",
-      "kyc": "KYC"
+      "kyc": "KYC",
+      "banners": "Banners"
     },
     "overview": "Overview",
     "kpi": {
@@ -376,6 +377,47 @@
       "birthDate": "Date of birth",
       "note": "Note to the player (required to reject)",
       "notePlaceholder": "e.g. The photo is blurry"
+    },
+    "banners": {
+      "new": "New banner",
+      "list": "Banners",
+      "created": "Banner created.",
+      "kinds": {
+        "TEXT": "Text",
+        "IMAGE": "Image"
+      },
+      "title": "Name (internal / alt text)",
+      "placement": "Placement",
+      "placements": {
+        "HOME": "Home",
+        "SPORTS": "Sports",
+        "LOTTERY": "Lottery",
+        "CASINO": "Casino"
+      },
+      "language": "Language",
+      "allLanguages": "All languages",
+      "order": "Order",
+      "image": "Desktop image",
+      "imageHint": "Recommended 1200×300 px (4:1). JPG, PNG, WebP or GIF, max 1.5 MB.",
+      "mobileImage": "Mobile image (optional)",
+      "mobileHint": "Recommended 800×400 px (2:1). Shown on phones.",
+      "headline": "Headline",
+      "body": "Text",
+      "cta": "Button",
+      "color": "Colour",
+      "link": "Link (optional)",
+      "startsAt": "Starts (optional)",
+      "endsAt": "Ends (optional)",
+      "create": "Create banner",
+      "live": "Live",
+      "scheduled": "Scheduled / ended",
+      "paused": "Paused",
+      "hasMobile": "with mobile image",
+      "stats": "{views} views · {clicks} clicks · CTR {ctr}%",
+      "pause": "Pause",
+      "activate": "Activate",
+      "delete": "Delete",
+      "empty": "No banners yet. Ad spaces stay hidden until you add one."
     }
   },
   "errors": {
@@ -432,7 +474,11 @@
     "kyc_file_too_large": "Each photo must be under {max} MB.",
     "note_required": "Add a note explaining the rejection.",
     "invalid_picks": "Pick 3 must have 3 digits and Pick 4 must have 4 digits.",
-    "draw_not_held": "This draw has not taken place yet."
+    "draw_not_held": "This draw has not taken place yet.",
+    "invalid_link": "The link must start with https:// or /.",
+    "banner_image_missing": "Add the desktop image.",
+    "banner_headline_missing": "Add a headline.",
+    "invalid_dates": "The end must be after the start."
   },
   "kyc": {
     "title": "Identity verification",
@@ -464,5 +510,8 @@
       "DOCUMENT_BACK": "Back",
       "SELFIE": "Selfie"
     }
+  },
+  "ads": {
+    "label": "Advertisement"
   }
 }
