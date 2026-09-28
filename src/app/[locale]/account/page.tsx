@@ -1,6 +1,8 @@
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { LocalTime } from "@/components/LocalTime";
 import { DepositLimitForm, SelfExclusionForm } from "@/components/account/AccountForms";
+import { KycForm } from "@/components/account/KycForm";
+import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { formatMoney } from "@/lib/money";
 import { getActiveCurrency, getOrCreateWallet } from "@/lib/wallet";
@@ -17,6 +19,14 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
   const currency = await getActiveCurrency(user, locale);
   const wallet = await getOrCreateWallet(user.id, currency);
   const excluded = user.selfExcludedUntil && user.selfExcludedUntil > new Date();
+  const tk = await getTranslations("kyc");
+  const lastKyc = await prisma.kycSubmission.findFirst({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
+  const KYC_STYLE: Record<string, string> = {
+    NONE: "bg-surface-2 text-muted",
+    PENDING: "bg-gold/15 text-gold",
+    VERIFIED: "bg-brand/15 text-brand",
+    REJECTED: "bg-danger/15 text-danger",
+  };
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -37,6 +47,22 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
             <LocalTime value={user.createdAt} dateOnly />
           </p>
         </div>
+      </section>
+
+      <section id="kyc" className="card p-5">
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="font-display text-lg font-bold">{tk("title")}</h2>
+          <span className={`chip ${KYC_STYLE[user.kycStatus]}`}>{tk(`status.${user.kycStatus}`)}</span>
+        </div>
+        <p className="mt-1 text-sm text-muted">{tk(`body.${user.kycStatus}`)}</p>
+        {user.kycStatus === "REJECTED" && lastKyc?.reviewNote && (
+          <p className="mt-2 rounded-xl bg-danger/10 p-3 text-sm text-danger">
+            {tk("reason")}: {lastKyc.reviewNote}
+          </p>
+        )}
+        {(user.kycStatus === "NONE" || user.kycStatus === "REJECTED") && (
+          <KycForm defaultType={currency === "MXN" ? "CURP" : "CPF"} defaultName={user.name} />
+        )}
       </section>
 
       <section className="card p-5">

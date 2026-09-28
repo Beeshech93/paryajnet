@@ -8,11 +8,12 @@ const zero = new Decimal(0);
 export default async function AdminOverview() {
   const [locale, t] = await Promise.all([getLocale(), getTranslations("admin")]);
 
-  const [users, pendingWithdrawals, pendingDeposits, openBets] = await Promise.all([
+  const [users, pendingWithdrawals, pendingDeposits, openBets, pendingKyc] = await Promise.all([
     prisma.user.count(),
     prisma.payment.count({ where: { kind: "WITHDRAWAL", status: "PENDING" } }),
     prisma.payment.count({ where: { kind: "DEPOSIT", status: "PENDING" } }),
     prisma.bet.count({ where: { status: "OPEN" } }),
+    prisma.kycSubmission.count({ where: { status: "PENDING" } }),
   ]);
 
   const rows = await Promise.all(
@@ -52,12 +53,13 @@ export default async function AdminOverview() {
     { label: t("kpi.openBets"), value: openBets },
     { label: t("kpi.pendingDeposits"), value: pendingDeposits },
     { label: t("kpi.pendingWithdrawals"), value: pendingWithdrawals, alert: pendingWithdrawals > 0 },
+    { label: t("kpi.pendingKyc"), value: pendingKyc, alert: pendingKyc > 0 },
   ];
 
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold">{t("overview")}</h1>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         {kpis.map((k) => (
           <div key={k.label} className="card p-4">
             <p className="text-xs text-muted">{k.label}</p>

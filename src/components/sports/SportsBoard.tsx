@@ -1,13 +1,22 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { placeBetAction } from "@/app/actions/play";
 import { FormMessage } from "@/components/ActionForm";
 import { LocalTime } from "@/components/LocalTime";
+import { codeLabel, isMainMarket, marketLabel, pickLabel } from "@/lib/labels";
 import { formatMoneyClient, formatNumber } from "@/lib/locale-tags";
 import type { ActionResult } from "@/lib/types";
+
+export type BoardMarket = {
+  id: string;
+  type: string;
+  line: number | null;
+  status: string;
+  selections: { id: string; code: string; odds: string }[];
+};
 
 export type BoardEvent = {
   id: string;
@@ -16,28 +25,30 @@ export type BoardEvent = {
   homeTeam: string;
   awayTeam: string;
   startsAt: string;
-  markets: {
-    id: string;
-    type: string;
-    status: string;
-    selections: { id: string; code: string; odds: string }[];
-  }[];
+  status: string;
+  clock: string | null;
+  homeScore: number | null;
+  awayScore: number | null;
+  markets: BoardMarket[];
 };
 
-type Leg = { eventId: string; selectionId: string; odds: string; label: string; match: string };
+type Leg = { eventId: string; selectionId: string; odds: string; label: string; match: string; live: boolean };
 
 export function SportsBoard({
   events,
   currency,
   limits,
   signedIn,
+  liveDelaySeconds,
 }: {
   events: BoardEvent[];
   currency: string;
   limits: { min: number; max: number };
   signedIn: boolean;
+  liveDelaySeconds: number;
 }) {
   const t = useTranslations("sports");
+  const tr = (k: string, v?: Record<string, string | number>) => t(k, v);
   const locale = useLocale();
   const router = useRouter();
   const [sport, setSport] = useState<string>("all");
@@ -45,41 +56,69 @@ export function SportsBoard({
   const [stake, setStake] = useState<string>(String(limits.min * 10));
   const [result, setResult] = useState<ActionResult<unknown> | null>(null);
   const [pending, start] = useTransition();
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const hasLive = events.some((e) => e.status === "LIVE");
+
+  // Keep odds, scores and suspensions fresh: every 5s with live games, else every 30s.
+  useEffect(() => {
+    const id = setInterval(() => router.refresh(), hasLive ? 5000 : 30000);
+    return () => clearInterval(id);
+  }, [hasLive, router]);
+
+  // Current state of every selection on the board, to detect changes in the slip.
+  const current = useMemo(() => {
+    const map = new Map<string, { odds: string; open: boolean }>();
+    for (const e of events)
+      for (const m of e.markets)
+        for (const s of m.selections) map.set(s.id, { odds: s.odds, open: m.status === "OPEN" });
+    return map;
+  }, [events]);
 
   const sports = useMemo(() => Array.from(new Set(events.map((e) => e.sport))), [events]);
   const visible = events.filter((e) => sport === "all" || e.sport === sport);
+  const live = visible.filter((e) => e.status === "LIVE");
   const leagues = useMemo(() => {
     const map = new Map<string, BoardEvent[]>();
-    for (const e of visible) map.set(e.league, [...(map.get(e.league) ?? []), e]);
+    for (const e of visible.filter((x) => x.status !== "LIVE")) map.set(e.league, [...(map.get(e.league) ?? []), e]);
     return Array.from(map);
   }, [visible]);
 
-  function selectionLabel(e: BoardEvent, type: string, code: string) {
-    if (type === "1X2") return code === "1" ? e.homeTeam : code === "2" ? e.awayTeam : t("draw");
-    return `${t(`markets.${type}`)} · ${t(`codes.${code}`)}`;
-  }
-
-  function toggle(e: BoardEvent, type: string, sel: { id: string; code: string; odds: string }) {
+  function toggle(e: BoardEvent, m: BoardMarket, sel: { id: string; code: string; odds: string }) {
     setResult(null);
-    setSlip((current) => {
-      if (current.some((l) => l.selectionId === sel.id)) return current.filter((l) => l.selectionId !== sel.id);
+    setSlip((cur) => {
+      if (cur.some((l) => l.selectionId === sel.id)) return cur.filter((l) => l.selectionId !== sel.id);
       const leg: Leg = {
         eventId: e.id,
         selectionId: sel.id,
         odds: sel.odds,
-        label: selectionLabel(e, type, sel.code),
+        label: pickLabel(tr, e, m, sel.code),
         match: `${e.homeTeam} — ${e.awayTeam}`,
+        live: e.status === "LIVE",
       };
       // One leg per event: picking another outcome of the same match replaces it.
-      return [...current.filter((l) => l.eventId !== e.id), leg];
+      return [...cur.filter((l) => l.eventId !== e.id), leg];
     });
   }
 
-  const totalOdds = slip.reduce((acc, l) => acc * Number(l.odds), 1);
+  const legState = slip.map((l) => {
+    const now = current.get(l.selectionId);
+    return { ...l, unavailable: !now || !now.open, newOdds: now && now.odds !== l.odds ? now.odds : null };
+  });
+  const changed = legState.some((l) => l.newOdds);
+  const unavailable = legState.some((l) => l.unavailable);
+
+  const totalOdds = Math.floor(slip.reduce((acc, l) => acc * Number(l.odds), 1) * 100) / 100;
   const stakeNum = Number(stake.replace(",", "."));
-  const potential = Number.isFinite(stakeNum)
-    ? Math.floor(((stakeNum * Math.floor(totalOdds * 100)) / 100) * 100) / 100
-    : 0;
+  const potential = Number.isFinite(stakeNum) ? Math.floor(stakeNum * totalOdds * 100) / 100 : 0;
+
+  function acceptChanges() {
+    setSlip((cur) =>
+      cur
+        .filter((l) => current.get(l.selectionId)?.open)
+        .map((l) => ({ ...l, odds: current.get(l.selectionId)!.odds })),
+    );
+  }
 
   function submit() {
     start(async () => {
@@ -89,8 +128,83 @@ export function SportsBoard({
       });
       setResult(res);
       if (res.ok) setSlip([]);
-      if (!res.ok && (res.error === "odds_changed" || res.error === "selection_unavailable")) router.refresh();
+      router.refresh();
     });
+  }
+
+  function EventCard({ e }: { e: BoardEvent }) {
+    const main = e.markets.filter((m) => isMainMarket(e.sport, m));
+    const extra = e.markets.filter((m) => !isMainMarket(e.sport, m));
+    const open = expanded[e.id];
+    const isLive = e.status === "LIVE";
+    return (
+      <article className={`card p-4 ${isLive ? "border-danger/40" : ""}`}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="font-semibold">
+            {e.homeTeam} <span className="text-muted">vs</span> {e.awayTeam}
+          </p>
+          {isLive ? (
+            <p className="flex items-center gap-2 text-sm">
+              <span className="chip animate-pulse bg-danger text-white">{t("live")}</span>
+              <span className="font-display text-lg font-bold tabular-nums">
+                {e.homeScore} - {e.awayScore}
+              </span>
+              {e.clock && <span className="text-xs text-muted tabular-nums">{e.clock}</span>}
+            </p>
+          ) : (
+            <p className="text-xs text-muted">
+              <LocalTime value={e.startsAt} />
+            </p>
+          )}
+        </div>
+        <MarketGrid e={e} markets={main} />
+        {extra.length > 0 && (
+          <>
+            {open && <MarketGrid e={e} markets={extra} />}
+            <button
+              onClick={() => setExpanded((x) => ({ ...x, [e.id]: !open }))}
+              className="mt-3 text-xs font-semibold text-brand"
+            >
+              {open ? t("fewerMarkets") : t("moreMarkets", { count: extra.length })}
+            </button>
+          </>
+        )}
+      </article>
+    );
+  }
+
+  function MarketGrid({ e, markets }: { e: BoardEvent; markets: BoardMarket[] }) {
+    return (
+      <div className="mt-3 grid gap-3 md:grid-cols-3">
+        {markets.map((m) => (
+          <div key={m.id} className={m.type === "CS" ? "md:col-span-3" : ""}>
+            <p className="mb-1 flex items-center gap-1 text-[11px] font-medium text-muted uppercase">
+              {marketLabel(tr, e.sport, m)}
+              {m.status !== "OPEN" && <span aria-label={t("suspended")}>🔒</span>}
+            </p>
+            <div
+              className={m.type === "CS" ? "grid grid-cols-4 gap-1.5 sm:grid-cols-6 lg:grid-cols-9" : "flex gap-1.5"}
+            >
+              {m.selections.map((s) => {
+                const active = slip.some((l) => l.selectionId === s.id);
+                return (
+                  <button
+                    key={s.id}
+                    disabled={m.status !== "OPEN"}
+                    data-active={active}
+                    onClick={() => toggle(e, m, s)}
+                    className="odds-btn disabled:opacity-40"
+                  >
+                    <span className="truncate text-[11px] opacity-70">{codeLabel(tr, e, m, s.code)}</span>
+                    <span className="font-bold tabular-nums">{formatNumber(s.odds, locale)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -110,47 +224,29 @@ export function SportsBoard({
           </div>
         )}
 
-        {leagues.length === 0 && <p className="card p-8 text-center text-muted">{t("noEvents")}</p>}
+        {live.length > 0 && (
+          <section>
+            <h2 className="mb-2 flex items-center gap-2 text-xs font-bold tracking-wider text-danger uppercase">
+              <span className="size-2 animate-pulse rounded-full bg-danger" /> {t("liveNow")}
+            </h2>
+            <div className="space-y-2">
+              {live.map((e) => (
+                <EventCard key={e.id} e={e} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {leagues.length === 0 && live.length === 0 && (
+          <p className="card p-8 text-center text-muted">{t("noEvents")}</p>
+        )}
 
         {leagues.map(([league, list]) => (
           <section key={league}>
             <h2 className="mb-2 text-xs font-bold tracking-wider text-muted uppercase">{league}</h2>
             <div className="space-y-2">
               {list.map((e) => (
-                <article key={e.id} className="card p-4">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <p className="font-semibold">
-                      {e.homeTeam} <span className="text-muted">vs</span> {e.awayTeam}
-                    </p>
-                    <p className="text-xs text-muted">
-                      <LocalTime value={e.startsAt} />
-                    </p>
-                  </div>
-                  <div className="mt-3 grid gap-3 md:grid-cols-[3fr_2fr_2fr]">
-                    {e.markets.map((m) => (
-                      <div key={m.id}>
-                        <p className="mb-1 text-[11px] font-medium text-muted uppercase">{t(`markets.${m.type}`)}</p>
-                        <div className="flex gap-1.5">
-                          {m.selections.map((s) => {
-                            const active = slip.some((l) => l.selectionId === s.id);
-                            return (
-                              <button
-                                key={s.id}
-                                disabled={m.status !== "OPEN"}
-                                data-active={active}
-                                onClick={() => toggle(e, m.type, s)}
-                                className="odds-btn disabled:opacity-40"
-                              >
-                                <span className="text-[11px] opacity-70">{t(`codes.${s.code}`)}</span>
-                                <span className="font-bold tabular-nums">{formatNumber(s.odds, locale)}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </article>
+                <EventCard key={e.id} e={e} />
               ))}
             </div>
           </section>
@@ -176,13 +272,31 @@ export function SportsBoard({
           </p>
 
           <ul className="mt-3 space-y-2">
-            {slip.map((l) => (
-              <li key={l.selectionId} className="flex items-start gap-2 rounded-xl bg-surface-2 p-3 text-sm">
+            {legState.map((l) => (
+              <li
+                key={l.selectionId}
+                className={`flex items-start gap-2 rounded-xl p-3 text-sm ${l.unavailable ? "bg-danger/10" : "bg-surface-2"}`}
+              >
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold">{l.label}</p>
+                  <p className="font-semibold">
+                    {l.live && <span className="mr-1 text-[10px] font-bold text-danger">{t("live")}</span>}
+                    {l.label}
+                  </p>
                   <p className="truncate text-xs text-muted">{l.match}</p>
+                  {l.unavailable && <p className="text-xs text-danger">{t("suspended")}</p>}
                 </div>
-                <span className="font-bold text-gold tabular-nums">{formatNumber(l.odds, locale)}</span>
+                <span className="text-right font-bold tabular-nums">
+                  {l.newOdds ? (
+                    <>
+                      <span className="block text-xs text-muted line-through">{formatNumber(l.odds, locale)}</span>
+                      <span className={Number(l.newOdds) > Number(l.odds) ? "text-brand" : "text-danger"}>
+                        {formatNumber(l.newOdds, locale)}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-gold">{formatNumber(l.odds, locale)}</span>
+                  )}
+                </span>
                 <button
                   aria-label={t("remove")}
                   onClick={() => setSlip((s) => s.filter((x) => x.selectionId !== l.selectionId))}
@@ -198,9 +312,7 @@ export function SportsBoard({
             <div className="mt-4 space-y-3 border-t border-line pt-4">
               <div className="flex justify-between text-sm">
                 <span className="text-muted">{t("totalOdds")}</span>
-                <span className="font-bold tabular-nums">
-                  {formatNumber(Math.floor(totalOdds * 100) / 100, locale)}
-                </span>
+                <span className="font-bold tabular-nums">{formatNumber(totalOdds, locale)}</span>
               </div>
               <div>
                 <label className="label" htmlFor="stake">
@@ -226,14 +338,21 @@ export function SportsBoard({
                   {formatMoneyClient(potential, currency, locale)}
                 </span>
               </div>
-              {signedIn ? (
-                <button onClick={submit} disabled={pending} className="btn-primary w-full">
-                  {pending ? "…" : t("placeBet")}
-                </button>
-              ) : (
+              {slip.some((l) => l.live) && (
+                <p className="text-[11px] text-muted">{t("liveDelay", { seconds: liveDelaySeconds })}</p>
+              )}
+              {!signedIn ? (
                 <Link href="/login" className="btn-primary w-full">
                   {t("loginToBet")}
                 </Link>
+              ) : changed || unavailable ? (
+                <button onClick={acceptChanges} className="btn w-full bg-gold text-bg">
+                  {t("acceptChanges")}
+                </button>
+              ) : (
+                <button onClick={submit} disabled={pending} className="btn-primary w-full">
+                  {pending ? t("placing") : t("placeBet")}
+                </button>
               )}
             </div>
           )}

@@ -23,6 +23,7 @@ model User {
   role              String    @default("USER") // USER | ADMIN
   preferredCurrency String    @default("BRL")
   selfExcludedUntil DateTime?
+  kycStatus         String    @default("NONE") // NONE | PENDING | VERIFIED | REJECTED
   createdAt         DateTime  @default(now())
 
   wallets       Wallet[]
@@ -31,6 +32,7 @@ model User {
   tickets       LotteryTicket[]
   casinoSeeds   CasinoSeed[]
   casinoRounds  CasinoRound[]
+  kycSubmissions KycSubmission[]
 }
 
 model Wallet {
@@ -71,7 +73,7 @@ model Payment {
   method       String // PIX | SPEI | OXXO
   amount       Decimal
   status       String   @default("PENDING") // PENDING | COMPLETED | REJECTED
-  providerRef  String?
+  providerRef  String?  @unique
   instructions String? // JSON: what the player needs to pay / where we pay out
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -85,16 +87,19 @@ model Payment {
 // ---------- Sports ----------
 
 model Event {
-  id        String   @id @default(cuid())
-  sport     String // football | basketball | ...
-  league    String
-  homeTeam  String
-  awayTeam  String
-  startsAt  DateTime
-  status    String   @default("SCHEDULED") // SCHEDULED | SETTLED | CANCELLED
-  homeScore Int?
-  awayScore Int?
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  externalId String?  @unique // id in an external odds feed, if any
+  sport      String // football | basketball
+  league     String
+  homeTeam   String
+  awayTeam   String
+  startsAt   DateTime
+  status     String   @default("SCHEDULED") // SCHEDULED | LIVE | SETTLED | CANCELLED
+  clock      String? // live match clock, e.g. "67'" or "Q3 04:12"
+  homeScore  Int?
+  awayScore  Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   markets Market[]
 
@@ -102,13 +107,18 @@ model Event {
 }
 
 model Market {
-  id      String @id @default(cuid())
+  id      String   @id @default(cuid())
   eventId String
-  type    String // 1X2 | OU25 | BTTS
-  status  String @default("OPEN") // OPEN | SUSPENDED | SETTLED
+  type    String // 1X2 | DC | ML | OU | HCP | BTTS | CS (see src/lib/sports-rules.ts)
+  line    Decimal? // OU: total line; HCP: handicap applied to the home side
+  key     String // type, or "type:line" — unique per event
+  sort    Int      @default(0)
+  status  String   @default("OPEN") // OPEN | SUSPENDED | SETTLED
 
   event      Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
   selections Selection[]
+
+  @@unique([eventId, key])
 }
 
 model Selection {
@@ -120,6 +130,8 @@ model Selection {
 
   market Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
   legs   BetLeg[]
+
+  @@unique([marketId, code])
 }
 
 model Bet {
@@ -238,4 +250,34 @@ model CasinoRound {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+}
+
+// ---------- KYC ----------
+
+model KycSubmission {
+  id             String    @id @default(cuid())
+  userId         String
+  fullName       String
+  documentType   String // CPF | CURP | PASSPORT
+  documentNumber String // normalised (digits / uppercase)
+  status         String    @default("PENDING") // PENDING | VERIFIED | REJECTED
+  reviewNote     String?
+  reviewedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files KycFile[]
+
+  @@index([status])
+  @@index([documentType, documentNumber])
+}
+
+model KycFile {
+  id           String @id @default(cuid())
+  submissionId String
+  kind         String // DOCUMENT_FRONT | DOCUMENT_BACK | SELFIE
+  mime         String
+  data         Bytes
+
+  submission KycSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 }

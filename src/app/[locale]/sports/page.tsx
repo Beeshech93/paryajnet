@@ -3,6 +3,7 @@ import { SportsBoard, type BoardEvent } from "@/components/sports/SportsBoard";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { CURRENCY_LIMITS } from "@/lib/money";
+import { LIVE_BET_DELAY_MS } from "@/lib/sports";
 import { getActiveCurrency } from "@/lib/wallet";
 
 export async function generateMetadata() {
@@ -16,9 +17,15 @@ export default async function SportsPage({ params }: { params: Promise<{ locale:
   const currency = await getActiveCurrency(user, locale);
 
   const events = await prisma.event.findMany({
-    where: { status: "SCHEDULED", startsAt: { gt: new Date() } },
+    where: { OR: [{ status: "LIVE" }, { status: "SCHEDULED", startsAt: { gt: new Date() } }] },
     orderBy: { startsAt: "asc" },
-    include: { markets: { include: { selections: true } } },
+    include: {
+      markets: {
+        where: { status: { not: "SETTLED" } },
+        orderBy: { sort: "asc" },
+        include: { selections: { orderBy: { id: "asc" } } },
+      },
+    },
   });
 
   const board: BoardEvent[] = events.map((e) => ({
@@ -28,9 +35,14 @@ export default async function SportsPage({ params }: { params: Promise<{ locale:
     homeTeam: e.homeTeam,
     awayTeam: e.awayTeam,
     startsAt: e.startsAt.toISOString(),
+    status: e.status,
+    clock: e.clock,
+    homeScore: e.homeScore,
+    awayScore: e.awayScore,
     markets: e.markets.map((m) => ({
       id: m.id,
       type: m.type,
+      line: m.line === null ? null : Number(m.line),
       status: m.status,
       selections: m.selections.map((s) => ({ id: s.id, code: s.code, odds: s.odds.toString() })),
     })),
@@ -45,6 +57,7 @@ export default async function SportsPage({ params }: { params: Promise<{ locale:
         currency={currency}
         limits={{ min: CURRENCY_LIMITS[currency].minStake, max: CURRENCY_LIMITS[currency].maxStake }}
         signedIn={!!user}
+        liveDelaySeconds={Math.round(LIVE_BET_DELAY_MS / 1000)}
       />
     </div>
   );

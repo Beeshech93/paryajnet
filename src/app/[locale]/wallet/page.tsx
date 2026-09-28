@@ -1,4 +1,5 @@
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { LocalTime } from "@/components/LocalTime";
 import { DepositForm, SimulateButton, WithdrawForm } from "@/components/wallet/WalletForms";
 import { requireUser } from "@/lib/auth";
@@ -68,7 +69,16 @@ export default async function WalletPage({ params }: { params: Promise<{ locale:
           <p className="text-xs text-muted">
             {t("withdrawMin", { min: formatMoney(limits.minWithdrawal, currency, locale) })}
           </p>
-          <WithdrawForm methods={limits.withdrawalMethods} currency={currency} />
+          {user.kycStatus === "VERIFIED" ? (
+            <WithdrawForm methods={limits.withdrawalMethods} currency={currency} />
+          ) : (
+            <div className="mt-4 rounded-xl bg-gold/10 p-4 text-sm">
+              <p>{t("kycNeeded")}</p>
+              <Link href="/account#kyc" className="btn-primary mt-3">
+                {t("verifyNow")}
+              </Link>
+            </div>
+          )}
         </section>
       </div>
 

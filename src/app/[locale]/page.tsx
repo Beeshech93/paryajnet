@@ -12,7 +12,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       where: { status: "SCHEDULED", startsAt: { gt: new Date() } },
       orderBy: { startsAt: "asc" },
       take: 4,
-      include: { markets: { where: { type: "1X2" }, include: { selections: true } } },
+      include: {
+        markets: { where: { type: { in: ["1X2", "ML"] } }, include: { selections: { orderBy: { id: "asc" } } } },
+      },
     }),
     prisma.lotteryDraw.findFirst({
       where: { status: "OPEN", closesAt: { gt: new Date() } },

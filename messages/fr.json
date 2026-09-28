@@ -1,7 +1,22 @@
 {
-  "meta": { "description": "Paris sportifs, loterie et casino en BRL et MXN." },
-  "nav": { "sports": "Sports", "lottery": "Loterie", "casino": "Casino", "admin": "Admin", "wallet": "Portefeuille", "myBets": "Mes paris", "account": "Compte", "logout": "Se déconnecter", "login": "Connexion", "register": "S'inscrire" },
-  "footer": { "responsible": "Les jeux d'argent peuvent créer une dépendance. Jouez de manière responsable. Réservé aux personnes de 18 ans et plus. Fixez des limites de dépôt ou faites une pause depuis votre compte." },
+  "meta": {
+    "description": "Paris sportifs, loterie et casino en BRL et MXN."
+  },
+  "nav": {
+    "sports": "Sports",
+    "lottery": "Loterie",
+    "casino": "Casino",
+    "admin": "Admin",
+    "wallet": "Portefeuille",
+    "myBets": "Mes paris",
+    "account": "Compte",
+    "logout": "Se déconnecter",
+    "login": "Connexion",
+    "register": "S'inscrire"
+  },
+  "footer": {
+    "responsible": "Les jeux d'argent peuvent créer une dépendance. Jouez de manière responsable. Réservé aux personnes de 18 ans et plus. Fixez des limites de dépôt ou faites une pause depuis votre compte."
+  },
   "home": {
     "kicker": "Sports · Loterie · Casino",
     "title": "Pariez sur ce que vous aimez, dans votre devise.",
@@ -43,10 +58,36 @@
     "title": "Sports",
     "subtitle": "Choisissez des issues pour faire un pari simple ou combiné.",
     "draw": "Nul",
-    "markets": { "1X2": "Résultat du match", "OU25": "Buts 2.5", "BTTS": "Les deux équipes marquent" },
-    "codes": { "1": "1", "X": "X", "2": "2", "OVER": "Plus", "UNDER": "Moins", "YES": "Oui", "NO": "Non" },
+    "markets": {
+      "1X2": "Résultat du match",
+      "BTTS": "Les deux équipes marquent",
+      "DC": "Double chance",
+      "ML": "Vainqueur",
+      "OU": "Buts {line}",
+      "OU_points": "Total de points {line}",
+      "HCP": "Handicap",
+      "CS": "Score exact"
+    },
+    "codes": {
+      "1": "1",
+      "X": "X",
+      "2": "2",
+      "OVER": "Plus",
+      "UNDER": "Moins",
+      "YES": "Oui",
+      "NO": "Non",
+      "1X": "1X",
+      "12": "12",
+      "X2": "X2",
+      "HOME": "Domicile",
+      "AWAY": "Extérieur",
+      "OTHER": "Autre"
+    },
     "allSports": "Tous",
-    "sportNames": { "football": "Football", "basketball": "Basket-ball" },
+    "sportNames": {
+      "football": "Football",
+      "basketball": "Basket-ball"
+    },
     "noEvents": "Aucun match disponible pour le moment.",
     "slip": "Coupon",
     "clear": "Vider",
@@ -60,12 +101,24 @@
     "potentialWin": "Gain potentiel",
     "placeBet": "Parier",
     "loginToBet": "Connectez-vous pour parier",
-    "placed": "Pari enregistré. Bonne chance !"
+    "placed": "Pari enregistré. Bonne chance !",
+    "live": "EN DIRECT",
+    "liveNow": "En direct",
+    "suspended": "Suspendu",
+    "moreMarkets": "+{count} marchés",
+    "fewerMarkets": "Moins de marchés",
+    "acceptChanges": "Accepter les nouvelles cotes",
+    "placing": "Confirmation…",
+    "liveDelay": "Les paris en direct sont confirmés après {seconds} secondes."
   },
   "lottery": {
     "title": "Loterie et borlette",
     "subtitle": "Composez un ticket avec autant de lignes que vous voulez et jouez le prochain tirage.",
-    "types": { "BORLETTE": "Borlette", "LOTO3": "Loto 3", "MARIAGE": "Mariage" },
+    "types": {
+      "BORLETTE": "Borlette",
+      "LOTO3": "Loto 3",
+      "MARIAGE": "Mariage"
+    },
     "rules": {
       "BORLETTE": "2 chiffres. Gagne si votre numéro sort en 1er, 2e ou 3e lot.",
       "LOTO3": "3 chiffres. Gagne si vous trouvez exactement le premier prix.",
@@ -92,7 +145,10 @@
   "casino": {
     "title": "Casino",
     "subtitle": "Jeux instantanés avec 1 % d'avantage maison. Chaque résultat est vérifiable.",
-    "games": { "DICE": "Dice", "LIMBO": "Limbo" },
+    "games": {
+      "DICE": "Dice",
+      "LIMBO": "Limbo"
+    },
     "won": "Vous avez gagné {amount} !",
     "lost": "Pas de chance cette fois.",
     "rollUnder": "Tirage inférieur à",
@@ -127,28 +183,60 @@
     "withdrawMin": "Minimum {min}. Traité sous 24 heures.",
     "payments": "Paiements",
     "noPayments": "Aucun paiement pour l'instant.",
-    "kind": { "DEPOSIT": "Dépôt", "WITHDRAWAL": "Retrait" },
-    "status": { "PENDING": "En attente", "COMPLETED": "Terminé", "REJECTED": "Refusé" },
+    "kind": {
+      "DEPOSIT": "Dépôt",
+      "WITHDRAWAL": "Retrait"
+    },
+    "status": {
+      "PENDING": "En attente",
+      "COMPLETED": "Terminé",
+      "REJECTED": "Refusé"
+    },
     "instructions": {
       "PIX": "Payez avec le code PIX copier-coller dans votre application bancaire. Le solde est mis à jour dès la confirmation.",
       "SPEI": "Effectuez un virement SPEI vers cette CLABE avec la référence ci-dessous.",
       "OXXO": "Payez dans n'importe quel magasin OXXO avec cette référence."
     },
-    "fields": { "pixCode": "Code PIX", "clabe": "CLABE", "reference": "Référence", "beneficiary": "Bénéficiaire", "pixKey": "Clé PIX" },
+    "fields": {
+      "pixCode": "Code PIX",
+      "clabe": "CLABE",
+      "reference": "Référence",
+      "beneficiary": "Bénéficiaire",
+      "pixKey": "Clé PIX"
+    },
     "simulate": "Simuler le paiement (mode test)",
     "history": "Opérations",
     "noTransactions": "Aucune opération pour l'instant.",
-    "txType": { "DEPOSIT": "Dépôt", "WITHDRAWAL": "Retrait", "BET": "Pari", "WIN": "Gain", "REFUND": "Remboursement", "ADJUSTMENT": "Ajustement" },
+    "txType": {
+      "DEPOSIT": "Dépôt",
+      "WITHDRAWAL": "Retrait",
+      "BET": "Pari",
+      "WIN": "Gain",
+      "REFUND": "Remboursement",
+      "ADJUSTMENT": "Ajustement"
+    },
     "amount": "Montant",
     "depositCta": "Générer le paiement",
     "withdrawCta": "Demander un retrait",
     "depositCreated": "Paiement créé — voir les instructions ci-dessous.",
-    "withdrawCreated": "Retrait demandé."
+    "withdrawCreated": "Retrait demandé.",
+    "kycNeeded": "Vérifiez votre identité pour retirer. Cela prend 2 minutes.",
+    "verifyNow": "Vérifier maintenant"
   },
   "bets": {
     "title": "Mes paris",
-    "tabs": { "sports": "Sports", "lottery": "Loterie", "casino": "Casino" },
-    "status": { "OPEN": "En cours", "PENDING": "En attente", "WON": "Gagné", "LOST": "Perdu", "VOID": "Annulé" },
+    "tabs": {
+      "sports": "Sports",
+      "lottery": "Loterie",
+      "casino": "Casino"
+    },
+    "status": {
+      "OPEN": "En cours",
+      "PENDING": "En attente",
+      "WON": "Gagné",
+      "LOST": "Perdu",
+      "VOID": "Annulé"
+    },
     "payout": "Gain"
   },
   "account": {
@@ -172,25 +260,102 @@
     "exclude": "Mettre mon compte en pause"
   },
   "admin": {
-    "nav": { "overview": "Vue d'ensemble", "events": "Événements", "lottery": "Tirages", "payments": "Paiements", "users": "Joueurs" },
+    "nav": {
+      "overview": "Vue d'ensemble",
+      "events": "Événements",
+      "lottery": "Tirages",
+      "payments": "Paiements",
+      "users": "Joueurs",
+      "kyc": "KYC"
+    },
     "overview": "Vue d'ensemble",
-    "kpi": { "users": "Joueurs", "openBets": "Paris sportifs en cours", "pendingDeposits": "Dépôts en attente", "pendingWithdrawals": "Retraits en attente" },
-    "table": { "currency": "Devise", "balances": "Soldes joueurs", "deposits": "Dépôts", "withdrawals": "Retraits", "ggrSports": "PBJ sports", "ggrLottery": "PBJ loterie", "ggrCasino": "PBJ casino" },
+    "kpi": {
+      "users": "Joueurs",
+      "openBets": "Paris sportifs en cours",
+      "pendingDeposits": "Dépôts en attente",
+      "pendingWithdrawals": "Retraits en attente",
+      "pendingKyc": "KYC à examiner"
+    },
+    "table": {
+      "currency": "Devise",
+      "balances": "Soldes joueurs",
+      "deposits": "Dépôts",
+      "withdrawals": "Retraits",
+      "ggrSports": "PBJ sports",
+      "ggrLottery": "PBJ loterie",
+      "ggrCasino": "PBJ casino"
+    },
     "ggrNote": "PBJ (produit brut des jeux) = mises réglées moins gains versés.",
     "done": "Terminé.",
     "empty": "Rien pour l'instant.",
     "events": {
-      "create": "Nouvel événement", "sport": "Sport", "league": "Ligue", "home": "Domicile", "away": "Extérieur", "startsAt": "Coup d'envoi",
-      "createCta": "Créer l'événement", "open": "Événements ouverts", "started": "Commencé — à régler", "open_": "Ouvert", "suspended": "Suspendu",
-      "legs": "Paris ouverts sur cette sélection", "settle": "Régler avec le score", "cancel": "Annuler et rembourser", "recent": "Réglés récemment", "cancelled": "Annulé"
+      "create": "Nouvel événement",
+      "sport": "Sport",
+      "league": "Ligue",
+      "home": "Domicile",
+      "away": "Extérieur",
+      "startsAt": "Coup d'envoi",
+      "createCta": "Créer l'événement",
+      "open": "Événements ouverts",
+      "started": "Commencé — à régler",
+      "open_": "Ouvert",
+      "suspended": "Suspendu",
+      "legs": "Paris ouverts sur cette sélection",
+      "settle": "Régler avec le score",
+      "cancel": "Annuler et rembourser",
+      "recent": "Réglés récemment",
+      "cancelled": "Annulé",
+      "autoMarkets": "Double chance, buts 1.5/3.5, handicaps et score exact sont générés automatiquement à partir de ces cotes (modèle de Poisson).",
+      "spread": "Handicap (domicile)",
+      "total": "Total de points",
+      "suspendedCount": "{count} suspendus",
+      "clock": "Chrono",
+      "updateLive": "Mettre à jour",
+      "startLive": "Passer en direct",
+      "suspendAll": "Tout suspendre",
+      "openAll": "Tout ouvrir",
+      "liveHint": "Un changement de score suspend tous les marchés. Ajustez les cotes puis rouvrez-les.",
+      "markets": "{count} marchés — modifier les cotes",
+      "marketType": "Marché",
+      "line": "Ligne",
+      "selections": "Sélections (code=cote)",
+      "addMarket": "Ajouter / mettre à jour"
     },
     "lottery": {
-      "create": "Nouveau tirage", "name": "Nom", "closesAt": "Clôture", "createCta": "Créer le tirage",
+      "create": "Nouveau tirage",
+      "name": "Nom",
+      "closesAt": "Clôture",
+      "createCta": "Créer le tirage",
       "tickets": "{count, plural, one {# ticket} other {# tickets}}",
-      "first": "1er (3 chiffres)", "second": "2e", "third": "3e", "settle": "Publier les résultats", "cancel": "Annuler et rembourser"
+      "first": "1er (3 chiffres)",
+      "second": "2e",
+      "third": "3e",
+      "settle": "Publier les résultats",
+      "cancel": "Annuler et rembourser"
     },
-    "payments": { "pending": "Paiements en attente", "approve": "Approuver", "reject": "Refuser", "note": "N'approuvez un dépôt qu'une fois l'argent reçu. Refuser un retrait rend les fonds au joueur.", "recent": "Récents" },
-    "users": { "user": "Joueur", "joined": "Inscription", "balances": "Soldes", "activity": "Paris / tickets / tours", "flags": "Indicateurs", "excluded": "Auto-exclu" }
+    "payments": {
+      "pending": "Paiements en attente",
+      "approve": "Approuver",
+      "reject": "Refuser",
+      "note": "N'approuvez un dépôt qu'une fois l'argent reçu. Refuser un retrait rend les fonds au joueur.",
+      "recent": "Récents"
+    },
+    "users": {
+      "user": "Joueur",
+      "joined": "Inscription",
+      "balances": "Soldes",
+      "activity": "Paris / tickets / tours",
+      "flags": "Indicateurs",
+      "excluded": "Auto-exclu"
+    },
+    "save": "Enregistrer",
+    "kyc": {
+      "pending": "Vérifications en attente",
+      "checksumOk": "Chiffres de contrôle valides",
+      "birthDate": "Date de naissance",
+      "note": "Note au joueur (obligatoire pour refuser)",
+      "notePlaceholder": "ex. : La photo est floue"
+    }
   },
   "errors": {
     "unexpected": "Une erreur s'est produite. Réessayez.",
@@ -230,6 +395,51 @@
     "confirm_required": "Cochez la case de confirmation.",
     "start_in_past": "La date doit être dans le futur.",
     "invalid_score": "Score invalide.",
-    "invalid_odds": "La cote doit être comprise entre 1.01 et 1000."
+    "invalid_odds": "La cote doit être comprise entre 1.01 et 1000.",
+    "invalid_market": "Définition de marché invalide.",
+    "not_live": "Cet événement n'est pas en direct.",
+    "kyc_required": "Vérifiez d'abord votre identité (Compte → Vérification d'identité).",
+    "kyc_already_submitted": "Vos documents sont déjà en cours d'examen.",
+    "invalid_document": "Numéro de document invalide.",
+    "invalid_full_name": "Indiquez votre nom complet (prénom et nom).",
+    "invalid_cpf": "CPF invalide.",
+    "invalid_curp": "CURP invalide.",
+    "curp_birthdate_mismatch": "La CURP ne correspond pas à votre date de naissance.",
+    "document_in_use": "Ce document est déjà lié à un autre compte.",
+    "kyc_file_missing": "Joignez toutes les photos requises.",
+    "kyc_file_type": "Les photos doivent être en JPG, PNG ou WebP.",
+    "kyc_file_too_large": "Chaque photo doit faire moins de {max} Mo.",
+    "note_required": "Ajoutez une note expliquant le refus."
+  },
+  "kyc": {
+    "title": "Vérification d'identité",
+    "status": {
+      "NONE": "Non vérifié",
+      "PENDING": "En cours d'examen",
+      "VERIFIED": "Vérifié",
+      "REJECTED": "Refusé"
+    },
+    "body": {
+      "NONE": "Obligatoire pour retirer vos gains. Envoyez une photo de votre pièce d'identité et un selfie.",
+      "PENDING": "Nous examinons vos documents. Cela prend généralement moins de 24 heures.",
+      "VERIFIED": "Votre identité est vérifiée. Vous pouvez retirer.",
+      "REJECTED": "Nous n'avons pas pu vérifier vos documents. Veuillez les renvoyer."
+    },
+    "reason": "Motif",
+    "fullName": "Nom complet comme sur le document",
+    "documentType": "Document",
+    "documentNumber": "Numéro",
+    "passport": "Passeport",
+    "front": "Recto du document (INE, CNH ou RG)",
+    "back": "Verso du document",
+    "selfie": "Selfie avec le document",
+    "privacy": "Vos documents servent uniquement à vérifier votre identité et ne sont visibles que par notre équipe conformité.",
+    "submit": "Envoyer pour vérification",
+    "submitted": "Documents envoyés. Nous vous tiendrons informé.",
+    "files": {
+      "DOCUMENT_FRONT": "Recto",
+      "DOCUMENT_BACK": "Verso",
+      "SELFIE": "Selfie"
+    }
   }
 }

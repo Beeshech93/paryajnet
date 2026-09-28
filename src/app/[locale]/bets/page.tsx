@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { LocalTime } from "@/components/LocalTime";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { pickLabel } from "@/lib/labels";
 import { formatMoney, formatOdds } from "@/lib/money";
 
 export async function generateMetadata() {
@@ -77,16 +78,13 @@ export default async function BetsPage({
               <ul className="mt-3 space-y-1.5">
                 {b.legs.map((l) => {
                   const e = l.selection.market.event;
-                  const type = l.selection.market.type;
-                  const code = l.selection.code;
-                  const pick =
-                    type === "1X2"
-                      ? code === "1"
-                        ? e.homeTeam
-                        : code === "2"
-                          ? e.awayTeam
-                          : ts("draw")
-                      : `${ts(`markets.${type}`)} · ${ts(`codes.${code}`)}`;
+                  const market = l.selection.market;
+                  const pick = pickLabel(
+                    (k, v) => ts(k, v),
+                    e,
+                    { type: market.type, line: market.line === null ? null : Number(market.line) },
+                    l.selection.code,
+                  );
                   return (
                     <li key={l.id} className="flex items-center gap-2">
                       <span

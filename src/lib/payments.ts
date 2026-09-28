@@ -1,58 +1,11 @@
-import { randomBytes } from "node:crypto";
 import { prisma } from "./db";
 import { CURRENCY_LIMITS, Decimal } from "./money";
+import { activeProvider, type WebhookEvent } from "./payment-providers";
 import { AppError, type Currency, type PaymentMethod } from "./types";
 import { credit, debit, getOrCreateWallet } from "./wallet";
 
-/**
- * Payment provider boundary. The mock provider returns realistic-looking
- * instructions; replace it with a real PIX / SPEI / OXXO integration and
- * confirm deposits from that provider's webhook via `confirmDeposit`.
- */
-interface PaymentProvider {
-  createDeposit(p: { paymentId: string; method: PaymentMethod; amount: Decimal; currency: Currency }): Promise<{
-    providerRef: string;
-    instructions: Record<string, string>;
-  }>;
-}
-
-const mockProvider: PaymentProvider = {
-  async createDeposit({ paymentId, method, amount }): Promise<{ providerRef: string; instructions: Record<string, string> }> {
-    const ref = randomBytes(6).toString("hex").toUpperCase();
-    const expiresAt = new Date(Date.now() + 30 * 60_000).toISOString();
-    switch (method) {
-      case "PIX":
-        return {
-          providerRef: `pix_${ref}`,
-          instructions: {
-            pixCode: `00020126580014BR.GOV.BCB.PIX0136${paymentId}5204000053039865406${amount.toFixed(2)}5802BR5909PARYAJNET6009SAO PAULO62070503***6304${ref.slice(0, 4)}`,
-            expiresAt,
-          },
-        };
-      case "SPEI":
-        return {
-          providerRef: `spei_${ref}`,
-          instructions: {
-            clabe: `646180${String(parseInt(ref, 16)).padStart(12, "0").slice(0, 12)}`,
-            reference: ref.slice(0, 7),
-            beneficiary: "ParyajNet",
-          },
-        };
-      case "OXXO":
-        return {
-          providerRef: `oxxo_${ref}`,
-          instructions: { reference: String(parseInt(ref, 16)).padStart(14, "0").slice(0, 14), expiresAt },
-        };
-    }
-  },
-};
-
-export const paymentsMode = () => (process.env.PAYMENTS_MODE === "live" ? "live" : "mock");
-
-function provider(): PaymentProvider {
-  if (paymentsMode() === "live") throw new AppError("payments_unavailable");
-  return mockProvider;
-}
+/** "mock" enables the simulate-payment button for players; never set it in production. */
+export const paymentsMode = () => (activeProvider().name === "mock" ? "mock" : "live");
 
 export async function createDeposit(userId: string, currency: Currency, method: PaymentMethod, amount: Decimal) {
   const limits = CURRENCY_LIMITS[currency];
@@ -82,11 +35,16 @@ export async function createDeposit(userId: string, currency: Currency, method: 
   const payment = await prisma.payment.create({
     data: { userId, walletId: wallet.id, kind: "DEPOSIT", method, amount },
   });
-  const { providerRef, instructions } = await provider().createDeposit({
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    include: { kycSubmissions: { where: { status: "VERIFIED" }, take: 1 } },
+  });
+  const { providerRef, instructions } = await activeProvider().createDeposit({
     paymentId: payment.id,
     method,
     amount,
     currency,
+    payer: { name: user.name, email: user.email, documentNumber: user.kycSubmissions[0]?.documentNumber },
   });
   return prisma.payment.update({
     where: { id: payment.id },
@@ -116,6 +74,22 @@ export async function rejectDeposit(paymentId: string) {
   if (res.count === 0) throw new AppError("payment_not_pending");
 }
 
+/** Apply a verified provider webhook. Idempotent: replays are ignored. */
+export async function applyWebhook(event: WebhookEvent) {
+  const payment = await prisma.payment.findUnique({ where: { providerRef: event.providerRef } });
+  if (!payment || payment.kind !== "DEPOSIT" || payment.status !== "PENDING") return "ignored";
+  if (event.status === "FAILED") {
+    await rejectDeposit(payment.id);
+    return "rejected";
+  }
+  if (event.amount && !new Decimal(event.amount).equals(payment.amount)) {
+    // Paid a different amount: leave it for manual review instead of crediting.
+    return "amount_mismatch";
+  }
+  await confirmDeposit(payment.id);
+  return "confirmed";
+}
+
 /** Funds are held (debited) as soon as a withdrawal is requested. */
 export async function requestWithdrawal(
   userId: string,
@@ -125,6 +99,8 @@ export async function requestWithdrawal(
   destination: string,
 ) {
   const limits = CURRENCY_LIMITS[currency];
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+  if (user.kycStatus !== "VERIFIED") throw new AppError("kyc_required");
   if (!limits.withdrawalMethods.includes(method)) throw new AppError("method_unavailable");
   if (amount.lt(limits.minWithdrawal)) throw new AppError("amount_below_min", { min: limits.minWithdrawal });
   const dest = destination.trim();

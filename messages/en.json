@@ -1,7 +1,22 @@
 {
-  "meta": { "description": "Sports betting, lottery and casino in BRL and MXN." },
-  "nav": { "sports": "Sports", "lottery": "Lottery", "casino": "Casino", "admin": "Admin", "wallet": "Wallet", "myBets": "My bets", "account": "Account", "logout": "Log out", "login": "Log in", "register": "Sign up" },
-  "footer": { "responsible": "Gambling can be addictive. Play responsibly. Only for people aged 18 and over. Set deposit limits or take a break from your account settings." },
+  "meta": {
+    "description": "Sports betting, lottery and casino in BRL and MXN."
+  },
+  "nav": {
+    "sports": "Sports",
+    "lottery": "Lottery",
+    "casino": "Casino",
+    "admin": "Admin",
+    "wallet": "Wallet",
+    "myBets": "My bets",
+    "account": "Account",
+    "logout": "Log out",
+    "login": "Log in",
+    "register": "Sign up"
+  },
+  "footer": {
+    "responsible": "Gambling can be addictive. Play responsibly. Only for people aged 18 and over. Set deposit limits or take a break from your account settings."
+  },
   "home": {
     "kicker": "Sports · Lottery · Casino",
     "title": "Bet on what you love, in your currency.",
@@ -43,10 +58,36 @@
     "title": "Sports",
     "subtitle": "Pick outcomes to build a single or an accumulator.",
     "draw": "Draw",
-    "markets": { "1X2": "Match result", "OU25": "Goals 2.5", "BTTS": "Both teams score" },
-    "codes": { "1": "1", "X": "X", "2": "2", "OVER": "Over", "UNDER": "Under", "YES": "Yes", "NO": "No" },
+    "markets": {
+      "1X2": "Match result",
+      "BTTS": "Both teams score",
+      "DC": "Double chance",
+      "ML": "Winner",
+      "OU": "Goals {line}",
+      "OU_points": "Total points {line}",
+      "HCP": "Handicap",
+      "CS": "Correct score"
+    },
+    "codes": {
+      "1": "1",
+      "X": "X",
+      "2": "2",
+      "OVER": "Over",
+      "UNDER": "Under",
+      "YES": "Yes",
+      "NO": "No",
+      "1X": "1X",
+      "12": "12",
+      "X2": "X2",
+      "HOME": "Home",
+      "AWAY": "Away",
+      "OTHER": "Other"
+    },
     "allSports": "All",
-    "sportNames": { "football": "Football", "basketball": "Basketball" },
+    "sportNames": {
+      "football": "Football",
+      "basketball": "Basketball"
+    },
     "noEvents": "No games available right now.",
     "slip": "Bet slip",
     "clear": "Clear",
@@ -60,12 +101,24 @@
     "potentialWin": "Potential win",
     "placeBet": "Place bet",
     "loginToBet": "Log in to bet",
-    "placed": "Bet placed. Good luck!"
+    "placed": "Bet placed. Good luck!",
+    "live": "LIVE",
+    "liveNow": "Live now",
+    "suspended": "Suspended",
+    "moreMarkets": "+{count} markets",
+    "fewerMarkets": "Fewer markets",
+    "acceptChanges": "Accept odds changes",
+    "placing": "Confirming…",
+    "liveDelay": "Live bets are confirmed after {seconds} seconds."
   },
   "lottery": {
     "title": "Lottery & borlette",
     "subtitle": "Build a ticket with as many lines as you like and play the next draw.",
-    "types": { "BORLETTE": "Borlette", "LOTO3": "Loto 3", "MARIAGE": "Mariage" },
+    "types": {
+      "BORLETTE": "Borlette",
+      "LOTO3": "Loto 3",
+      "MARIAGE": "Mariage"
+    },
     "rules": {
       "BORLETTE": "2 digits. Pays if your number comes out as the 1st, 2nd or 3rd lot.",
       "LOTO3": "3 digits. Pays if you match the first prize exactly.",
@@ -92,7 +145,10 @@
   "casino": {
     "title": "Casino",
     "subtitle": "Instant games with a 1% house edge. Every result can be verified.",
-    "games": { "DICE": "Dice", "LIMBO": "Limbo" },
+    "games": {
+      "DICE": "Dice",
+      "LIMBO": "Limbo"
+    },
     "won": "You won {amount}!",
     "lost": "No luck this time.",
     "rollUnder": "Roll under",
@@ -127,28 +183,60 @@
     "withdrawMin": "Minimum {min}. Reviewed within 24 hours.",
     "payments": "Payments",
     "noPayments": "No payments yet.",
-    "kind": { "DEPOSIT": "Deposit", "WITHDRAWAL": "Withdrawal" },
-    "status": { "PENDING": "Pending", "COMPLETED": "Completed", "REJECTED": "Rejected" },
+    "kind": {
+      "DEPOSIT": "Deposit",
+      "WITHDRAWAL": "Withdrawal"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "COMPLETED": "Completed",
+      "REJECTED": "Rejected"
+    },
     "instructions": {
       "PIX": "Pay with PIX copy-and-paste in your bank app. Your balance updates as soon as the payment is confirmed.",
       "SPEI": "Make a SPEI transfer to this CLABE with the reference below.",
       "OXXO": "Pay at any OXXO store with this reference."
     },
-    "fields": { "pixCode": "PIX code", "clabe": "CLABE", "reference": "Reference", "beneficiary": "Beneficiary", "pixKey": "PIX key" },
+    "fields": {
+      "pixCode": "PIX code",
+      "clabe": "CLABE",
+      "reference": "Reference",
+      "beneficiary": "Beneficiary",
+      "pixKey": "PIX key"
+    },
     "simulate": "Simulate payment (test mode)",
     "history": "Transactions",
     "noTransactions": "No transactions yet.",
-    "txType": { "DEPOSIT": "Deposit", "WITHDRAWAL": "Withdrawal", "BET": "Bet", "WIN": "Winnings", "REFUND": "Refund", "ADJUSTMENT": "Adjustment" },
+    "txType": {
+      "DEPOSIT": "Deposit",
+      "WITHDRAWAL": "Withdrawal",
+      "BET": "Bet",
+      "WIN": "Winnings",
+      "REFUND": "Refund",
+      "ADJUSTMENT": "Adjustment"
+    },
     "amount": "Amount",
     "depositCta": "Generate payment",
     "withdrawCta": "Request withdrawal",
     "depositCreated": "Payment created — see the instructions below.",
-    "withdrawCreated": "Withdrawal requested."
+    "withdrawCreated": "Withdrawal requested.",
+    "kycNeeded": "Verify your identity to withdraw. It takes 2 minutes.",
+    "verifyNow": "Verify now"
   },
   "bets": {
     "title": "My bets",
-    "tabs": { "sports": "Sports", "lottery": "Lottery", "casino": "Casino" },
-    "status": { "OPEN": "Open", "PENDING": "Pending", "WON": "Won", "LOST": "Lost", "VOID": "Void" },
+    "tabs": {
+      "sports": "Sports",
+      "lottery": "Lottery",
+      "casino": "Casino"
+    },
+    "status": {
+      "OPEN": "Open",
+      "PENDING": "Pending",
+      "WON": "Won",
+      "LOST": "Lost",
+      "VOID": "Void"
+    },
     "payout": "Payout"
   },
   "account": {
@@ -172,25 +260,102 @@
     "exclude": "Pause my account"
   },
   "admin": {
-    "nav": { "overview": "Overview", "events": "Events", "lottery": "Draws", "payments": "Payments", "users": "Players" },
+    "nav": {
+      "overview": "Overview",
+      "events": "Events",
+      "lottery": "Draws",
+      "payments": "Payments",
+      "users": "Players",
+      "kyc": "KYC"
+    },
     "overview": "Overview",
-    "kpi": { "users": "Players", "openBets": "Open sports bets", "pendingDeposits": "Pending deposits", "pendingWithdrawals": "Pending withdrawals" },
-    "table": { "currency": "Currency", "balances": "Player balances", "deposits": "Deposits", "withdrawals": "Withdrawals", "ggrSports": "GGR sports", "ggrLottery": "GGR lottery", "ggrCasino": "GGR casino" },
+    "kpi": {
+      "users": "Players",
+      "openBets": "Open sports bets",
+      "pendingDeposits": "Pending deposits",
+      "pendingWithdrawals": "Pending withdrawals",
+      "pendingKyc": "KYC to review"
+    },
+    "table": {
+      "currency": "Currency",
+      "balances": "Player balances",
+      "deposits": "Deposits",
+      "withdrawals": "Withdrawals",
+      "ggrSports": "GGR sports",
+      "ggrLottery": "GGR lottery",
+      "ggrCasino": "GGR casino"
+    },
     "ggrNote": "GGR = settled stakes minus payouts.",
     "done": "Done.",
     "empty": "Nothing here yet.",
     "events": {
-      "create": "New event", "sport": "Sport", "league": "League", "home": "Home", "away": "Away", "startsAt": "Kick-off",
-      "createCta": "Create event", "open": "Open events", "started": "Started — settle it", "open_": "Open", "suspended": "Suspended",
-      "legs": "Open bets on this selection", "settle": "Settle with score", "cancel": "Cancel & refund", "recent": "Recently settled", "cancelled": "Cancelled"
+      "create": "New event",
+      "sport": "Sport",
+      "league": "League",
+      "home": "Home",
+      "away": "Away",
+      "startsAt": "Kick-off",
+      "createCta": "Create event",
+      "open": "Open events",
+      "started": "Started — settle it",
+      "open_": "Open",
+      "suspended": "Suspended",
+      "legs": "Open bets on this selection",
+      "settle": "Settle with score",
+      "cancel": "Cancel & refund",
+      "recent": "Recently settled",
+      "cancelled": "Cancelled",
+      "autoMarkets": "Double chance, goals 1.5/3.5, handicaps and correct score are generated automatically from these prices (Poisson model).",
+      "spread": "Spread (home)",
+      "total": "Total points",
+      "suspendedCount": "{count} suspended",
+      "clock": "Clock",
+      "updateLive": "Update",
+      "startLive": "Start live",
+      "suspendAll": "Suspend all",
+      "openAll": "Open all",
+      "liveHint": "A score change suspends every market. Reprice, then open them again.",
+      "markets": "{count} markets — edit odds",
+      "marketType": "Market",
+      "line": "Line",
+      "selections": "Selections (code=odds)",
+      "addMarket": "Add / reprice"
     },
     "lottery": {
-      "create": "New draw", "name": "Name", "closesAt": "Closes at", "createCta": "Create draw",
+      "create": "New draw",
+      "name": "Name",
+      "closesAt": "Closes at",
+      "createCta": "Create draw",
       "tickets": "{count, plural, one {# ticket} other {# tickets}}",
-      "first": "1st (3 digits)", "second": "2nd", "third": "3rd", "settle": "Publish results", "cancel": "Cancel & refund"
+      "first": "1st (3 digits)",
+      "second": "2nd",
+      "third": "3rd",
+      "settle": "Publish results",
+      "cancel": "Cancel & refund"
     },
-    "payments": { "pending": "Pending payments", "approve": "Approve", "reject": "Reject", "note": "Approve a deposit only once the money has arrived. Rejecting a withdrawal returns the funds to the player.", "recent": "Recent" },
-    "users": { "user": "Player", "joined": "Joined", "balances": "Balances", "activity": "Bets / tickets / rounds", "flags": "Flags", "excluded": "Self-excluded" }
+    "payments": {
+      "pending": "Pending payments",
+      "approve": "Approve",
+      "reject": "Reject",
+      "note": "Approve a deposit only once the money has arrived. Rejecting a withdrawal returns the funds to the player.",
+      "recent": "Recent"
+    },
+    "users": {
+      "user": "Player",
+      "joined": "Joined",
+      "balances": "Balances",
+      "activity": "Bets / tickets / rounds",
+      "flags": "Flags",
+      "excluded": "Self-excluded"
+    },
+    "save": "Save",
+    "kyc": {
+      "pending": "Pending verifications",
+      "checksumOk": "Check digits valid",
+      "birthDate": "Date of birth",
+      "note": "Note to the player (required to reject)",
+      "notePlaceholder": "e.g. The photo is blurry"
+    }
   },
   "errors": {
     "unexpected": "Something went wrong. Please try again.",
@@ -230,6 +395,51 @@
     "confirm_required": "Please tick the confirmation box.",
     "start_in_past": "The date must be in the future.",
     "invalid_score": "Invalid score.",
-    "invalid_odds": "Odds must be between 1.01 and 1000."
+    "invalid_odds": "Odds must be between 1.01 and 1000.",
+    "invalid_market": "Invalid market definition.",
+    "not_live": "This event is not live.",
+    "kyc_required": "Verify your identity first (Account → Identity verification).",
+    "kyc_already_submitted": "Your documents are already under review.",
+    "invalid_document": "Invalid document number.",
+    "invalid_full_name": "Enter your full name (first and last name).",
+    "invalid_cpf": "Invalid CPF.",
+    "invalid_curp": "Invalid CURP.",
+    "curp_birthdate_mismatch": "The CURP does not match your date of birth.",
+    "document_in_use": "This document is already linked to another account.",
+    "kyc_file_missing": "Please attach all the required photos.",
+    "kyc_file_type": "Photos must be JPG, PNG or WebP.",
+    "kyc_file_too_large": "Each photo must be under {max} MB.",
+    "note_required": "Add a note explaining the rejection."
+  },
+  "kyc": {
+    "title": "Identity verification",
+    "status": {
+      "NONE": "Not verified",
+      "PENDING": "Under review",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected"
+    },
+    "body": {
+      "NONE": "Required to withdraw winnings. Send a photo of your document and a selfie.",
+      "PENDING": "We are reviewing your documents. This usually takes less than 24 hours.",
+      "VERIFIED": "Your identity is verified. You can withdraw.",
+      "REJECTED": "We could not verify your documents. Please send them again."
+    },
+    "reason": "Reason",
+    "fullName": "Full name as on the document",
+    "documentType": "Document",
+    "documentNumber": "Number",
+    "passport": "Passport",
+    "front": "Document front (or INE / CNH / RG)",
+    "back": "Document back",
+    "selfie": "Selfie holding the document",
+    "privacy": "Your documents are only used to verify your identity and are visible only to our compliance team.",
+    "submit": "Send for review",
+    "submitted": "Documents sent. We will notify you soon.",
+    "files": {
+      "DOCUMENT_FRONT": "Front",
+      "DOCUMENT_BACK": "Back",
+      "SELFIE": "Selfie"
+    }
   }
 }

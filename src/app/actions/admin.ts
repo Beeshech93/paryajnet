@@ -6,8 +6,17 @@ import { prisma } from "@/lib/db";
 import { cancelDraw, settleDraw } from "@/lib/lottery";
 import { Decimal } from "@/lib/money";
 import { approveWithdrawal, confirmDeposit, rejectDeposit, rejectWithdrawal } from "@/lib/payments";
-import { cancelEvent, settleEvent } from "@/lib/sports";
-import { MARKET_TYPES } from "@/lib/sports-rules";
+import { reviewKyc } from "@/lib/kyc";
+import { basketballMarkets, footballMarkets } from "@/lib/pricing";
+import {
+  cancelEvent,
+  createEvent,
+  settleEvent,
+  setAllMarkets,
+  startLive,
+  updateLive,
+  upsertMarkets,
+} from "@/lib/sports";
 import { AppError, type ActionResult } from "@/lib/types";
 import { run } from "./run";
 
@@ -20,12 +29,15 @@ function asAdmin(fn: () => Promise<unknown>) {
 
 const odds = z.coerce.number().min(1.01).max(1000);
 
-const eventSchema = z.object({
-  sport: z.string().trim().min(1),
-  league: z.string().trim().min(1),
-  homeTeam: z.string().trim().min(1),
-  awayTeam: z.string().trim().min(1),
+const baseEvent = {
+  league: z.string().trim().min(1).max(100),
+  homeTeam: z.string().trim().min(1).max(100),
+  awayTeam: z.string().trim().min(1).max(100),
   startsAt: z.coerce.date(),
+};
+const footballSchema = z.object({
+  ...baseEvent,
+  sport: z.literal("football"),
   o1: odds,
   oX: odds,
   o2: odds,
@@ -34,37 +46,86 @@ const eventSchema = z.object({
   oYes: odds,
   oNo: odds,
 });
+const halfLine = z.coerce.number().refine((n) => Number.isFinite(n) && Math.round(n * 2) === n * 2);
+const basketballSchema = z.object({
+  ...baseEvent,
+  sport: z.literal("basketball"),
+  ml1: odds,
+  ml2: odds,
+  spread: halfLine,
+  total: halfLine.refine((n) => n > 0),
+});
 
 export async function createEventAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
   return asAdmin(async () => {
-    const parsed = eventSchema.safeParse(Object.fromEntries(form));
+    const raw = Object.fromEntries(form);
+    const parsed = z.discriminatedUnion("sport", [footballSchema, basketballSchema]).safeParse(raw);
     if (!parsed.success) throw new AppError("invalid_form");
     const d = parsed.data;
     if (d.startsAt <= new Date()) throw new AppError("start_in_past");
-    const priceFor: Record<string, number> = {
-      "1": d.o1,
-      X: d.oX,
-      "2": d.o2,
-      OVER: d.oOver,
-      UNDER: d.oUnder,
-      YES: d.oYes,
-      NO: d.oNo,
-    };
-    await prisma.event.create({
-      data: {
-        sport: d.sport,
-        league: d.league,
-        homeTeam: d.homeTeam,
-        awayTeam: d.awayTeam,
-        startsAt: d.startsAt,
-        markets: {
-          create: Object.entries(MARKET_TYPES).map(([type, codes]) => ({
-            type,
-            selections: { create: codes.map((code) => ({ code, odds: new Decimal(priceFor[code]) })) },
-          })),
-        },
-      },
-    });
+    const markets =
+      d.sport === "football"
+        ? footballMarkets({ odds1X2: [d.o1, d.oX, d.o2], oddsOU25: [d.oOver, d.oUnder], oddsBTTS: [d.oYes, d.oNo] })
+        : basketballMarkets({ oddsML: [d.ml1, d.ml2], spread: d.spread, total: d.total });
+    await createEvent({ ...d, markets });
+  });
+}
+
+/** Add (or reprice) a market. Selections are entered one per line as "code=odds". */
+export async function addMarketAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const eventId = String(form.get("eventId"));
+    const type = String(form.get("type"));
+    const lineRaw = String(form.get("line") ?? "")
+      .trim()
+      .replace(",", ".");
+    const line = lineRaw === "" ? null : Number(lineRaw);
+    const selections = String(form.get("selections") ?? "")
+      .split(/[\n,;]+/)
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .map((l) => {
+        const [code, price] = l.split(/\s*[=:]\s*/);
+        return { code: code?.trim().toUpperCase(), odds: Number(price?.replace(",", ".")) };
+      });
+    if (selections.some((s) => !s.code || !Number.isFinite(s.odds))) throw new AppError("invalid_market");
+    const event = await prisma.event.findUniqueOrThrow({ where: { id: eventId } });
+    if (event.status !== "SCHEDULED" && event.status !== "LIVE") throw new AppError("already_settled");
+    await prisma.$transaction((tx) => upsertMarkets(tx, eventId, [{ type, line, selections }]));
+  });
+}
+
+export async function startLiveAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(() => startLive(String(form.get("eventId"))));
+}
+
+export async function updateLiveAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const home = Number(form.get("homeScore"));
+    const away = Number(form.get("awayScore"));
+    if (![home, away].every((n) => Number.isInteger(n) && n >= 0 && n < 400)) throw new AppError("invalid_score");
+    const clock =
+      String(form.get("clock") ?? "")
+        .trim()
+        .slice(0, 20) || null;
+    await updateLive(String(form.get("eventId")), home, away, clock);
+  });
+}
+
+export async function setAllMarketsAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(() =>
+    setAllMarkets(String(form.get("eventId")), form.get("status") === "OPEN" ? "OPEN" : "SUSPENDED"),
+  );
+}
+
+export async function reviewKycAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const decision = form.get("decision") === "approve" ? "approve" : "reject";
+    const note =
+      String(form.get("note") ?? "")
+        .trim()
+        .slice(0, 500) || null;
+    await reviewKyc(String(form.get("submissionId")), decision, note);
   });
 }
 
@@ -72,7 +133,7 @@ export async function settleEventAction(_prev: ActionResult | null, form: FormDa
   return asAdmin(async () => {
     const home = Number(form.get("homeScore"));
     const away = Number(form.get("awayScore"));
-    if (![home, away].every((n) => Number.isInteger(n) && n >= 0 && n < 100)) throw new AppError("invalid_score");
+    if (![home, away].every((n) => Number.isInteger(n) && n >= 0 && n < 400)) throw new AppError("invalid_score");
     await settleEvent(String(form.get("eventId")), home, away);
   });
 }

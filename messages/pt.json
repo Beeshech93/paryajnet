@@ -1,7 +1,22 @@
 {
-  "meta": { "description": "Apostas esportivas, loteria e cassino em BRL e MXN." },
-  "nav": { "sports": "Esportes", "lottery": "Loteria", "casino": "Cassino", "admin": "Admin", "wallet": "Carteira", "myBets": "Minhas apostas", "account": "Conta", "logout": "Sair", "login": "Entrar", "register": "Cadastrar" },
-  "footer": { "responsible": "Jogos de aposta podem causar dependência. Jogue com responsabilidade. Proibido para menores de 18 anos. Defina limites de depósito ou faça uma pausa nas configurações da conta." },
+  "meta": {
+    "description": "Apostas esportivas, loteria e cassino em BRL e MXN."
+  },
+  "nav": {
+    "sports": "Esportes",
+    "lottery": "Loteria",
+    "casino": "Cassino",
+    "admin": "Admin",
+    "wallet": "Carteira",
+    "myBets": "Minhas apostas",
+    "account": "Conta",
+    "logout": "Sair",
+    "login": "Entrar",
+    "register": "Cadastrar"
+  },
+  "footer": {
+    "responsible": "Jogos de aposta podem causar dependência. Jogue com responsabilidade. Proibido para menores de 18 anos. Defina limites de depósito ou faça uma pausa nas configurações da conta."
+  },
   "home": {
     "kicker": "Esportes · Loteria · Cassino",
     "title": "Aposte no que você ama, na sua moeda.",
@@ -43,10 +58,36 @@
     "title": "Esportes",
     "subtitle": "Escolha resultados para montar uma aposta simples ou múltipla.",
     "draw": "Empate",
-    "markets": { "1X2": "Resultado final", "OU25": "Gols 2.5", "BTTS": "Ambas marcam" },
-    "codes": { "1": "1", "X": "X", "2": "2", "OVER": "Mais", "UNDER": "Menos", "YES": "Sim", "NO": "Não" },
+    "markets": {
+      "1X2": "Resultado final",
+      "BTTS": "Ambas marcam",
+      "DC": "Dupla chance",
+      "ML": "Vencedor",
+      "OU": "Gols {line}",
+      "OU_points": "Total de pontos {line}",
+      "HCP": "Handicap",
+      "CS": "Placar exato"
+    },
+    "codes": {
+      "1": "1",
+      "X": "X",
+      "2": "2",
+      "OVER": "Mais",
+      "UNDER": "Menos",
+      "YES": "Sim",
+      "NO": "Não",
+      "1X": "1X",
+      "12": "12",
+      "X2": "X2",
+      "HOME": "Mandante",
+      "AWAY": "Visitante",
+      "OTHER": "Outro"
+    },
     "allSports": "Todos",
-    "sportNames": { "football": "Futebol", "basketball": "Basquete" },
+    "sportNames": {
+      "football": "Futebol",
+      "basketball": "Basquete"
+    },
     "noEvents": "Nenhum jogo disponível no momento.",
     "slip": "Cupom",
     "clear": "Limpar",
@@ -60,12 +101,24 @@
     "potentialWin": "Retorno possível",
     "placeBet": "Apostar",
     "loginToBet": "Entre para apostar",
-    "placed": "Aposta feita. Boa sorte!"
+    "placed": "Aposta feita. Boa sorte!",
+    "live": "AO VIVO",
+    "liveNow": "Ao vivo agora",
+    "suspended": "Suspenso",
+    "moreMarkets": "+{count} mercados",
+    "fewerMarkets": "Menos mercados",
+    "acceptChanges": "Aceitar mudanças de odds",
+    "placing": "Confirmando…",
+    "liveDelay": "Apostas ao vivo são confirmadas após {seconds} segundos."
   },
   "lottery": {
     "title": "Loteria e borlette",
     "subtitle": "Monte um bilhete com quantas jogadas quiser e participe do próximo sorteio.",
-    "types": { "BORLETTE": "Borlette", "LOTO3": "Loto 3", "MARIAGE": "Mariage" },
+    "types": {
+      "BORLETTE": "Borlette",
+      "LOTO3": "Loto 3",
+      "MARIAGE": "Mariage"
+    },
     "rules": {
       "BORLETTE": "2 dígitos. Paga se o seu número sair como 1º, 2º ou 3º lote.",
       "LOTO3": "3 dígitos. Paga se acertar exatamente o primeiro prêmio.",
@@ -92,7 +145,10 @@
   "casino": {
     "title": "Cassino",
     "subtitle": "Jogos instantâneos com 1% de vantagem da casa. Todo resultado é verificável.",
-    "games": { "DICE": "Dice", "LIMBO": "Limbo" },
+    "games": {
+      "DICE": "Dice",
+      "LIMBO": "Limbo"
+    },
     "won": "Você ganhou {amount}!",
     "lost": "Não foi dessa vez.",
     "rollUnder": "Rolagem abaixo de",
@@ -127,28 +183,60 @@
     "withdrawMin": "Mínimo {min}. Analisado em até 24 horas.",
     "payments": "Pagamentos",
     "noPayments": "Nenhum pagamento ainda.",
-    "kind": { "DEPOSIT": "Depósito", "WITHDRAWAL": "Saque" },
-    "status": { "PENDING": "Pendente", "COMPLETED": "Concluído", "REJECTED": "Recusado" },
+    "kind": {
+      "DEPOSIT": "Depósito",
+      "WITHDRAWAL": "Saque"
+    },
+    "status": {
+      "PENDING": "Pendente",
+      "COMPLETED": "Concluído",
+      "REJECTED": "Recusado"
+    },
     "instructions": {
       "PIX": "Pague com PIX copia e cola no app do seu banco. O saldo é atualizado assim que o pagamento for confirmado.",
       "SPEI": "Faça uma transferência SPEI para esta CLABE com a referência abaixo.",
       "OXXO": "Pague em qualquer loja OXXO com esta referência."
     },
-    "fields": { "pixCode": "Código PIX", "clabe": "CLABE", "reference": "Referência", "beneficiary": "Beneficiário", "pixKey": "Chave PIX" },
+    "fields": {
+      "pixCode": "Código PIX",
+      "clabe": "CLABE",
+      "reference": "Referência",
+      "beneficiary": "Beneficiário",
+      "pixKey": "Chave PIX"
+    },
     "simulate": "Simular pagamento (modo teste)",
     "history": "Movimentações",
     "noTransactions": "Nenhuma movimentação ainda.",
-    "txType": { "DEPOSIT": "Depósito", "WITHDRAWAL": "Saque", "BET": "Aposta", "WIN": "Prêmio", "REFUND": "Reembolso", "ADJUSTMENT": "Ajuste" },
+    "txType": {
+      "DEPOSIT": "Depósito",
+      "WITHDRAWAL": "Saque",
+      "BET": "Aposta",
+      "WIN": "Prêmio",
+      "REFUND": "Reembolso",
+      "ADJUSTMENT": "Ajuste"
+    },
     "amount": "Valor",
     "depositCta": "Gerar pagamento",
     "withdrawCta": "Solicitar saque",
     "depositCreated": "Pagamento gerado — veja as instruções abaixo.",
-    "withdrawCreated": "Saque solicitado."
+    "withdrawCreated": "Saque solicitado.",
+    "kycNeeded": "Verifique sua identidade para sacar. Leva 2 minutos.",
+    "verifyNow": "Verificar agora"
   },
   "bets": {
     "title": "Minhas apostas",
-    "tabs": { "sports": "Esportes", "lottery": "Loteria", "casino": "Cassino" },
-    "status": { "OPEN": "Em aberto", "PENDING": "Pendente", "WON": "Ganha", "LOST": "Perdida", "VOID": "Anulada" },
+    "tabs": {
+      "sports": "Esportes",
+      "lottery": "Loteria",
+      "casino": "Cassino"
+    },
+    "status": {
+      "OPEN": "Em aberto",
+      "PENDING": "Pendente",
+      "WON": "Ganha",
+      "LOST": "Perdida",
+      "VOID": "Anulada"
+    },
     "payout": "Pagamento"
   },
   "account": {
@@ -172,25 +260,102 @@
     "exclude": "Pausar minha conta"
   },
   "admin": {
-    "nav": { "overview": "Resumo", "events": "Eventos", "lottery": "Sorteios", "payments": "Pagamentos", "users": "Jogadores" },
+    "nav": {
+      "overview": "Resumo",
+      "events": "Eventos",
+      "lottery": "Sorteios",
+      "payments": "Pagamentos",
+      "users": "Jogadores",
+      "kyc": "KYC"
+    },
     "overview": "Resumo",
-    "kpi": { "users": "Jogadores", "openBets": "Apostas esportivas em aberto", "pendingDeposits": "Depósitos pendentes", "pendingWithdrawals": "Saques pendentes" },
-    "table": { "currency": "Moeda", "balances": "Saldos dos jogadores", "deposits": "Depósitos", "withdrawals": "Saques", "ggrSports": "GGR esportes", "ggrLottery": "GGR loteria", "ggrCasino": "GGR cassino" },
+    "kpi": {
+      "users": "Jogadores",
+      "openBets": "Apostas esportivas em aberto",
+      "pendingDeposits": "Depósitos pendentes",
+      "pendingWithdrawals": "Saques pendentes",
+      "pendingKyc": "KYC para analisar"
+    },
+    "table": {
+      "currency": "Moeda",
+      "balances": "Saldos dos jogadores",
+      "deposits": "Depósitos",
+      "withdrawals": "Saques",
+      "ggrSports": "GGR esportes",
+      "ggrLottery": "GGR loteria",
+      "ggrCasino": "GGR cassino"
+    },
     "ggrNote": "GGR = apostas liquidadas menos pagamentos.",
     "done": "Pronto.",
     "empty": "Nada por aqui ainda.",
     "events": {
-      "create": "Novo evento", "sport": "Esporte", "league": "Liga", "home": "Mandante", "away": "Visitante", "startsAt": "Início",
-      "createCta": "Criar evento", "open": "Eventos abertos", "started": "Começou — liquide", "open_": "Aberto", "suspended": "Suspenso",
-      "legs": "Apostas abertas nesta seleção", "settle": "Liquidar com placar", "cancel": "Cancelar e reembolsar", "recent": "Liquidados recentemente", "cancelled": "Cancelado"
+      "create": "Novo evento",
+      "sport": "Esporte",
+      "league": "Liga",
+      "home": "Mandante",
+      "away": "Visitante",
+      "startsAt": "Início",
+      "createCta": "Criar evento",
+      "open": "Eventos abertos",
+      "started": "Começou — liquide",
+      "open_": "Aberto",
+      "suspended": "Suspenso",
+      "legs": "Apostas abertas nesta seleção",
+      "settle": "Liquidar com placar",
+      "cancel": "Cancelar e reembolsar",
+      "recent": "Liquidados recentemente",
+      "cancelled": "Cancelado",
+      "autoMarkets": "Dupla chance, gols 1.5/3.5, handicaps e placar exato são gerados automaticamente a partir destas odds (modelo de Poisson).",
+      "spread": "Handicap (mandante)",
+      "total": "Total de pontos",
+      "suspendedCount": "{count} suspensos",
+      "clock": "Relógio",
+      "updateLive": "Atualizar",
+      "startLive": "Iniciar ao vivo",
+      "suspendAll": "Suspender tudo",
+      "openAll": "Abrir tudo",
+      "liveHint": "Uma mudança no placar suspende todos os mercados. Ajuste as odds e abra de novo.",
+      "markets": "{count} mercados — editar odds",
+      "marketType": "Mercado",
+      "line": "Linha",
+      "selections": "Seleções (código=odd)",
+      "addMarket": "Adicionar / atualizar"
     },
     "lottery": {
-      "create": "Novo sorteio", "name": "Nome", "closesAt": "Fecha em", "createCta": "Criar sorteio",
+      "create": "Novo sorteio",
+      "name": "Nome",
+      "closesAt": "Fecha em",
+      "createCta": "Criar sorteio",
       "tickets": "{count, plural, one {# bilhete} other {# bilhetes}}",
-      "first": "1º (3 dígitos)", "second": "2º", "third": "3º", "settle": "Publicar resultados", "cancel": "Cancelar e reembolsar"
+      "first": "1º (3 dígitos)",
+      "second": "2º",
+      "third": "3º",
+      "settle": "Publicar resultados",
+      "cancel": "Cancelar e reembolsar"
     },
-    "payments": { "pending": "Pagamentos pendentes", "approve": "Aprovar", "reject": "Recusar", "note": "Aprove um depósito só depois que o dinheiro chegar. Recusar um saque devolve o valor ao jogador.", "recent": "Recentes" },
-    "users": { "user": "Jogador", "joined": "Cadastro", "balances": "Saldos", "activity": "Apostas / bilhetes / rodadas", "flags": "Marcações", "excluded": "Autoexcluído" }
+    "payments": {
+      "pending": "Pagamentos pendentes",
+      "approve": "Aprovar",
+      "reject": "Recusar",
+      "note": "Aprove um depósito só depois que o dinheiro chegar. Recusar um saque devolve o valor ao jogador.",
+      "recent": "Recentes"
+    },
+    "users": {
+      "user": "Jogador",
+      "joined": "Cadastro",
+      "balances": "Saldos",
+      "activity": "Apostas / bilhetes / rodadas",
+      "flags": "Marcações",
+      "excluded": "Autoexcluído"
+    },
+    "save": "Salvar",
+    "kyc": {
+      "pending": "Verificações pendentes",
+      "checksumOk": "Dígitos verificadores válidos",
+      "birthDate": "Data de nascimento",
+      "note": "Nota para o jogador (obrigatória para recusar)",
+      "notePlaceholder": "ex.: A foto está desfocada"
+    }
   },
   "errors": {
     "unexpected": "Algo deu errado. Tente novamente.",
@@ -230,6 +395,51 @@
     "confirm_required": "Marque a caixa de confirmação.",
     "start_in_past": "A data deve estar no futuro.",
     "invalid_score": "Placar inválido.",
-    "invalid_odds": "A odd deve estar entre 1.01 e 1000."
+    "invalid_odds": "A odd deve estar entre 1.01 e 1000.",
+    "invalid_market": "Definição de mercado inválida.",
+    "not_live": "Este evento não está ao vivo.",
+    "kyc_required": "Verifique sua identidade primeiro (Conta → Verificação de identidade).",
+    "kyc_already_submitted": "Seus documentos já estão em análise.",
+    "invalid_document": "Número de documento inválido.",
+    "invalid_full_name": "Informe seu nome completo (nome e sobrenome).",
+    "invalid_cpf": "CPF inválido.",
+    "invalid_curp": "CURP inválido.",
+    "curp_birthdate_mismatch": "O CURP não corresponde à sua data de nascimento.",
+    "document_in_use": "Este documento já está vinculado a outra conta.",
+    "kyc_file_missing": "Anexe todas as fotos exigidas.",
+    "kyc_file_type": "As fotos devem ser JPG, PNG ou WebP.",
+    "kyc_file_too_large": "Cada foto deve ter menos de {max} MB.",
+    "note_required": "Adicione uma nota explicando a recusa."
+  },
+  "kyc": {
+    "title": "Verificação de identidade",
+    "status": {
+      "NONE": "Não verificado",
+      "PENDING": "Em análise",
+      "VERIFIED": "Verificado",
+      "REJECTED": "Recusado"
+    },
+    "body": {
+      "NONE": "Necessário para sacar prêmios. Envie uma foto do seu documento e uma selfie.",
+      "PENDING": "Estamos analisando seus documentos. Normalmente leva menos de 24 horas.",
+      "VERIFIED": "Sua identidade está verificada. Você já pode sacar.",
+      "REJECTED": "Não conseguimos verificar seus documentos. Envie novamente."
+    },
+    "reason": "Motivo",
+    "fullName": "Nome completo como no documento",
+    "documentType": "Documento",
+    "documentNumber": "Número",
+    "passport": "Passaporte",
+    "front": "Frente do documento (RG, CNH ou INE)",
+    "back": "Verso do documento",
+    "selfie": "Selfie segurando o documento",
+    "privacy": "Seus documentos são usados apenas para verificar sua identidade e só nossa equipe de compliance os vê.",
+    "submit": "Enviar para análise",
+    "submitted": "Documentos enviados. Avisaremos em breve.",
+    "files": {
+      "DOCUMENT_FRONT": "Frente",
+      "DOCUMENT_BACK": "Verso",
+      "SELFIE": "Selfie"
+    }
   }
 }

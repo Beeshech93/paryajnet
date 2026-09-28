@@ -41,6 +41,8 @@ export default async function AdminUsers() {
                 {u._count.bets} / {u._count.tickets} / {u._count.casinoRounds}
               </td>
               <td className="p-3">
+                {u.kycStatus === "VERIFIED" && <span className="chip mr-1 bg-brand/15 text-brand">KYC ✓</span>}
+                {u.kycStatus === "PENDING" && <span className="chip mr-1 bg-gold/15 text-gold">KYC …</span>}
                 {u.role === "ADMIN" && <span className="chip bg-danger/15 text-danger">ADMIN</span>}
                 {u.selfExcludedUntil && u.selfExcludedUntil > new Date() && (
                   <span className="chip bg-gold/15 text-gold">{t("users.excluded")}</span>

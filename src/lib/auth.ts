@@ -79,7 +79,10 @@ export async function adminForAction() {
   return user;
 }
 
-export function assertCanPlay(user: { selfExcludedUntil: Date | null }) {
+export function assertCanPlay(user: { selfExcludedUntil: Date | null; kycStatus: string }) {
+  if (process.env.KYC_REQUIRED_TO_PLAY === "true" && user.kycStatus !== "VERIFIED") {
+    throw new AppError("kyc_required");
+  }
   if (user.selfExcludedUntil && user.selfExcludedUntil > new Date()) {
     throw new AppError("self_excluded", { until: user.selfExcludedUntil.toISOString().slice(0, 10) });
   }

@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "node scripts/set-db-provider.mjs && prisma generate && next build",
+    "build:vercel": "node scripts/set-db-provider.mjs && prisma generate && prisma db push --skip-generate && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "db:push": "prisma db push",
+    "db:push": "node scripts/set-db-provider.mjs && prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "prisma db push --force-reset && tsx prisma/seed.ts",
+    "db:reset": "node scripts/set-db-provider.mjs && prisma db push --force-reset && tsx prisma/seed.ts",
     "test": "tsx --test src/lib/*.test.ts"
   },
   "prisma": {

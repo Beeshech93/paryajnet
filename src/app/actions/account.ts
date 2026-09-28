@@ -2,6 +2,7 @@
 
 import { getLocale } from "next-intl/server";
 import { userForAction } from "@/lib/auth";
+import { submitKyc } from "@/lib/kyc";
 import { prisma } from "@/lib/db";
 import { parseAmount } from "@/lib/money";
 import { AppError, type ActionResult } from "@/lib/types";
@@ -34,5 +35,20 @@ export async function selfExcludeAction(_prev: ActionResult | null, form: FormDa
     // Never shorten an existing exclusion.
     if (user.selfExcludedUntil && user.selfExcludedUntil > until) return;
     await prisma.user.update({ where: { id: user.id }, data: { selfExcludedUntil: until } });
+  });
+}
+
+export async function submitKycAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return run(async () => {
+    const user = await userForAction();
+    await submitKyc(user.id, {
+      fullName: String(form.get("fullName") ?? ""),
+      documentType: String(form.get("documentType") ?? ""),
+      documentNumber: String(form.get("documentNumber") ?? ""),
+      files: (["DOCUMENT_FRONT", "DOCUMENT_BACK", "SELFIE"] as const).map((kind) => ({
+        kind,
+        file: form.get(kind) as File | null,
+      })),
+    });
   });
 }
