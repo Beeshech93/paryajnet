@@ -21,7 +21,7 @@
   },
   "home": {
     "kicker": "Deportes · Lotería · Casino",
-    "title": "Apuesta a lo que te gusta, en tu moneda.",
+    "title": "Apuesta a lo que te gusta, <accent>en tu moneda.</accent>",
     "subtitle": "Momios de fútbol, sorteos diarios de borlette y juegos de casino verificables — en reales y pesos mexicanos.",
     "ctaSports": "Ver partidos de hoy",
     "ctaRegister": "Crear cuenta",
@@ -38,7 +38,13 @@
     "nextDraw": "Próximo sorteo",
     "closes": "Cierra",
     "drawPitch": "La borlette paga hasta 50× en el primer lote y el loto 3 paga 500×.",
-    "noDraw": "No hay sorteos abiertos por ahora."
+    "noDraw": "No hay sorteos abiertos por ahora.",
+    "heroLive": "En vivo ahora · Deportes · Lotería · Casino",
+    "trustPayments": "PIX · SPEI · OXXO",
+    "trustFair": "Resultados verificables",
+    "trustAge": "Juego responsable",
+    "heroLastNumbers": "Últimos números ·",
+    "heroCasinoChip": "Dice y Limbo · RTP 99 %"
   },
   "auth": {
     "loginTitle": "Bienvenido de nuevo",

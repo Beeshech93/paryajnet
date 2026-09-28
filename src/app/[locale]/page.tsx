@@ -2,6 +2,7 @@ import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocalTime } from "@/components/LocalTime";
 import { AdSlot } from "@/components/ads/AdSlot";
+import { HeroBanner } from "@/components/home/HeroBanner";
 import { StateBadge } from "@/components/lottery/StateBadge";
 import { prisma } from "@/lib/db";
 import { ensureUpcomingDraws } from "@/lib/lottery";
@@ -11,7 +12,11 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   setRequestLocale((await params).locale);
   const [t, tl, locale] = await Promise.all([getTranslations("home"), getTranslations("lottery"), getLocale()]);
   await ensureUpcomingDraws();
-  const [events, draw] = await Promise.all([
+  const heroMarkets = {
+    where: { type: { in: ["1X2", "ML"] }, status: "OPEN" },
+    include: { selections: { orderBy: { id: "asc" as const } } },
+  };
+  const [events, draw, liveEvent, lastResult] = await Promise.all([
     prisma.event.findMany({
       where: { status: "SCHEDULED", startsAt: { gt: new Date() } },
       orderBy: { startsAt: "asc" },
@@ -24,7 +29,18 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       where: { status: "OPEN", closesAt: { gt: new Date() } },
       orderBy: { closesAt: "asc" },
     }),
+    prisma.event.findFirst({
+      where: { status: "LIVE" },
+      orderBy: { startsAt: "asc" },
+      include: { markets: heroMarkets },
+    }),
+    prisma.lotteryDraw.findFirst({ where: { status: "SETTLED" }, orderBy: [{ drawAt: "desc" }, { closesAt: "desc" }] }),
   ]);
+
+  // Hero shows the live match if there is one (else the next game) and the latest official numbers (else the next draw).
+  const featuredRow = liveEvent?.markets.length ? liveEvent : (events.find((e) => e.markets.length) ?? null);
+  const featured = featuredRow ? { ...featuredRow, selections: featuredRow.markets[0]?.selections ?? [] } : null;
+  const heroDraw = lastResult ?? draw;
 
   const verticals = [
     {
@@ -58,33 +74,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   return (
     <div className="space-y-10">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-300 via-sky-400 to-blue-500 p-8 text-brand-ink shadow-pop sm:p-12">
-        <div className="absolute -top-24 -right-24 size-64 rounded-full bg-gold sm:size-80" aria-hidden />
-        <div className="absolute -right-6 -bottom-10 size-32 rounded-full border-[14px] border-danger" aria-hidden />
-        <div
-          className="absolute top-16 right-44 hidden size-16 rotate-12 rounded-2xl bg-white/50 lg:block"
-          aria-hidden
-        />
-        <div className="relative">
-          <p className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-bold tracking-wide uppercase">
-            <span className="size-2 rounded-full bg-danger" /> {t("kicker")}
-          </p>
-          <h1 className="mt-4 max-w-2xl font-display text-4xl font-bold tracking-tight sm:text-6xl">{t("title")}</h1>
-          <p className="mt-4 max-w-xl text-base font-medium text-brand-ink/80">{t("subtitle")}</p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link href="/sports" className="btn-accent px-6 py-3 text-base">
-              {t("ctaSports")}
-            </Link>
-            <Link
-              href="/register"
-              className="btn bg-white px-6 py-3 text-base text-brand-ink shadow-sm hover:bg-sky-50"
-            >
-              {t("ctaRegister")}
-            </Link>
-          </div>
-          <p className="mt-6 text-xs font-medium text-brand-ink/70">{t("payments")}</p>
-        </div>
-      </section>
+      <HeroBanner event={featured} draw={heroDraw} />
 
       <AdSlot placement="HOME" />
 

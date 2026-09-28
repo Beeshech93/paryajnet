@@ -21,7 +21,7 @@
   },
   "home": {
     "kicker": "Esportes · Loteria · Cassino",
-    "title": "Aposte no que você ama, na sua moeda.",
+    "title": "Aposte no que você ama, <accent>na sua moeda.</accent>",
     "subtitle": "Odds de futebol, sorteios diários de borlette e jogos de cassino verificáveis — em reais e pesos mexicanos.",
     "ctaSports": "Ver jogos de hoje",
     "ctaRegister": "Criar conta",
@@ -38,7 +38,13 @@
     "nextDraw": "Próximo sorteio",
     "closes": "Fecha",
     "drawPitch": "A borlette paga até 50× no primeiro lote e o loto 3 paga 500×.",
-    "noDraw": "Nenhum sorteio aberto no momento."
+    "noDraw": "Nenhum sorteio aberto no momento.",
+    "heroLive": "Ao vivo agora · Esportes · Loteria · Cassino",
+    "trustPayments": "PIX · SPEI · OXXO",
+    "trustFair": "Resultados verificáveis",
+    "trustAge": "Jogo responsável",
+    "heroLastNumbers": "Últimos números ·",
+    "heroCasinoChip": "Dice e Limbo · RTP 99%"
   },
   "auth": {
     "loginTitle": "Bem-vindo de volta",

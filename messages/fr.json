@@ -21,7 +21,7 @@
   },
   "home": {
     "kicker": "Sports · Loterie · Casino",
-    "title": "Pariez sur ce que vous aimez, dans votre devise.",
+    "title": "Pariez sur ce que vous aimez, <accent>dans votre devise.</accent>",
     "subtitle": "Cotes de football, tirages de borlette quotidiens et jeux de casino vérifiables — en réais et en pesos mexicains.",
     "ctaSports": "Voir les matchs du jour",
     "ctaRegister": "Créer un compte",
@@ -38,7 +38,13 @@
     "nextDraw": "Prochain tirage",
     "closes": "Clôture",
     "drawPitch": "La borlette paie jusqu'à 50× sur le premier lot, le loto 3 paie 500×.",
-    "noDraw": "Aucun tirage ouvert pour le moment."
+    "noDraw": "Aucun tirage ouvert pour le moment.",
+    "heroLive": "En direct · Sports · Loterie · Casino",
+    "trustPayments": "PIX · SPEI · OXXO",
+    "trustFair": "Résultats vérifiables",
+    "trustAge": "Jeu responsable",
+    "heroLastNumbers": "Derniers numéros ·",
+    "heroCasinoChip": "Dice et Limbo · RTP 99 %"
   },
   "auth": {
     "loginTitle": "Bon retour",

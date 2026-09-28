@@ -21,7 +21,7 @@
   },
   "home": {
     "kicker": "Sports · Lottery · Casino",
-    "title": "Bet on what you love, in your currency.",
+    "title": "Bet on what you love, <accent>in your currency.</accent>",
     "subtitle": "Football odds, daily borlette draws and provably fair casino games — in reais and Mexican pesos.",
     "ctaSports": "See today's games",
     "ctaRegister": "Create account",
@@ -38,7 +38,13 @@
     "nextDraw": "Next draw",
     "closes": "Closes",
     "drawPitch": "Borlette pays up to 50× on the first lot, loto 3 pays 500×.",
-    "noDraw": "No open draws right now."
+    "noDraw": "No open draws right now.",
+    "heroLive": "Live now · Sports · Lottery · Casino",
+    "trustPayments": "PIX · SPEI · OXXO",
+    "trustFair": "Verifiable results",
+    "trustAge": "Responsible gaming",
+    "heroLastNumbers": "Latest numbers ·",
+    "heroCasinoChip": "Dice & Limbo · 99% RTP"
   },
   "auth": {
     "loginTitle": "Welcome back",
