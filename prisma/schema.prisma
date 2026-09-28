@@ -71,6 +71,7 @@ model Payment {
   walletId     String
   kind         String // DEPOSIT | WITHDRAWAL
   method       String // PIX | SPEI | OXXO
+  provider     String   @default("mock") // payment provider that handles it (see src/lib/payment-providers)
   amount       Decimal
   status       String   @default("PENDING") // PENDING | COMPLETED | REJECTED
   providerRef  String?  @unique

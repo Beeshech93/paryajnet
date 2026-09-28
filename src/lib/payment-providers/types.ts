@@ -6,7 +6,7 @@ export type DepositRequest = {
   method: PaymentMethod;
   amount: Decimal;
   currency: Currency;
-  payer: { name: string; email: string; documentNumber?: string | null };
+  payer: { name: string; email: string; phone?: string | null; documentNumber?: string | null };
 };
 
 export type WebhookEvent = { providerRef: string; status: "PAID" | "FAILED"; amount?: string };

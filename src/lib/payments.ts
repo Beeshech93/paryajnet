@@ -1,11 +1,8 @@
 import { prisma } from "./db";
 import { CURRENCY_LIMITS, Decimal } from "./money";
-import { activeProvider, type WebhookEvent } from "./payment-providers";
+import { providerFor, type WebhookEvent } from "./payment-providers";
 import { AppError, type Currency, type PaymentMethod } from "./types";
 import { credit, debit, getOrCreateWallet } from "./wallet";
-
-/** "mock" enables the simulate-payment button for players; never set it in production. */
-export const paymentsMode = () => (activeProvider().name === "mock" ? "mock" : "live");
 
 export async function createDeposit(userId: string, currency: Currency, method: PaymentMethod, amount: Decimal) {
   const limits = CURRENCY_LIMITS[currency];
@@ -32,20 +29,29 @@ export async function createDeposit(userId: string, currency: Currency, method: 
     }
   }
 
+  const provider = providerFor(method);
   const payment = await prisma.payment.create({
-    data: { userId, walletId: wallet.id, kind: "DEPOSIT", method, amount },
+    data: { userId, walletId: wallet.id, kind: "DEPOSIT", method, amount, provider: provider.name },
   });
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
     include: { kycSubmissions: { where: { status: "VERIFIED" }, take: 1 } },
   });
-  const { providerRef, instructions } = await activeProvider().createDeposit({
-    paymentId: payment.id,
-    method,
-    amount,
-    currency,
-    payer: { name: user.name, email: user.email, documentNumber: user.kycSubmissions[0]?.documentNumber },
-  });
+  let created;
+  try {
+    created = await provider.createDeposit({
+      paymentId: payment.id,
+      method,
+      amount,
+      currency,
+      payer: { name: user.name, email: user.email, documentNumber: user.kycSubmissions[0]?.documentNumber },
+    });
+  } catch (err) {
+    console.error(`[payments] ${provider.name} createDeposit failed`, err);
+    await prisma.payment.update({ where: { id: payment.id }, data: { status: "REJECTED" } });
+    throw new AppError("payments_unavailable");
+  }
+  const { providerRef, instructions } = created;
   return prisma.payment.update({
     where: { id: payment.id },
     data: { providerRef, instructions: JSON.stringify(instructions) },
@@ -75,9 +81,10 @@ export async function rejectDeposit(paymentId: string) {
 }
 
 /** Apply a verified provider webhook. Idempotent: replays are ignored. */
-export async function applyWebhook(event: WebhookEvent) {
+export async function applyWebhook(event: WebhookEvent, providerName?: string) {
   const payment = await prisma.payment.findUnique({ where: { providerRef: event.providerRef } });
   if (!payment || payment.kind !== "DEPOSIT" || payment.status !== "PENDING") return "ignored";
+  if (providerName && payment.provider !== providerName) return "ignored";
   if (event.status === "FAILED") {
     await rejectDeposit(payment.id);
     return "rejected";
@@ -115,6 +122,7 @@ export async function requestWithdrawal(
         walletId: wallet.id,
         kind: "WITHDRAWAL",
         method,
+        provider: "manual",
         amount,
         instructions: JSON.stringify(method === "PIX" ? { pixKey: dest } : { clabe: dest }),
       },

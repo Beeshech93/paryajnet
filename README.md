@@ -56,7 +56,12 @@ messages/*.json             traducciones
 
 ## Antes de producción
 
-- **Pagos reales:** implementa `PaymentProvider` (`src/lib/payment-providers/types.ts`) para tu proveedor, regístralo en `index.ts` y pon `PAYMENTS_PROVIDER=<nombre>`. El proveedor mock muestra el botón "simular pago": no lo uses en producción.
+- **Pagos en México (Conekta, ya integrado):**
+  1. En el panel de Conekta copia tu llave privada (`key_…`) a `CONEKTA_PRIVATE_KEY`.
+  2. Crea la llave de webhooks: `curl -X POST https://api.conekta.io/webhook_keys -u key_…: -H "Accept: application/vnd.conekta-v2.3.0+json" -H "Content-Type: application/json" -d '{"active":true}'` y guarda `public_key` en `CONEKTA_WEBHOOK_PUBLIC_KEY`.
+  3. Registra el webhook `https://<tu-dominio>/api/payments/webhook/conekta` (eventos `order.paid`, `order.expired`).
+  4. Pon `PAYMENTS_PROVIDER_MX=conekta`. Prueba primero con llaves de sandbox.
+- **PIX (Brasil):** falta elegir proveedor. Implementa `PaymentProvider` (`src/lib/payment-providers/types.ts`), regístralo en `index.ts` y pon `PAYMENTS_PROVIDER_PIX=<nombre>`. Mientras tanto PIX usa el proveedor mock, que muestra el botón "simular pago": no lo dejes así en producción.
 - **KYC:** la revisión es manual. Para escalar, conecta un proveedor (idwall, unico, Truora, Metamap…) y consulta PEP y listas de sanciones.
 - **Migraciones:** `prisma db push` basta para empezar; con usuarios reales pasa a `prisma migrate`.
 - **Licencias:** operar apuestas con dinero real exige autorización en cada país: en Brasil, la Secretaria de Prêmios e Apostas (Lei 14.790/2023, dominio `.bet.br`); en México, un permiso de SEGOB. Las loterías tipo borlette tienen reglas propias y pueden no estar permitidas a operadores privados. Consúltalo con un abogado antes de lanzar.

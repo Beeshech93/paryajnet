@@ -4,7 +4,7 @@ import { getLocale } from "next-intl/server";
 import { assertCanPlay, userForAction } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { parseAmount } from "@/lib/money";
-import { confirmDeposit, createDeposit, paymentsMode, requestWithdrawal } from "@/lib/payments";
+import { confirmDeposit, createDeposit, requestWithdrawal } from "@/lib/payments";
 import { AppError, type ActionResult, type PaymentMethod } from "@/lib/types";
 import { getActiveCurrency } from "@/lib/wallet";
 import { run } from "./run";
@@ -39,10 +39,10 @@ export async function withdrawAction(_prev: ActionResult | null, form: FormData)
 /** Development only: pretend the provider confirmed the player's payment. */
 export async function simulatePaymentAction(paymentId: string) {
   return run(async () => {
-    if (paymentsMode() !== "mock") throw new AppError("forbidden");
     const user = await userForAction();
     const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
-    if (!payment || payment.userId !== user.id) throw new AppError("forbidden");
+    // Only payments handled by the mock provider can be simulated.
+    if (!payment || payment.userId !== user.id || payment.provider !== "mock") throw new AppError("forbidden");
     await confirmDeposit(paymentId);
   });
 }

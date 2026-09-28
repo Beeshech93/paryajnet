@@ -5,7 +5,6 @@ import { DepositForm, SimulateButton, WithdrawForm } from "@/components/wallet/W
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { CURRENCY_LIMITS, formatMoney } from "@/lib/money";
-import { paymentsMode } from "@/lib/payments";
 import { getActiveCurrency, getOrCreateWallet } from "@/lib/wallet";
 
 export async function generateMetadata() {
@@ -31,7 +30,6 @@ export default async function WalletPage({ params }: { params: Promise<{ locale:
     prisma.payment.findMany({ where: { walletId: wallet.id }, orderBy: { createdAt: "desc" }, take: 10 }),
     prisma.transaction.findMany({ where: { walletId: wallet.id }, orderBy: { createdAt: "desc" }, take: 25 }),
   ]);
-  const mock = paymentsMode() === "mock";
 
   return (
     <div className="space-y-8">
@@ -105,15 +103,19 @@ export default async function WalletPage({ params }: { params: Promise<{ locale:
                   {p.kind === "DEPOSIT" && p.status === "PENDING" && (
                     <div className="mt-3 space-y-2 rounded-xl bg-surface-2 p-3">
                       <p className="text-xs text-muted">{t(`instructions.${p.method}`)}</p>
+                      {info.barcodeUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={info.barcodeUrl} alt={t("fields.reference")} className="h-16 rounded bg-white p-1" />
+                      )}
                       {Object.entries(info)
-                        .filter(([k]) => k !== "expiresAt")
+                        .filter(([k, v]) => k !== "expiresAt" && k !== "barcodeUrl" && v)
                         .map(([k, v]) => (
                           <div key={k}>
                             <p className="label">{t.has(`fields.${k}`) ? t(`fields.${k}`) : k}</p>
                             <p className="font-mono text-xs break-all select-all">{v}</p>
                           </div>
                         ))}
-                      {mock && <SimulateButton paymentId={p.id} />}
+                      {p.provider === "mock" && <SimulateButton paymentId={p.id} />}
                     </div>
                   )}
                 </div>

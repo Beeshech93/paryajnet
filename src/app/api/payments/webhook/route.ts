@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { activeProvider } from "@/lib/payment-providers";
+import { mockProvider } from "@/lib/payment-providers/mock";
 import { applyWebhook } from "@/lib/payments";
 
-/** POST /api/payments/webhook — deposit confirmations from the active payment provider. */
+/** POST /api/payments/webhook — generic HMAC-signed webhook (see mock provider), e.g. for a relay. */
 export async function POST(req: Request) {
   const raw = await req.text();
   let event;
   try {
-    event = await activeProvider().parseWebhook(raw, req.headers);
+    event = await mockProvider.parseWebhook(raw, req.headers);
   } catch {
     return NextResponse.json({ error: "invalid_signature" }, { status: 401 });
   }

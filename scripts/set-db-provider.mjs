@@ -3,6 +3,13 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
 const url = process.env.DATABASE_URL ?? "";
+if (process.env.VERCEL && !/^postgres(ql)?:\/\//.test(url)) {
+  console.error(
+    "DATABASE_URL must be a postgres:// connection string on Vercel " +
+      (url ? "(got a non-Postgres value)." : "(it is empty). Set it in Project → Settings → Environment Variables."),
+  );
+  process.exit(1);
+}
 const provider = /^postgres(ql)?:\/\//.test(url) ? "postgresql" : "sqlite";
 const path = new URL("../prisma/schema.prisma", import.meta.url);
 const schema = readFileSync(path, "utf8");

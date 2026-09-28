@@ -202,7 +202,8 @@
       "clabe": "CLABE",
       "reference": "Reference",
       "beneficiary": "Beneficiary",
-      "pixKey": "PIX key"
+      "pixKey": "PIX key",
+      "bank": "Bank"
     },
     "simulate": "Simulate payment (test mode)",
     "history": "Transactions",
