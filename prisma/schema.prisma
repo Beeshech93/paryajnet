@@ -1,0 +1,241 @@
+// ParyajNet data model.
+//
+// Money is stored as Decimal in the currency's major unit (e.g. 12.50 BRL).
+// Status/type columns are plain strings so the schema runs unchanged on
+// SQLite (development) and PostgreSQL (production); the allowed values are
+// defined as TypeScript unions in src/lib/types.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  passwordHash      String
+  name              String
+  birthDate         DateTime
+  role              String    @default("USER") // USER | ADMIN
+  preferredCurrency String    @default("BRL")
+  selfExcludedUntil DateTime?
+  createdAt         DateTime  @default(now())
+
+  wallets       Wallet[]
+  payments      Payment[]
+  bets          Bet[]
+  tickets       LotteryTicket[]
+  casinoSeeds   CasinoSeed[]
+  casinoRounds  CasinoRound[]
+}
+
+model Wallet {
+  id                 String   @id @default(cuid())
+  userId             String
+  currency           String // BRL | MXN
+  balance            Decimal  @default(0)
+  dailyDepositLimit  Decimal?
+  createdAt          DateTime @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  payments     Payment[]
+
+  @@unique([userId, currency])
+}
+
+// Immutable ledger: every balance change writes one row.
+model Transaction {
+  id           String   @id @default(cuid())
+  walletId     String
+  type         String // DEPOSIT | WITHDRAWAL | BET | WIN | REFUND | ADJUSTMENT
+  amount       Decimal // signed: negative for debits
+  balanceAfter Decimal
+  reference    String?
+  createdAt    DateTime @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId, createdAt])
+}
+
+model Payment {
+  id           String   @id @default(cuid())
+  userId       String
+  walletId     String
+  kind         String // DEPOSIT | WITHDRAWAL
+  method       String // PIX | SPEI | OXXO
+  amount       Decimal
+  status       String   @default("PENDING") // PENDING | COMPLETED | REJECTED
+  providerRef  String?
+  instructions String? // JSON: what the player needs to pay / where we pay out
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([status, kind])
+}
+
+// ---------- Sports ----------
+
+model Event {
+  id        String   @id @default(cuid())
+  sport     String // football | basketball | ...
+  league    String
+  homeTeam  String
+  awayTeam  String
+  startsAt  DateTime
+  status    String   @default("SCHEDULED") // SCHEDULED | SETTLED | CANCELLED
+  homeScore Int?
+  awayScore Int?
+  createdAt DateTime @default(now())
+
+  markets Market[]
+
+  @@index([status, startsAt])
+}
+
+model Market {
+  id      String @id @default(cuid())
+  eventId String
+  type    String // 1X2 | OU25 | BTTS
+  status  String @default("OPEN") // OPEN | SUSPENDED | SETTLED
+
+  event      Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  selections Selection[]
+}
+
+model Selection {
+  id       String  @id @default(cuid())
+  marketId String
+  code     String // 1 | X | 2 | OVER | UNDER | YES | NO
+  odds     Decimal
+  result   String  @default("PENDING") // PENDING | WON | LOST | VOID
+
+  market Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  legs   BetLeg[]
+}
+
+model Bet {
+  id           String    @id @default(cuid())
+  userId       String
+  walletId     String
+  currency     String
+  stake        Decimal
+  totalOdds    Decimal
+  potentialWin Decimal
+  payout       Decimal?
+  status       String    @default("OPEN") // OPEN | WON | LOST | VOID
+  createdAt    DateTime  @default(now())
+  settledAt    DateTime?
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  legs BetLeg[]
+
+  @@index([userId, createdAt])
+  @@index([status])
+}
+
+model BetLeg {
+  id          String  @id @default(cuid())
+  betId       String
+  selectionId String
+  odds        Decimal // odds at the moment the bet was placed
+  result      String  @default("PENDING")
+
+  bet       Bet       @relation(fields: [betId], references: [id], onDelete: Cascade)
+  selection Selection @relation(fields: [selectionId], references: [id])
+}
+
+// ---------- Lottery / borlette ----------
+
+model LotteryDraw {
+  id        String   @id @default(cuid())
+  name      String
+  closesAt  DateTime
+  status    String   @default("OPEN") // OPEN | SETTLED | CANCELLED
+  // Results: first prize is 3 digits (its last two digits are lot 1),
+  // second and third prizes are 2 digits (lots 2 and 3).
+  first     String?
+  second    String?
+  third     String?
+  createdAt DateTime @default(now())
+
+  tickets LotteryTicket[]
+
+  @@index([status, closesAt])
+}
+
+model LotteryTicket {
+  id         String   @id @default(cuid())
+  userId     String
+  walletId   String
+  drawId     String
+  currency   String
+  totalStake Decimal
+  payout     Decimal?
+  status     String   @default("OPEN") // OPEN | WON | LOST | VOID
+  createdAt  DateTime @default(now())
+
+  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  draw  LotteryDraw   @relation(fields: [drawId], references: [id])
+  lines LotteryLine[]
+
+  @@index([userId, createdAt])
+}
+
+model LotteryLine {
+  id       String   @id @default(cuid())
+  ticketId String
+  type     String // BORLETTE | LOTO3 | MARIAGE
+  numbers  String // "45" | "123" | "12-34"
+  stake    Decimal
+  payout   Decimal?
+  result   String   @default("PENDING")
+
+  ticket LotteryTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+// ---------- Casino (provably fair) ----------
+
+model CasinoSeed {
+  id             String   @id @default(cuid())
+  userId         String
+  serverSeed     String // secret until the seed is rotated
+  serverSeedHash String
+  clientSeed     String
+  nonce          Int      @default(0)
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, active])
+}
+
+model CasinoRound {
+  id             String   @id @default(cuid())
+  userId         String
+  walletId       String
+  game           String // DICE | LIMBO
+  currency       String
+  stake          Decimal
+  target         Decimal // dice: roll-under target; limbo: target multiplier
+  outcome        Decimal // dice: roll 0-99.99; limbo: result multiplier
+  multiplier     Decimal // payout multiplier if won
+  payout         Decimal
+  won            Boolean
+  seedId         String
+  nonce          Int
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}

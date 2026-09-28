@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0e1a;
+  --color-surface: #111827;
+  --color-surface-2: #182236;
+  --color-line: #243049;
+  --color-ink: #e8edf7;
+  --color-muted: #8b98b3;
+  --color-brand: #22d37f;
+  --color-brand-ink: #03170d;
+  --color-gold: #f5c542;
+  --color-casino: #a78bfa;
+  --color-danger: #f0506e;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), var(--font-inter), ui-sans-serif, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+@utility card {
+  @apply rounded-2xl border border-line bg-surface;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility btn-primary {
+  @apply btn bg-brand text-brand-ink hover:brightness-110;
+}
+
+@utility btn-ghost {
+  @apply btn border border-line text-ink hover:bg-surface-2;
+}
+
+@utility btn-danger {
+  @apply btn border border-danger/40 text-danger hover:bg-danger/10;
+}
+
+@utility input {
+  @apply w-full rounded-xl border border-line bg-bg px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted/60 focus:border-brand;
+}
+
+@utility label {
+  @apply mb-1.5 block text-xs font-medium tracking-wide text-muted uppercase;
+}
+
+@utility odds-btn {
+  @apply flex min-w-0 flex-1 flex-col items-center rounded-xl border border-line bg-surface-2 px-2 py-2 text-sm transition hover:border-brand/60;
+  &[data-active="true"] {
+    @apply border-brand bg-brand text-brand-ink;
+  }
+}
+
+@utility chip {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+}

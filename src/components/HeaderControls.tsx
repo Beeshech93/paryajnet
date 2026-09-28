@@ -1,0 +1,75 @@
+"use client";
+
+import { useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { usePathname, useRouter, Link } from "@/i18n/navigation";
+import { routing } from "@/i18n/routing";
+import { setCurrencyAction } from "@/app/actions/prefs";
+import { CURRENCIES } from "@/lib/types";
+
+const LOCALE_NAMES: Record<string, string> = { pt: "Português", es: "Español", fr: "Français", en: "English" };
+
+export function LocaleSwitcher() {
+  const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+  return (
+    <select
+      aria-label="Language"
+      className="rounded-lg border border-line bg-surface px-2 py-1.5 text-xs font-semibold uppercase"
+      value={locale}
+      onChange={(e) => router.replace(pathname, { locale: e.target.value })}
+    >
+      {routing.locales.map((l) => (
+        <option key={l} value={l}>
+          {l.toUpperCase()} · {LOCALE_NAMES[l]}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+export function CurrencySwitcher({ current }: { current: string }) {
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex rounded-lg border border-line bg-surface p-0.5 text-xs font-bold" aria-busy={pending}>
+      {CURRENCIES.map((c) => (
+        <button
+          key={c}
+          type="button"
+          onClick={() => start(() => setCurrencyAction(c))}
+          className={`rounded-md px-2 py-1 transition ${c === current ? "bg-brand text-brand-ink" : "text-muted hover:text-ink"}`}
+        >
+          {c}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
+  const t = useTranslations("nav");
+  const pathname = usePathname();
+  const links = [
+    { href: "/sports", label: t("sports") },
+    { href: "/lottery", label: t("lottery") },
+    { href: "/casino", label: t("casino") },
+    ...(isAdmin ? [{ href: "/admin", label: t("admin") }] : []),
+  ];
+  return (
+    <nav className="flex gap-1 overflow-x-auto text-sm font-semibold">
+      {links.map((l) => {
+        const active = pathname.startsWith(l.href);
+        return (
+          <Link
+            key={l.href}
+            href={l.href}
+            className={`rounded-lg px-3 py-2 whitespace-nowrap transition ${active ? "bg-surface-2 text-ink" : "text-muted hover:text-ink"}`}
+          >
+            {l.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
