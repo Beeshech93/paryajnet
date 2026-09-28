@@ -1,11 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter, Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { setCurrencyAction } from "@/app/actions/prefs";
-import { CURRENCIES } from "@/lib/types";
 
 const LOCALE_NAMES: Record<string, string> = { pt: "Português", es: "Español", fr: "Français", en: "English" };
 
@@ -29,31 +26,13 @@ export function LocaleSwitcher() {
   );
 }
 
-export function CurrencySwitcher({ current }: { current: string }) {
-  const [pending, start] = useTransition();
-  return (
-    <div className="flex rounded-lg border border-line bg-surface p-0.5 text-xs font-bold" aria-busy={pending}>
-      {CURRENCIES.map((c) => (
-        <button
-          key={c}
-          type="button"
-          onClick={() => start(() => setCurrencyAction(c))}
-          className={`rounded-md px-2 py-1 transition ${c === current ? "bg-brand text-brand-ink shadow-sm" : "text-muted hover:text-ink"}`}
-        >
-          {c}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const links = [
     { href: "/sports", label: t("sports") },
     { href: "/lottery", label: t("lottery") },
-    { href: "/casino", label: t("casino") },
+    { href: "/s", label: t("myService") },
     ...(isAdmin ? [{ href: "/admin", label: t("admin") }] : []),
   ];
   return (

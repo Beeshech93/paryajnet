@@ -8,7 +8,7 @@ import {
   type LotteryCode,
   type SessionCode,
 } from "./lottery-schedule";
-import { CURRENCY_LIMITS, Decimal } from "./money";
+import { Decimal, LIMITS } from "./money";
 import {
   isValidResult,
   linePayout,
@@ -18,40 +18,43 @@ import {
   type DrawResult,
   type LotteryType,
 } from "./lottery-rules";
-import { AppError, type Currency } from "./types";
-import { credit, debit, getOrCreateWallet } from "./wallet";
+import { type Tx } from "./db";
+import { ORDER_LEAD_MINUTES } from "./sports";
+import { AppError } from "./types";
 
 export type TicketLineInput = { type: LotteryType; numbers: string; stake: Decimal };
 
-export async function buyTicket(userId: string, currency: Currency, drawId: string, input: TicketLineInput[]) {
-  const limits = CURRENCY_LIMITS[currency];
+function checkLines(input: TicketLineInput[]) {
   if (input.length === 0) throw new AppError("empty_ticket");
   if (input.length > MAX_LINES) throw new AppError("too_many_lines", { max: MAX_LINES });
-
   const lines = input.map((l) => {
     const numbers = normalizeNumbers(l.type, l.numbers);
     if (!numbers) throw new AppError("invalid_numbers", { numbers: l.numbers });
-    if (l.stake.lt(limits.minStake) || l.stake.gt(limits.maxStake)) {
-      throw new AppError("stake_out_of_range", { min: limits.minStake, max: limits.maxStake });
+    if (l.stake.lt(LIMITS.minStake) || l.stake.gt(LIMITS.maxStake)) {
+      throw new AppError("stake_out_of_range", { min: LIMITS.minStake, max: LIMITS.maxStake });
     }
     return { type: l.type, numbers, stake: l.stake };
   });
-
   const maxWin = lines.reduce((acc, l) => acc.add(maxLinePayout(l.type, l.stake)), new Decimal(0));
-  if (maxWin.gt(limits.maxPayout)) throw new AppError("max_payout", { max: limits.maxPayout });
-
+  if (maxWin.gt(LIMITS.maxPayout)) throw new AppError("max_payout", { max: LIMITS.maxPayout });
   const totalStake = lines.reduce((acc, l) => acc.add(l.stake), new Decimal(0));
+  return { lines, totalStake, maxWin };
+}
 
-  return prisma.$transaction(async (tx) => {
-    const draw = await tx.lotteryDraw.findUnique({ where: { id: drawId } });
-    if (!draw || draw.status !== "OPEN" || draw.closesAt <= new Date()) throw new AppError("draw_closed");
-    const wallet = await getOrCreateWallet(userId, currency, tx);
-    const ticket = await tx.lotteryTicket.create({
-      data: { userId, walletId: wallet.id, drawId, currency, totalStake, lines: { create: lines } },
-    });
-    await debit(tx, wallet.id, totalStake, "BET", `ticket:${ticket.id}`);
-    return ticket;
-  });
+/** Validate a ticket. `payBy` is the draw's betting close minus the lead time for paying. */
+export async function quoteLotteryTicket(drawId: string, input: TicketLineInput[]) {
+  const { lines, totalStake, maxWin } = checkLines(input);
+  const draw = await prisma.lotteryDraw.findUnique({ where: { id: drawId } });
+  const payBy = draw ? new Date(draw.closesAt.getTime() - ORDER_LEAD_MINUTES * 60_000) : null;
+  if (!draw || draw.status !== "OPEN" || !payBy || payBy <= new Date()) throw new AppError("draw_closed");
+  return { draw, lines, totalStake, maxWin, payBy };
+}
+
+export async function createTicketForOrder(tx: Tx, orderId: string, drawId: string, input: TicketLineInput[]) {
+  const { lines, totalStake } = checkLines(input);
+  const draw = await tx.lotteryDraw.findUnique({ where: { id: drawId } });
+  if (!draw || draw.status !== "OPEN" || draw.closesAt <= new Date()) throw new AppError("draw_closed");
+  return tx.lotteryTicket.create({ data: { orderId, drawId, totalStake, lines: { create: lines } } });
 }
 
 /** Create any missing scheduled state draws (idempotent; safe to call on every page load). */
@@ -99,11 +102,35 @@ export async function settleDraw(drawId: string, result: DrawResult, picks?: { p
 
   await prisma.lotteryDraw.update({ where: { id: drawId }, data: { status: "SETTLED", ...result, ...picks } });
 
-  const tickets = await prisma.lotteryTicket.findMany({ where: { drawId, status: "OPEN" }, select: { id: true } });
-  for (const { id } of tickets) {
-    await prisma.$transaction(async (tx) => {
-      const ticket = await tx.lotteryTicket.findUniqueOrThrow({ where: { id }, include: { lines: true } });
-      let total = new Decimal(0);
+  // Only paid (confirmed) services are settled now; the rest are settled if an admin confirms them later.
+  const tickets = await prisma.lotteryTicket.findMany({
+    where: { drawId, status: "OPEN", order: { status: "CONFIRMED" } },
+    select: { orderId: true },
+  });
+  const settled: string[] = [];
+  for (const { orderId } of tickets) {
+    if (await settleLotteryOrder(orderId)) settled.push(orderId);
+  }
+  if (settled.length) await (await import("./agent")).notifyResults(settled);
+}
+
+/** Settle a confirmed lottery service if its draw has results (or was cancelled). */
+export async function settleLotteryOrder(orderId: string): Promise<boolean> {
+  return prisma.$transaction(async (tx) => {
+    const ticket = await tx.lotteryTicket.findUnique({
+      where: { orderId },
+      include: { lines: true, draw: true, order: true },
+    });
+    if (!ticket || ticket.status !== "OPEN" || ticket.order.status !== "CONFIRMED") return false;
+    const { draw } = ticket;
+    let status: "WON" | "LOST" | "VOID";
+    let total = new Decimal(0);
+    if (draw.status === "CANCELLED") {
+      status = "VOID";
+      total = ticket.totalStake;
+      await tx.lotteryLine.updateMany({ where: { ticketId: ticket.id }, data: { result: "VOID" } });
+    } else if (draw.status === "SETTLED" && draw.first && draw.second && draw.third) {
+      const result = { first: draw.first, second: draw.second, third: draw.third };
       for (const line of ticket.lines) {
         const payout = linePayout(line.type as LotteryType, line.numbers, line.stake, result);
         total = total.add(payout);
@@ -112,26 +139,34 @@ export async function settleDraw(drawId: string, result: DrawResult, picks?: { p
           data: { payout, result: payout.gt(0) ? "WON" : "LOST" },
         });
       }
-      const status = total.gt(0) ? "WON" : "LOST";
-      const res = await tx.lotteryTicket.updateMany({ where: { id, status: "OPEN" }, data: { status, payout: total } });
-      if (res.count === 1) await credit(tx, ticket.walletId, total, "WIN", `ticket:${id}`);
+      status = total.gt(0) ? "WON" : "LOST";
+    } else {
+      return false;
+    }
+    const res = await tx.lotteryTicket.updateMany({
+      where: { id: ticket.id, status: "OPEN" },
+      data: { status, payout: total },
     });
-  }
+    if (res.count === 0) return false;
+    await tx.order.update({
+      where: { id: orderId },
+      data: { status, payout: status === "LOST" ? null : total, settledAt: new Date() },
+    });
+    return true;
+  });
 }
 
 export async function cancelDraw(drawId: string) {
   const draw = await prisma.lotteryDraw.findUniqueOrThrow({ where: { id: drawId } });
   if (draw.status !== "OPEN") throw new AppError("already_settled");
   await prisma.lotteryDraw.update({ where: { id: drawId }, data: { status: "CANCELLED" } });
-  const tickets = await prisma.lotteryTicket.findMany({ where: { drawId, status: "OPEN" } });
-  for (const t of tickets) {
-    await prisma.$transaction(async (tx) => {
-      const res = await tx.lotteryTicket.updateMany({
-        where: { id: t.id, status: "OPEN" },
-        data: { status: "VOID", payout: t.totalStake },
-      });
-      await tx.lotteryLine.updateMany({ where: { ticketId: t.id }, data: { result: "VOID" } });
-      if (res.count === 1) await credit(tx, t.walletId, t.totalStake, "REFUND", `ticket:${t.id}`);
-    });
+  const tickets = await prisma.lotteryTicket.findMany({
+    where: { drawId, status: "OPEN", order: { status: "CONFIRMED" } },
+    select: { orderId: true },
+  });
+  const settled: string[] = [];
+  for (const { orderId } of tickets) {
+    if (await settleLotteryOrder(orderId)) settled.push(orderId);
   }
+  if (settled.length) await (await import("./agent")).notifyResults(settled);
 }

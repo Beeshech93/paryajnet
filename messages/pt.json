@@ -14,15 +14,17 @@
     "login": "Entrar",
     "register": "Cadastrar",
     "home": "Início",
-    "betsShort": "Apostas"
+    "betsShort": "Apostas",
+    "myService": "Meu serviço",
+    "myServiceShort": "Serviço"
   },
   "footer": {
     "responsible": "Jogos de aposta podem causar dependência. Jogue com responsabilidade. Proibido para menores de 18 anos. Defina limites de depósito ou faça uma pausa nas configurações da conta."
   },
   "home": {
-    "kicker": "Esportes · Loteria · Cassino",
+    "kicker": "Esportes · Loteria",
     "title": "Aposte no que você ama, <accent>na sua moeda.</accent>",
-    "subtitle": "Odds de futebol, sorteios diários de borlette e jogos de cassino verificáveis — em reais e pesos mexicanos.",
+    "subtitle": "Odds de futebol e borlette diária com os sorteios oficiais de Nova York, Flórida e Geórgia. Sem cadastro: pague por PIX e acompanhe tudo pelo WhatsApp.",
     "ctaSports": "Ver jogos de hoje",
     "ctaRegister": "Criar conta",
     "payments": "Depósitos por PIX (BRL) e SPEI ou OXXO (MXN).",
@@ -39,28 +41,20 @@
     "closes": "Fecha",
     "drawPitch": "A borlette paga até 50× no primeiro lote e o loto 3 paga 500×.",
     "noDraw": "Nenhum sorteio aberto no momento.",
-    "heroLive": "Ao vivo agora · Esportes · Loteria · Cassino",
+    "heroLive": "Ao vivo agora · Esportes · Loteria",
     "trustPayments": "PIX · SPEI · OXXO",
     "trustFair": "Resultados verificáveis",
     "trustAge": "Jogo responsável",
     "heroLastNumbers": "Últimos números ·",
-    "heroCasinoChip": "Dice e Limbo · RTP 99%"
+    "heroCasinoChip": "Dice e Limbo · RTP 99%",
+    "ctaService": "Consultar meu serviço",
+    "heroWhatsappChip": "Pague por PIX · avisos no WhatsApp"
   },
   "auth": {
-    "loginTitle": "Bem-vindo de volta",
+    "loginTitle": "Acesso do administrador",
     "email": "E-mail",
     "password": "Senha",
-    "loginCta": "Entrar",
-    "noAccount": "Ainda não tem conta?",
-    "registerCta": "Criar conta",
-    "registerTitle": "Crie sua conta",
-    "registerSubtitle": "Você precisa ter 18 anos ou mais para jogar.",
-    "name": "Nome completo",
-    "passwordHint": "Pelo menos 8 caracteres.",
-    "birthDate": "Data de nascimento",
-    "currency": "Moeda",
-    "terms": "Tenho 18 anos ou mais e aceito os termos e a política de jogo responsável.",
-    "haveAccount": "Já tem conta?"
+    "loginCta": "Entrar"
   },
   "sports": {
     "title": "Esportes",
@@ -162,155 +156,6 @@
     },
     "stateRule": "Resultados oficiais do estado: 1º lote = dois últimos dígitos do Pick 3; 2º e 3º lotes = os dois pares do Pick 4."
   },
-  "casino": {
-    "title": "Cassino",
-    "subtitle": "Jogos instantâneos com 1% de vantagem da casa. Todo resultado é verificável.",
-    "games": {
-      "DICE": "Dice",
-      "LIMBO": "Limbo"
-    },
-    "won": "Você ganhou {amount}!",
-    "lost": "Não foi dessa vez.",
-    "rollUnder": "Rolagem abaixo de",
-    "targetMultiplier": "Multiplicador alvo",
-    "multiplier": "Multiplicador",
-    "winChance": "Chance",
-    "payout": "Pagamento",
-    "stake": "Valor",
-    "play": "Jogar",
-    "loginToPlay": "Entre para jogar",
-    "history": "Suas últimas rodadas",
-    "fairTitle": "Provably fair",
-    "fairBody": "Cada resultado vem de HMAC-SHA256(semente do servidor, semente do cliente:nonce). O hash da semente do servidor é exibido antes de você jogar.",
-    "serverSeedHash": "Semente do servidor (SHA-256)",
-    "clientSeed": "Semente do cliente",
-    "nonce": "Próximo nonce",
-    "rotate": "Trocar sementes",
-    "rotated": "Novo par de sementes ativo.",
-    "previousSeed": "Semente anterior (revelada)",
-    "serverSeed": "Semente do servidor",
-    "roundsPlayed": "Rodadas jogadas",
-    "verifyHow": "Para verificar: confira que SHA-256(semente do servidor) é igual ao hash exibido; depois pegue os 4 primeiros bytes de HMAC-SHA256(semente do servidor, \"clientSeed:nonce\") divididos por 2^32. Dice = floor(f × 10000) / 100. Limbo = 0.99 / (1 − f).",
-    "loginForFairness": "Entre para ver suas sementes."
-  },
-  "wallet": {
-    "title": "Carteira",
-    "active": "ativa",
-    "switchHint": "Use o seletor BRL / MXN no topo para trocar a moeda ativa.",
-    "deposit": "Depositar",
-    "depositRange": "De {min} a {max}.",
-    "withdraw": "Sacar",
-    "withdrawMin": "Mínimo {min}. Analisado em até 24 horas.",
-    "payments": "Pagamentos",
-    "noPayments": "Nenhum pagamento ainda.",
-    "kind": {
-      "DEPOSIT": "Depósito",
-      "WITHDRAWAL": "Saque"
-    },
-    "status": {
-      "PENDING": "Pendente",
-      "COMPLETED": "Concluído",
-      "REJECTED": "Recusado"
-    },
-    "instructions": {
-      "PIX": "Pague com PIX copia e cola no app do seu banco. O saldo é atualizado assim que o pagamento for confirmado.",
-      "SPEI": "Faça uma transferência SPEI para esta CLABE com a referência abaixo.",
-      "OXXO": "Pague em qualquer loja OXXO com esta referência."
-    },
-    "fields": {
-      "pixCode": "Código PIX",
-      "clabe": "CLABE",
-      "reference": "Referência",
-      "beneficiary": "Beneficiário",
-      "pixKey": "Chave PIX",
-      "bank": "Banco"
-    },
-    "simulate": "Simular pagamento (modo teste)",
-    "history": "Movimentações",
-    "noTransactions": "Nenhuma movimentação ainda.",
-    "txType": {
-      "DEPOSIT": "Depósito",
-      "WITHDRAWAL": "Saque",
-      "BET": "Aposta",
-      "WIN": "Prêmio",
-      "REFUND": "Reembolso",
-      "ADJUSTMENT": "Ajuste"
-    },
-    "amount": "Valor",
-    "depositCta": "Gerar pagamento",
-    "withdrawCta": "Solicitar saque",
-    "depositCreated": "Pagamento gerado — veja as instruções abaixo.",
-    "withdrawCreated": "Saque solicitado.",
-    "kycNeeded": "Verifique sua identidade para sacar. Leva 2 minutos.",
-    "verifyNow": "Verificar agora",
-    "copy": "Copiar",
-    "copied": "Copiado",
-    "step1": "Pague exatamente {amount}.",
-    "step2": "Inclua a referência na descrição da transferência.",
-    "step3": "Envie o seu comprovante. O saldo é creditado quando nossa equipe confirmar o pagamento.",
-    "receiptSent": "Comprovante enviado — estamos verificando seu pagamento.",
-    "receiptThanks": "Obrigado! Confirmaremos seu depósito em breve.",
-    "paidTitle": "Já pagou? Avise a gente",
-    "payerNote": "Nome do titular ou ID da transação",
-    "payerNotePlaceholder": "ex.: Maria Silva · E1234…",
-    "receipt": "Comprovante (foto ou PDF)",
-    "sendReceipt": "Enviar comprovante",
-    "pixKeyType": "Tipo de chave",
-    "pixTypes": {
-      "CPF": "CPF",
-      "CNPJ": "CNPJ",
-      "EMAIL": "E-mail",
-      "PHONE": "Celular",
-      "EVP": "Chave aleatória"
-    },
-    "pixPlaceholders": {
-      "CPF": "000.000.000-00",
-      "CNPJ": "00.000.000/0000-00",
-      "EMAIL": "nome@email.com",
-      "PHONE": "(11) 98765-4321",
-      "EVP": "123e4567-e89b-12d3-a456-…"
-    },
-    "withdrawNote": "O valor fica reservado do seu saldo e nossa equipe envia o pagamento para esta chave, normalmente em até 24 horas. A chave deve estar no seu nome.",
-    "withdrawPending": "Em andamento: nossa equipe enviará o pagamento para {destination}.",
-    "depositsUnavailable": "Depósitos nesta moeda ainda não estão disponíveis.",
-    "depositNote": "Os depósitos são creditados quando nossa equipe confirma o pagamento. Os prêmios são creditados automaticamente."
-  },
-  "bets": {
-    "title": "Minhas apostas",
-    "tabs": {
-      "sports": "Esportes",
-      "lottery": "Loteria",
-      "casino": "Cassino"
-    },
-    "status": {
-      "OPEN": "Em aberto",
-      "PENDING": "Pendente",
-      "WON": "Ganha",
-      "LOST": "Perdida",
-      "VOID": "Anulada"
-    },
-    "payout": "Pagamento"
-  },
-  "account": {
-    "title": "Conta",
-    "name": "Nome",
-    "email": "E-mail",
-    "memberSince": "Membro desde",
-    "responsibleTitle": "Jogo responsável",
-    "responsibleBody": "Defina limites para que o jogo continue sendo diversão. A autoexclusão bloqueia apostas e depósitos e não pode ser encerrada antes do prazo.",
-    "depositLimit": "Limite diário de depósito",
-    "currentLimit": "Limite atual: {limit} a cada 24 horas.",
-    "noLimit": "Sem limite definido.",
-    "selfExclusion": "Fazer uma pausa",
-    "excludedUntil": "Sua conta está pausada até",
-    "selfExclusionBody": "Pause apostas e depósitos pelo período que escolher.",
-    "saved": "Salvo.",
-    "limitPlaceholder": "Vazio = sem limite",
-    "save": "Salvar",
-    "days": "{count, plural, one {# dia} other {# dias}}",
-    "confirmExclusion": "Entendo que não poderei apostar nem depositar até o fim do período.",
-    "exclude": "Pausar minha conta"
-  },
   "admin": {
     "nav": {
       "overview": "Resumo",
@@ -320,7 +165,9 @@
       "users": "Jogadores",
       "kyc": "KYC",
       "banners": "Banners",
-      "settings": "Configurações"
+      "settings": "Configurações",
+      "orders": "Serviços",
+      "whatsapp": "WhatsApp"
     },
     "overview": "Resumo",
     "kpi": {
@@ -328,18 +175,15 @@
       "openBets": "Apostas esportivas em aberto",
       "pendingDeposits": "Depósitos pendentes",
       "pendingWithdrawals": "Saques pendentes",
-      "pendingKyc": "KYC para analisar"
+      "pendingKyc": "KYC para analisar",
+      "receipts": "Comprovantes para conferir",
+      "toPay": "Prêmios a pagar",
+      "awaiting": "Aguardando pagamento",
+      "active": "Ativos",
+      "stakes": "Apostas confirmadas",
+      "paidOut": "Prêmios pagos",
+      "owed": "Prêmios pendentes"
     },
-    "table": {
-      "currency": "Moeda",
-      "balances": "Saldos dos jogadores",
-      "deposits": "Depósitos",
-      "withdrawals": "Saques",
-      "ggrSports": "GGR esportes",
-      "ggrLottery": "GGR loteria",
-      "ggrCasino": "GGR cassino"
-    },
-    "ggrNote": "GGR = apostas liquidadas menos pagamentos.",
     "done": "Pronto.",
     "empty": "Nada por aqui ainda.",
     "events": {
@@ -391,32 +235,8 @@
       "scheduled": "Os sorteios de NY, FL e GA são criados automaticamente. Informe o Pick 3 e o Pick 4 oficiais após cada sorteio.",
       "awaiting": "Aguardando resultados",
       "upcoming": "Próximos",
-      "custom": "Sorteio especial (opcional)"
-    },
-    "payments": {
-      "pending": "Pagamentos pendentes",
-      "approve": "Aprovar",
-      "reject": "Recusar",
-      "note": "Aprove um depósito só depois que o dinheiro chegar. Recusar um saque devolve o valor ao jogador.",
-      "recent": "Recentes",
-      "noteLabel": "Nota (obrigatória para recusar)",
-      "notePlaceholder": "ex.: ID E2E do PIX, ou motivo da recusa",
-      "depositsTitle": "Depósitos a confirmar ({count})",
-      "depositsHelp": "Procure no seu banco uma transferência com este valor e referência e confirme: o saldo é creditado ao jogador na hora.",
-      "viewReceipt": "Ver comprovante",
-      "noReceipt": "O jogador ainda não enviou comprovante.",
-      "confirmDeposit": "Confirmar depósito",
-      "withdrawalsTitle": "Saques a pagar ({count})",
-      "withdrawalsHelp": "Envie o PIX do seu banco para esta chave e marque como pago. Recusar devolve o valor ao saldo do jogador.",
-      "markPaid": "Marcar como pago"
-    },
-    "users": {
-      "user": "Jogador",
-      "joined": "Cadastro",
-      "balances": "Saldos",
-      "activity": "Apostas / bilhetes / rodadas",
-      "flags": "Marcações",
-      "excluded": "Autoexcluído"
+      "custom": "Sorteio especial (opcional)",
+      "recent": "Recentes"
     },
     "save": "Salvar",
     "kyc": {
@@ -469,13 +289,101 @@
     },
     "settings": {
       "saved": "Configurações salvas.",
-      "intro": "Para onde os jogadores enviam seus depósitos. Cada depósito recebe um código PIX copia e cola e um QR com o valor exato e a referência; você confirma em Pagamentos quando o dinheiro chegar.",
+      "intro": "Sua chave PIX: o agente do WhatsApp a envia aos clientes, com PIX copia e cola e QR Code no valor exato e o código do serviço como referência.",
       "beneficiary": "Nome do recebedor",
       "city": "Cidade",
       "bank": "Banco (opcional)",
       "pixHint": "Nome e cidade aparecem no app do banco do jogador (máx. 25 e 15 caracteres). Deixe a chave vazia para desativar depósitos PIX.",
       "speiHint": "Deixe a CLABE vazia para desativar depósitos SPEI manuais.",
-      "save": "Salvar configurações"
+      "save": "Salvar configurações",
+      "pixKeyType": "Tipo de chave",
+      "pixKey": "Chave PIX",
+      "pixTypes": {
+        "CPF": "CPF",
+        "CNPJ": "CNPJ",
+        "EMAIL": "E-mail",
+        "PHONE": "Celular",
+        "EVP": "Chave aleatória"
+      }
+    },
+    "orders": {
+      "searchPlaceholder": "Código, WhatsApp ou nome",
+      "search": "Buscar",
+      "empty": "Nenhum serviço aqui.",
+      "late": "fora do prazo",
+      "onTime": "no prazo",
+      "customer": "Cliente",
+      "payBy": "Pagar até",
+      "confirmedAt": "confirmado",
+      "paidAt": "pago",
+      "paymentTitle": "Pagamento do cliente",
+      "receipt": "Comprovante",
+      "receiptAt": "Comprovante recebido",
+      "noReceipt": "Ainda sem comprovante. O cliente envia pelo WhatsApp.",
+      "tooLate": "O comprovante chegou fora do prazo (ou não chegou): este serviço não pode ser confirmado. Recuse com uma nota.",
+      "confirmHelp": "Confira se chegaram {amount} com a referência {code} no seu banco e confirme: a aposta fica ativa e o cliente é avisado.",
+      "note": "Nota (opcional)",
+      "confirmNotePlaceholder": "ex.: ID E2E do PIX",
+      "confirm": "Confirmar pagamento",
+      "rejectReason": "Motivo (enviado ao cliente)",
+      "rejectPlaceholder": "ex.: Pagamento não encontrado",
+      "reject": "Recusar",
+      "resend": "Reenviar dados de pagamento no WhatsApp",
+      "resent": "Enviado.",
+      "payWinner": "Pagar o ganhador",
+      "payRefund": "Devolver",
+      "payoutKey": "Chave PIX do cliente",
+      "waitingKey": "Aguardando o cliente enviar a chave PIX pelo WhatsApp. Você também pode digitá-la abaixo.",
+      "keyType": "Tipo de chave",
+      "enterKey": "Chave PIX",
+      "changeKey": "Alterar chave PIX",
+      "saveKey": "Salvar chave",
+      "keySaved": "Chave salva.",
+      "paidNotePlaceholder": "ex.: ID E2E do PIX enviado",
+      "markPaid": "Pago · finalizar serviço",
+      "kinds": {
+        "SPORTS": "Esportes",
+        "LOTTERY": "Loteria"
+      },
+      "filters": {
+        "RECEIPT_RECEIVED": "Para conferir",
+        "PAYOUT": "A pagar",
+        "AWAITING_PAYMENT": "Aguardando pagamento",
+        "CONFIRMED": "Ativos",
+        "DONE": "Finalizados",
+        "CLOSED": "Recusados/expirados",
+        "ALL": "Todos"
+      }
+    },
+    "whatsapp": {
+      "title": "Agente do WhatsApp",
+      "notConfigured": "O agente do WhatsApp não está conectado: as mensagens só ficam registradas. Configure em WhatsApp.",
+      "failedRecent": "{count} mensagens do WhatsApp falharam nas últimas 24 h.",
+      "setupIntro": "Conecte seu servidor Evolution API adicionando estas variáveis (na Vercel → Settings → Environment Variables) e faça um novo deploy:",
+      "setupDocker": "Ainda sem servidor? O projeto inclui evolution/docker-compose.yml e um guia (evolution/README.md) para rodar em uma VPS ou Railway.",
+      "createInstance": "Criar instância do WhatsApp",
+      "created": "Instância criada. Escaneie o QR Code.",
+      "scanTitle": "Vincule o número de WhatsApp do agente",
+      "scanBody": "No celular: WhatsApp → Aparelhos conectados → Conectar um aparelho, e escaneie este código. Ele muda a cada poucos segundos.",
+      "pairingCode": "Ou use o código de pareamento",
+      "refresh": "Atualizar",
+      "webhookLabel": "Endereço do site para mensagens recebidas",
+      "setWebhook": "Configurar webhook",
+      "webhookSet": "Webhook configurado.",
+      "webhookHelp": "A Evolution enviará as mensagens dos clientes (comprovantes, chaves PIX, códigos) para /api/whatsapp/webhook neste endereço.",
+      "testLabel": "Enviar uma mensagem de teste",
+      "sendTest": "Enviar teste",
+      "testSent": "Mensagem de teste enviada (veja o registro).",
+      "logout": "Desconectar número do WhatsApp",
+      "log": "Mensagens recentes",
+      "states": {
+        "open": "Conectado",
+        "connecting": "Aguardando leitura do QR",
+        "close": "Desconectado",
+        "missing": "Instância não criada",
+        "not_configured": "Não configurado",
+        "error": "Erro"
+      }
     }
   },
   "errors": {
@@ -538,42 +446,102 @@
     "banner_headline_missing": "Adicione um título.",
     "invalid_dates": "O fim deve ser depois do início.",
     "too_many_pending": "Você já tem {max} depósitos aguardando confirmação.",
-    "receipt_type": "O comprovante deve ser uma foto (JPG, PNG, WebP) ou PDF.",
+    "receipt_type": "O comprovante deve ser uma foto ou PDF.",
     "receipt_missing": "Escreva uma nota ou anexe o comprovante.",
-    "pix_name_required": "Informe o nome do recebedor da chave PIX."
-  },
-  "kyc": {
-    "title": "Verificação de identidade",
-    "status": {
-      "NONE": "Não verificado",
-      "PENDING": "Em análise",
-      "VERIFIED": "Verificado",
-      "REJECTED": "Recusado"
-    },
-    "body": {
-      "NONE": "Necessário para sacar prêmios. Envie uma foto do seu documento e uma selfie.",
-      "PENDING": "Estamos analisando seus documentos. Normalmente leva menos de 24 horas.",
-      "VERIFIED": "Sua identidade está verificada. Você já pode sacar.",
-      "REJECTED": "Não conseguimos verificar seus documentos. Envie novamente."
-    },
-    "reason": "Motivo",
-    "fullName": "Nome completo como no documento",
-    "documentType": "Documento",
-    "documentNumber": "Número",
-    "passport": "Passaporte",
-    "front": "Frente do documento (RG, CNH ou INE)",
-    "back": "Verso do documento",
-    "selfie": "Selfie segurando o documento",
-    "privacy": "Seus documentos são usados apenas para verificar sua identidade e só nossa equipe de compliance os vê.",
-    "submit": "Enviar para análise",
-    "submitted": "Documentos enviados. Avisaremos em breve.",
-    "files": {
-      "DOCUMENT_FRONT": "Frente",
-      "DOCUMENT_BACK": "Verso",
-      "SELFIE": "Selfie"
-    }
+    "pix_name_required": "Informe o nome do recebedor da chave PIX.",
+    "invalid_name": "Informe seu nome.",
+    "invalid_phone": "Informe um WhatsApp do Brasil válido, com DDD.",
+    "too_many_open": "Este número já tem {max} serviços aguardando pagamento.",
+    "adult_required": "Você precisa confirmar que tem 18 anos ou mais.",
+    "receipt_too_large": "O comprovante é muito grande (máx. 5 MB).",
+    "order_not_open": "Este serviço não está mais aguardando pagamento.",
+    "paid_too_late": "O comprovante chegou fora do prazo; este serviço não pode ser confirmado.",
+    "order_not_payable": "Este serviço não tem prêmio a pagar.",
+    "payout_key_missing": "Primeiro adicione a chave PIX do cliente.",
+    "whatsapp_not_configured": "O agente do WhatsApp não está configurado (EVOLUTION_API_URL / EVOLUTION_API_KEY).",
+    "whatsapp_token_missing": "Primeiro defina EVOLUTION_WEBHOOK_TOKEN."
   },
   "ads": {
     "label": "Publicidade"
+  },
+  "orders": {
+    "name": "Seu nome",
+    "whatsapp": "WhatsApp",
+    "whatsappHint": "Enviamos os dados de pagamento e seus resultados para este número.",
+    "adult": "Tenho 18 anos ou mais e aceito os termos e a política de jogo responsável.",
+    "create": "Criar serviço",
+    "creating": "Criando…",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "code": "Código do serviço",
+    "lookup": "Consultar",
+    "lookupTitle": "Meu serviço",
+    "lookupBody": "Digite o código que enviamos pelo WhatsApp (ex.: PJ7K3M9Q).",
+    "lookupAnother": "Consultar outro serviço",
+    "notFound": "Serviço não encontrado",
+    "service": "Serviço",
+    "amount": "A pagar",
+    "payout": "Prêmio",
+    "potential": "Ganho possível",
+    "payTitle": "Pague por PIX",
+    "payBody": "Pague exatamente {amount} e envie o comprovante pelo WhatsApp até",
+    "pixCode": "PIX copia e cola",
+    "pixKey": "Chave PIX",
+    "beneficiary": "Favorecido",
+    "payViaWhatsapp": "Enviaremos os dados de pagamento pelo WhatsApp.",
+    "sendReceipt": "Depois de pagar, envie o comprovante (foto ou PDF) no chat do WhatsApp. Nossa equipe confere e ativa seu serviço.",
+    "receiptReceived": "Recebemos seu comprovante e estamos conferindo o pagamento.",
+    "details": "Detalhes",
+    "status": {
+      "AWAITING_PAYMENT": "Aguardando pagamento",
+      "RECEIPT_RECEIVED": "Comprovante recebido",
+      "CONFIRMED": "Ativo",
+      "WON": "Premiado",
+      "LOST": "Não premiado",
+      "VOID": "Anulado · devolução",
+      "PAID": "Pago",
+      "REJECTED": "Recusado",
+      "EXPIRED": "Expirado"
+    },
+    "statusHelp": {
+      "AWAITING_PAYMENT": "Pague por PIX e envie o comprovante pelo WhatsApp.",
+      "RECEIPT_RECEIVED": "Estamos conferindo seu pagamento.",
+      "CONFIRMED": "Pagamento confirmado. Boa sorte!",
+      "WON": "Responda no WhatsApp com sua chave PIX para receber o prêmio.",
+      "LOST": "Não foi desta vez. Obrigado por jogar!",
+      "VOID": "O evento foi cancelado: responda no WhatsApp com sua chave PIX para a devolução.",
+      "PAID": "Pagamento enviado por PIX.",
+      "REJECTED": "Não foi possível confirmar o pagamento.",
+      "EXPIRED": "O prazo de pagamento terminou."
+    },
+    "steps": {
+      "AWAITING_PAYMENT": "Criado",
+      "RECEIPT_RECEIVED": "Comprovante",
+      "CONFIRMED": "Confirmado",
+      "RESULT": "Resultado",
+      "PAID": "Finalizado"
+    }
+  },
+  "bot": {
+    "created": "Olá {name}! 👋\n\nSeu serviço *{code}* foi criado:\n{summary}\n\n💰 Valor a pagar: *{amount}*\n🏆 Ganho possível: {potential}\n\n📲 *Pague por PIX*\nChave ({keyType}): *{key}*\nFavorecido: {beneficiary}\n\nEm seguida enviamos o QR Code e o PIX copia e cola. Depois de pagar, *envie o comprovante aqui* (foto ou PDF) até *{deadline}*.\n\nAcompanhe: {link}",
+    "createdNoPix": "Olá {name}! Seu serviço *{code}* foi criado:\n{summary}\n\n💰 Valor: *{amount}*\nEm breve enviaremos os dados para pagamento.",
+    "qrCaption": "QR Code PIX · {code} · {amount}",
+    "receiptOk": "✅ Recebemos seu comprovante do serviço *{code}*. Vamos conferir o pagamento e avisamos por aqui.",
+    "receiptLate": "⚠️ Recebemos o comprovante do serviço *{code}*, mas depois do prazo. Nossa equipe vai analisar.",
+    "receiptClosed": "O serviço *{code}* não está aguardando pagamento.",
+    "receiptError": "Não conseguimos baixar o arquivo. Pode enviar de novo?",
+    "receiptType": "Envie o comprovante como foto (JPG/PNG) ou PDF de até 5 MB.",
+    "noOpenOrder": "Não encontramos um serviço aguardando pagamento neste número. Crie o seu em {link}",
+    "confirmed": "🎯 Pagamento confirmado! Seu serviço *{code}* está ativo. Ganho possível: {potential}. Boa sorte! 🍀",
+    "rejected": "❌ Não conseguimos confirmar o pagamento do serviço *{code}*.\nMotivo: {reason}",
+    "expired": "⏰ O serviço *{code}* expirou sem pagamento.",
+    "won": "🎉 Parabéns! O serviço *{code}* foi premiado: *{payout}*.\n\nResponda com sua *chave PIX* (CPF, celular, e-mail ou chave aleatória) para receber o pagamento.",
+    "void": "↩️ O serviço *{code}* foi anulado (evento cancelado). Vamos devolver *{payout}*.\n\nResponda com sua *chave PIX* para receber a devolução.",
+    "lost": "Resultado do serviço *{code}*: não foi desta vez. Obrigado por jogar! 🍀",
+    "pixSaved": "✅ Chave PIX registrada para o serviço *{code}*: {type} {key}. O pagamento será enviado em breve.",
+    "pixInvalid": "Não reconheci uma chave PIX válida para o serviço *{code}*. Envie só a chave: CPF, celular com DDD, e-mail ou chave aleatória.",
+    "paid": "💸 Pagamento de *{payout}* enviado para a chave {key} (serviço *{code}*). Obrigado!",
+    "status": "Serviço *{code}*: {status}.",
+    "help": "Olá! 👋 Sou o assistente da ParyajNet.\n• Para apostar, crie seu serviço em {link}\n• Para pagar, envie aqui a foto ou PDF do comprovante\n• Para consultar, envie o código do serviço\n\nSeus serviços abertos: {codes}"
   }
 }

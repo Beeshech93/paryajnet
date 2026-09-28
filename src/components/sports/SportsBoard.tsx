@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link, useRouter } from "@/i18n/navigation";
-import { placeBetAction } from "@/app/actions/play";
-import { FormMessage } from "@/components/ActionForm";
+import { useRouter } from "@/i18n/navigation";
+import { OrderForm } from "@/components/OrderForm";
 import { LocalTime } from "@/components/LocalTime";
 import { codeLabel, isMainMarket, marketLabel, pickLabel } from "@/lib/labels";
 import { formatMoneyClient, formatNumber } from "@/lib/locale-tags";
-import type { ActionResult } from "@/lib/types";
 
 export type BoardMarket = {
   id: string;
@@ -34,19 +32,7 @@ export type BoardEvent = {
 
 type Leg = { eventId: string; selectionId: string; odds: string; label: string; match: string; live: boolean };
 
-export function SportsBoard({
-  events,
-  currency,
-  limits,
-  signedIn,
-  liveDelaySeconds,
-}: {
-  events: BoardEvent[];
-  currency: string;
-  limits: { min: number; max: number };
-  signedIn: boolean;
-  liveDelaySeconds: number;
-}) {
+export function SportsBoard({ events, limits }: { events: BoardEvent[]; limits: { min: number; max: number } }) {
   const t = useTranslations("sports");
   const tr = (k: string, v?: Record<string, string | number>) => t(k, v);
   const locale = useLocale();
@@ -54,8 +40,6 @@ export function SportsBoard({
   const [sport, setSport] = useState<string>("all");
   const [slip, setSlip] = useState<Leg[]>([]);
   const [stake, setStake] = useState<string>(String(limits.min * 10));
-  const [result, setResult] = useState<ActionResult<unknown> | null>(null);
-  const [pending, start] = useTransition();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const hasLive = events.some((e) => e.status === "LIVE");
@@ -85,7 +69,6 @@ export function SportsBoard({
   }, [visible]);
 
   function toggle(e: BoardEvent, m: BoardMarket, sel: { id: string; code: string; odds: string }) {
-    setResult(null);
     setSlip((cur) => {
       if (cur.some((l) => l.selectionId === sel.id)) return cur.filter((l) => l.selectionId !== sel.id);
       const leg: Leg = {
@@ -118,18 +101,6 @@ export function SportsBoard({
         .filter((l) => current.get(l.selectionId)?.open)
         .map((l) => ({ ...l, odds: current.get(l.selectionId)!.odds })),
     );
-  }
-
-  function submit() {
-    start(async () => {
-      const res = await placeBetAction({
-        stake: stake.replace(",", "."),
-        legs: slip.map((l) => ({ selectionId: l.selectionId, odds: l.odds })),
-      });
-      setResult(res);
-      if (res.ok) setSlip([]);
-      router.refresh();
-    });
   }
 
   function EventCard({ e }: { e: BoardEvent }) {
@@ -190,7 +161,7 @@ export function SportsBoard({
                 return (
                   <button
                     key={s.id}
-                    disabled={m.status !== "OPEN"}
+                    disabled={m.status !== "OPEN" || e.status === "LIVE"}
                     data-active={active}
                     onClick={() => toggle(e, m, s)}
                     className="odds-btn disabled:opacity-40"
@@ -335,7 +306,7 @@ export function SportsBoard({
               </div>
               <div>
                 <label className="label" htmlFor="stake">
-                  {t("stake")} ({currency})
+                  {t("stake")} (R$)
                 </label>
                 <input
                   id="stake"
@@ -346,36 +317,33 @@ export function SportsBoard({
                 />
                 <p className="mt-1 text-[11px] text-muted">
                   {t("limits", {
-                    min: formatMoneyClient(limits.min, currency, locale),
-                    max: formatMoneyClient(limits.max, currency, locale),
+                    min: formatMoneyClient(limits.min, locale),
+                    max: formatMoneyClient(limits.max, locale),
                   })}
                 </p>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted">{t("potentialWin")}</span>
-                <span className="font-bold text-brand-strong tabular-nums">
-                  {formatMoneyClient(potential, currency, locale)}
-                </span>
+                <span className="font-bold text-brand-strong tabular-nums">{formatMoneyClient(potential, locale)}</span>
               </div>
-              {slip.some((l) => l.live) && (
-                <p className="text-[11px] text-muted">{t("liveDelay", { seconds: liveDelaySeconds })}</p>
-              )}
-              {!signedIn ? (
-                <Link href="/login" className="btn-primary w-full">
-                  {t("loginToBet")}
-                </Link>
-              ) : changed || unavailable ? (
+              {changed || unavailable ? (
                 <button onClick={acceptChanges} className="btn-gold w-full py-3">
                   {t("acceptChanges")}
                 </button>
               ) : (
-                <button onClick={submit} disabled={pending} className="btn-accent w-full py-3 text-base">
-                  {pending ? t("placing") : t("placeBet")}
-                </button>
+                <div className="border-t border-line pt-3">
+                  <OrderForm
+                    payload={() => ({
+                      kind: "SPORTS",
+                      stake: stake.replace(",", "."),
+                      legs: slip.map((l) => ({ selectionId: l.selectionId, odds: l.odds })),
+                    })}
+                    onCreated={() => setSlip([])}
+                  />
+                </div>
               )}
             </div>
           )}
-          <FormMessage state={result} success={t("placed")} />
         </div>
       </aside>
     </div>

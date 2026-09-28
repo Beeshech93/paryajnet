@@ -1,5 +1,5 @@
 import { prisma, type Tx } from "./db";
-import { CURRENCY_LIMITS, Decimal } from "./money";
+import { Decimal, LIMITS } from "./money";
 import type { MarketDraft } from "./pricing";
 import {
   combinedOdds,
@@ -10,22 +10,15 @@ import {
   resolveSelection,
   validateMarket,
 } from "./sports-rules";
-import { AppError, type Currency, type Outcome } from "./types";
-import { credit, debit, getOrCreateWallet } from "./wallet";
+import { AppError, type Outcome } from "./types";
 
 export type SlipLeg = { selectionId: string; odds: string };
 
-/** In-play bets are held for this long, then re-checked, so late goals can't be exploited. */
 /** Market-wide writes touch dozens of rows; give them more than Prisma's 5s default. */
 export const LONG_TX = { maxWait: 10_000, timeout: 30_000 };
 
-export const LIVE_BET_DELAY_MS = Number(process.env.LIVE_BET_DELAY_MS ?? 5000);
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-function bettable(event: { status: string; startsAt: Date }, now = new Date()) {
-  return event.status === "LIVE" || (event.status === "SCHEDULED" && event.startsAt > now);
-}
+/** Customers need time to pay before kick-off: services close this long before the first game. */
+export const ORDER_LEAD_MINUTES = Number(process.env.ORDER_LEAD_MINUTES ?? 10);
 
 async function loadAndCheck(tx: Tx, slip: SlipLeg[]) {
   const selections = await tx.selection.findMany({
@@ -35,47 +28,46 @@ async function loadAndCheck(tx: Tx, slip: SlipLeg[]) {
   if (selections.length !== slip.length) throw new AppError("selection_unavailable");
   const eventIds = new Set(selections.map((s) => s.market.eventId));
   if (eventIds.size !== selections.length) throw new AppError("same_event_legs");
+  const cutoff = new Date(Date.now() + ORDER_LEAD_MINUTES * 60_000);
   for (const s of selections) {
-    if (s.market.status !== "OPEN" || !bettable(s.market.event)) throw new AppError("selection_unavailable");
+    const e = s.market.event;
+    // Pre-match only: payment is confirmed by hand, so in-play betting isn't offered.
+    if (s.market.status !== "OPEN" || e.status !== "SCHEDULED" || e.startsAt <= cutoff) {
+      throw new AppError("selection_unavailable");
+    }
     const seen = slip.find((l) => l.selectionId === s.id)!;
     if (!s.odds.equals(new Decimal(seen.odds))) throw new AppError("odds_changed");
   }
   return selections;
 }
 
-export async function placeSportsBet(userId: string, currency: Currency, stake: Decimal, slip: SlipLeg[]) {
-  const limits = CURRENCY_LIMITS[currency];
+/** Validate a bet slip and price it. `payBy` is the first kick-off minus the lead time. */
+export async function quoteSportsBet(stake: Decimal, slip: SlipLeg[]) {
   if (slip.length === 0) throw new AppError("empty_slip");
   if (slip.length > MAX_LEGS) throw new AppError("too_many_legs", { max: MAX_LEGS });
-  if (stake.lt(limits.minStake) || stake.gt(limits.maxStake)) {
-    throw new AppError("stake_out_of_range", { min: limits.minStake, max: limits.maxStake });
+  if (stake.lt(LIMITS.minStake) || stake.gt(LIMITS.maxStake)) {
+    throw new AppError("stake_out_of_range", { min: LIMITS.minStake, max: LIMITS.maxStake });
   }
-
-  const first = await loadAndCheck(prisma, slip);
-  const totalOdds = combinedOdds(first.map((s) => s.odds));
+  const selections = await loadAndCheck(prisma, slip);
+  const totalOdds = combinedOdds(selections.map((s) => s.odds));
   const potentialWin = stake.mul(totalOdds).toDecimalPlaces(2, Decimal.ROUND_DOWN);
-  if (potentialWin.gt(limits.maxPayout)) throw new AppError("max_payout", { max: limits.maxPayout });
+  if (potentialWin.gt(LIMITS.maxPayout)) throw new AppError("max_payout", { max: LIMITS.maxPayout });
+  const firstStart = Math.min(...selections.map((s) => s.market.event.startsAt.getTime()));
+  return { selections, totalOdds, potentialWin, payBy: new Date(firstStart - ORDER_LEAD_MINUTES * 60_000) };
+}
 
-  const live = first.some((s) => s.market.event.status === "LIVE");
-  if (live) await sleep(LIVE_BET_DELAY_MS);
-
-  return prisma.$transaction(async (tx) => {
-    // Re-validate inside the transaction: odds, suspensions or kick-off may have changed.
-    const selections = await loadAndCheck(tx, slip);
-    const wallet = await getOrCreateWallet(userId, currency, tx);
-    const bet = await tx.bet.create({
-      data: {
-        userId,
-        walletId: wallet.id,
-        currency,
-        stake,
-        totalOdds,
-        potentialWin,
-        legs: { create: selections.map((s) => ({ selectionId: s.id, odds: s.odds })) },
-      },
-    });
-    await debit(tx, wallet.id, stake, "BET", `bet:${bet.id}`);
-    return bet;
+/** Create the bet for a service inside the order's transaction (re-validates odds and availability). */
+export async function createBetForOrder(tx: Tx, orderId: string, stake: Decimal, slip: SlipLeg[]) {
+  const selections = await loadAndCheck(tx, slip);
+  const totalOdds = combinedOdds(selections.map((s) => s.odds));
+  return tx.bet.create({
+    data: {
+      orderId,
+      stake,
+      totalOdds,
+      potentialWin: stake.mul(totalOdds).toDecimalPlaces(2, Decimal.ROUND_DOWN),
+      legs: { create: selections.map((s) => ({ selectionId: s.id, odds: s.odds })) },
+    },
   });
 }
 
@@ -223,35 +215,47 @@ export async function cancelEvent(eventId: string) {
 }
 
 async function settleBetsTouching(selectionIds: string[]) {
+  // Only paid (confirmed) services are settled. Unconfirmed ones stay open: if the
+  // receipt arrived on time, confirming them later settles them straight away.
   const bets = await prisma.bet.findMany({
-    where: { status: "OPEN", legs: { some: { selectionId: { in: selectionIds } } } },
-    select: { id: true },
+    where: { status: "OPEN", order: { status: "CONFIRMED" }, legs: { some: { selectionId: { in: selectionIds } } } },
+    select: { orderId: true },
   });
-  for (const { id } of bets) {
-    await prisma.$transaction(async (tx) => {
-      const bet = await tx.bet.findUniqueOrThrow({
-        where: { id },
-        include: { legs: { include: { selection: true } } },
-      });
-      if (bet.status !== "OPEN") return;
-      for (const leg of bet.legs) {
-        if (leg.result !== leg.selection.result) {
-          await tx.betLeg.update({ where: { id: leg.id }, data: { result: leg.selection.result } });
-        }
-      }
-      const { status, payout } = evaluateBet(
-        bet.stake,
-        bet.legs.map((l) => ({ odds: l.odds, result: l.selection.result as Outcome })),
-      );
-      if (status === "OPEN") return;
-      // Guard against double settlement: only the transition from OPEN pays out.
-      const res = await tx.bet.updateMany({
-        where: { id, status: "OPEN" },
-        data: { status, payout, settledAt: new Date() },
-      });
-      if (res.count === 1 && payout && payout.gt(0)) {
-        await credit(tx, bet.walletId, payout, status === "VOID" ? "REFUND" : "WIN", `bet:${id}`);
-      }
-    });
+  const settled: string[] = [];
+  for (const { orderId } of bets) {
+    if (await settleSportsOrder(orderId)) settled.push(orderId);
   }
+  if (settled.length) await (await import("./agent")).notifyResults(settled);
+}
+
+/** Settle a confirmed sports service if all its games are decided. Returns true when it was settled now. */
+export async function settleSportsOrder(orderId: string): Promise<boolean> {
+  return prisma.$transaction(async (tx) => {
+    const bet = await tx.bet.findUnique({
+      where: { orderId },
+      include: { legs: { include: { selection: true } }, order: true },
+    });
+    if (!bet || bet.status !== "OPEN" || bet.order.status !== "CONFIRMED") return false;
+    for (const leg of bet.legs) {
+      if (leg.result !== leg.selection.result) {
+        await tx.betLeg.update({ where: { id: leg.id }, data: { result: leg.selection.result } });
+      }
+    }
+    const { status, payout } = evaluateBet(
+      bet.stake,
+      bet.legs.map((l) => ({ odds: l.odds, result: l.selection.result as Outcome })),
+    );
+    if (status === "OPEN") return false;
+    // Guard against double settlement: only the transition from OPEN counts.
+    const res = await tx.bet.updateMany({
+      where: { id: bet.id, status: "OPEN" },
+      data: { status, payout, settledAt: new Date() },
+    });
+    if (res.count === 0) return false;
+    await tx.order.update({
+      where: { id: orderId },
+      data: { status, payout: status === "LOST" ? null : payout, settledAt: new Date() },
+    });
+    return true;
+  });
 }

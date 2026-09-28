@@ -31,17 +31,15 @@ const ICONS: Record<string, React.ReactNode> = {
 };
 
 /** App-style tab bar for phones. */
-export function BottomNav({ signedIn }: { signedIn: boolean }) {
+export function BottomNav({ isAdmin }: { isAdmin: boolean }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const items = [
     { href: "/", key: "home", label: t("home") },
     { href: "/sports", key: "sports", label: t("sports") },
     { href: "/lottery", key: "lottery", label: t("lottery") },
-    { href: "/casino", key: "casino", label: t("casino") },
-    signedIn
-      ? { href: "/bets", key: "bets", label: t("betsShort") }
-      : { href: "/login", key: "login", label: t("login") },
+    { href: "/s", key: "bets", label: t("myServiceShort") },
+    ...(isAdmin ? [{ href: "/admin", key: "login", label: t("admin") }] : []),
   ];
 
   return (
@@ -49,7 +47,7 @@ export function BottomNav({ signedIn }: { signedIn: boolean }) {
       aria-label="Main"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
-      <ul className="mx-auto grid max-w-md grid-cols-5">
+      <ul className={`mx-auto grid max-w-md ${isAdmin ? "grid-cols-5" : "grid-cols-4"}`}>
         {items.map((item) => {
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           return (

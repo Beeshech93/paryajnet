@@ -7,13 +7,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const t = await getTranslations("admin");
   const links = [
     { href: "/admin", label: t("nav.overview") },
+    { href: "/admin/orders", label: t("nav.orders") },
+    { href: "/admin/whatsapp", label: t("nav.whatsapp") },
     { href: "/admin/events", label: t("nav.events") },
     { href: "/admin/lottery", label: t("nav.lottery") },
-    { href: "/admin/payments", label: t("nav.payments") },
-    { href: "/admin/kyc", label: t("nav.kyc") },
     { href: "/admin/banners", label: t("nav.banners") },
     { href: "/admin/settings", label: t("nav.settings") },
-    { href: "/admin/users", label: t("nav.users") },
   ];
   return (
     <div>

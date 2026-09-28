@@ -97,10 +97,10 @@ export async function HeroBanner({ event, draw }: { event: HeroEvent | null; dra
               <span aria-hidden>→</span>
             </Link>
             <Link
-              href="/register"
+              href="/s"
               className="btn border border-white/30 bg-white/10 px-6 py-3 text-base text-white backdrop-blur hover:bg-white/20"
             >
-              {t("ctaRegister")}
+              {t("ctaService")}
             </Link>
           </div>
           <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/75">
@@ -193,7 +193,7 @@ export async function HeroBanner({ event, draw }: { event: HeroEvent | null; dra
           )}
 
           <div className="absolute bottom-0 left-2 rounded-full border border-white/20 bg-white/15 px-3 py-1.5 text-xs font-semibold shadow-lg backdrop-blur motion-safe:animate-[float_5s_ease-in-out_0.5s_infinite]">
-            🎲 {t("heroCasinoChip")}
+            💬 {t("heroWhatsappChip")}
           </div>
         </div>
       </div>

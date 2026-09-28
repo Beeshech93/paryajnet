@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { ActionForm, SubmitButton } from "@/components/ActionForm";
 import { loginAction } from "@/app/actions/auth";
 
@@ -32,12 +31,6 @@ export default function LoginPage() {
         </div>
         <SubmitButton className="btn-primary w-full">{t("loginCta")}</SubmitButton>
       </ActionForm>
-      <p className="mt-4 text-center text-sm text-muted">
-        {t("noAccount")}{" "}
-        <Link href="/register" className="text-brand-strong">
-          {t("registerCta")}
-        </Link>
-      </p>
     </div>
   );
 }

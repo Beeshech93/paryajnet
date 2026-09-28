@@ -1,69 +1,68 @@
 # ParyajNet
 
-Plataforma web de apuestas: **deportes**, **lotería / borlette** y **casino provably fair**.
-Idiomas: português, español, français, English. Monedas: **BRL** (reales) y **MXN** (pesos mexicanos).
+Sports betting and borlette (New York, Florida, Georgia) for Brazil, in português, español, français and English.
+**Customers have no accounts**: they create a *service*, pay by PIX and follow everything on WhatsApp, where an
+agent (Evolution API) sends payment details, collects receipts and asks winners for their PIX key.
+Only admins log in: they confirm payments and finalise services by their code.
 
 Stack: Next.js 15 (App Router, server actions) · next-intl · Prisma · Tailwind CSS 4.
 
-## Arranque rápido
+## How a service works
+
+```
+Customer (site)                 WhatsApp agent                        Admin (/admin/orders)
+────────────────                ─────────────────                     ─────────────────────
+Builds a bet slip / ticket
+Name + WhatsApp + 18+  ──────▶  Summary, PIX key, QR, copia e cola
+                                Customer sends receipt (photo/PDF) ─▶ Checks the bank, confirms
+                                "Payment confirmed" ◀───────────────  (or rejects with a reason)
+Event / draw settles ──────────▶ Won/void: asks for the PIX key
+                                 Lost: short message
+                                 Customer replies with the key ─────▶ Pays by PIX, "Paid · finalise"
+                                 "Payout sent" ◀─────────────────────
+```
+
+- Code format `PJ` + 6 characters (e.g. `PJ7K3M9Q`); customers check it at `/s/<code>`, admins search it in **Services**.
+- A service must be paid (receipt received) before the deadline: first kick-off / draw close minus `ORDER_LEAD_MINUTES`.
+  Unpaid services expire. Only confirmed services are settled; if the admin confirms an on-time receipt after the
+  result, it is settled right away.
+- Pre-match only (live odds are shown but can't be picked: payment is confirmed by hand).
+- Winnings are paid by the admin by PIX; the agent recognises CPF, CNPJ, phone, e-mail or random keys in free text.
+
+## Quick start
 
 ```bash
-cp .env.example .env        # y pon un AUTH_SECRET: openssl rand -hex 32
+cp .env.example .env        # set AUTH_SECRET (openssl rand -hex 32)
 npm install
-npm run db:push             # crea la base SQLite (dev.db)
-npm run db:seed             # partidos, sorteos, admin y jugador demo (ver SEED_* en .env)
-npm run dev                 # http://localhost:3000
+npm run db:push
+npm run db:seed             # admin (SEED_ADMIN_*), demo games and lottery draws
+npm run dev                 # http://localhost:3000 — admin at /login
 ```
 
-`npm test` corre las pruebas de reglas (liquidación, pagos de borlette, RNG y RTP del casino).
-`npm run db:reset` borra y vuelve a sembrar la base.
+Then in **Admin → Configuración** enter your PIX key (it goes into every payment message and QR).
+`npm test` runs the rule tests (settlement, borlette payouts, PIX BR Code, phone/PIX-key parsing, Evolution payloads).
 
-## Qué incluye
+## Features
 
-| Área | Detalle |
+| Area | |
 | --- | --- |
-| Deportes | Fútbol: 1X2, doble oportunidad, goles 1.5/2.5/3.5, hándicap, ambos anotan y marcador exacto (generados con un modelo Poisson a partir de 1X2 y goles 2.5). Baloncesto: ganador, hándicap y puntos totales. Sencillas y combinadas (máx. 20, una por partido). Liquidación automática por marcador; los hándicaps y totales de línea entera se anulan en empate. |
-| En vivo | Marcador y reloj en vivo, refresco cada 5 s. Las apuestas en vivo se retienen `LIVE_BET_DELAY_MS` y se revalidan: si hubo gol o cambio de momio en ese tiempo, se rechazan. Un cambio de marcador suspende todos los mercados hasta que se reabran. El boleto detecta momios cambiados y pide aceptarlos. |
-| Feed de cuotas | `POST /api/feed` (Bearer `FEED_API_KEY`) crea y actualiza eventos, mercados, momios, marcador en vivo y resultados, idempotente por `externalId`. Un adaptador para tu proveedor (Sportradar, Betradar, Genius…) solo tiene que traducir al formato de `src/lib/feed.ts`. |
-| KYC | CPF con dígitos verificadores, CURP con dígito verificador y fecha de nacimiento cruzada, o pasaporte. Foto del documento y selfie (reducidas en el navegador). Un documento por cuenta. Revisión en `/admin/kyc`; las imágenes solo las ve un admin. Retiros bloqueados sin KYC; `KYC_REQUIRED_TO_PLAY=true` también exige KYC para jugar y depositar (obligatorio en Brasil). |
-| Lotería | Borlette sobre los sorteos oficiales de **Nueva York** (mediodía 2:30 p.m., noche 10:30 p.m.), **Florida** (1:30 p.m., 9:45 p.m.) y **Georgia** (12:29 p.m., 6:59 p.m., 11:34 p.m.), hora del Este. Los sorteos se crean solos y cierran `LOTTERY_CUTOFF_MINUTES` antes. 1.er lote = dos últimas cifras del Pick 3; 2.º y 3.er lote = los dos pares del Pick 4. Borlette 50×/20×/10×, Loto 3 500×, Mariage 1000× (`src/lib/lottery-rules.ts`). Resultados: a mano en `/admin/lottery` o por API en `POST /api/lottery/results` (Bearer `FEED_API_KEY`, `{"results":[{"lottery":"NY","session":"MIDDAY","date":"2026-09-28","pick3":"347","pick4":"1285"}]}`). También se pueden crear sorteos especiales. |
-| Casino | Dice y Limbo, 1% de ventaja de la casa. HMAC-SHA256(server seed, `clientSeed:nonce`); el hash se muestra antes de jugar y la semilla se revela al rotarla. |
-| Billetera | Una billetera por moneda, libro mayor inmutable (`Transaction`), débitos atómicos que nunca dejan saldo negativo. |
-| Pagos | **Manual por defecto** (`PAYMENTS_PROVIDER=manual`): configuras tu clave PIX (y/o CLABE SPEI) en `/admin/settings`; cada depósito genera un código PIX "copia e cola" + QR con el monto exacto y una referencia (BR Code del Banco Central). El jugador puede enviar nota y comprobante; el saldo se acredita **solo cuando el admin confirma** en `/admin/pagos`. Las **ganancias se acreditan solas** al liquidar. Los **retiros** se piden con tipo y clave PIX validada (CPF, CNPJ, correo, teléfono, aleatoria) o CLABE; el monto queda reservado y el admin paga a mano y marca "pagado" (rechazar devuelve el saldo). `WITHDRAWALS_REQUIRE_KYC` (por defecto `true`). También hay adaptadores para Conekta y webhooks firmados. El proveedor `mock` (simular pago) nunca funciona en producción. |
-| Juego responsable | Verificación de 18+ en el registro, límite diario de depósito, autoexclusión (1 día a 1 año). |
-| Publicidad | Espacios de banner en inicio, deportes, lotería y casino (etiqueta "Publicidad"). Banners de **imagen** (computadora ~1200×300 y móvil opcional ~800×400) o de **texto** (título, texto, botón y color azul/amarillo/rojo). Rotación automática, idioma, fechas de inicio/fin, conteo de vistas (cuando el banner se ve en pantalla) y clics, CTR. Gestión en `/admin/banners`; un espacio sin banners activos no se muestra. |
-| Admin | `/admin`: KPIs y GGR por moneda, crear/editar/suspender/liquidar eventos, sorteos, aprobar pagos, lista de jugadores. |
+| Sports | Football: 1X2, double chance, goals 1.5/2.5/3.5, handicap, BTTS, correct score (Poisson pricing from 1X2 + O/U 2.5). Basketball: winner, spread, total. Singles and accumulators. Live scores and admin live console. Odds feed at `POST /api/feed`. |
+| Lottery | Borlette on the official NY (2:30 pm / 10:30 pm), FL (1:30 pm / 9:45 pm), GA (12:29 pm / 6:59 pm / 11:34 pm) draws, Eastern Time, created automatically. Lot 1 = last two digits of Pick 3; lots 2–3 = the pairs of Pick 4. Borlette 50×/20×/10×, Loto 3 500×, Mariage 1000×. Results by hand or `POST /api/lottery/results`. |
+| Services | `Order` model: bet or ticket, customer name + WhatsApp, amount, deadline, receipt, payout and PIX key, status history. |
+| WhatsApp agent | `src/lib/agent.ts` + `src/lib/evolution.ts`. Webhook `POST /api/whatsapp/webhook?token=…`. Every message is logged (Admin → WhatsApp). Works without Evolution (messages logged as `SKIPPED`). Setup: [evolution/README.md](evolution/README.md). |
+| PIX | Static BR Code ("copia e cola") with amount and the service code as reference, CRC16 verified against the Banco Central example; QR sent as an image. |
+| Admin | Services (to check / to pay / active / finished), WhatsApp connection (QR, webhook, test, log), events, draws, banners, PIX settings. |
+| Advertising | Banner spaces on home, sports and lottery (`/admin/banners`). |
 
-Límites por moneda (apuesta mín./máx., pago máximo, depósitos): `src/lib/money.ts`.
+## Deploy (Vercel + PostgreSQL)
 
-## Estructura
+`scripts/vercel-build.mjs` resolves the database from `DATABASE_URL` or the variables a connected Postgres store
+injects, applies the schema and builds. Variables: see `.env.example` (`AUTH_SECRET`, `FEED_API_KEY`, `CRON_SECRET`,
+`EVOLUTION_*`, `WHATSAPP_AGENT_NUMBER`, `SITE_URL`). Seed the admin once: `DATABASE_URL=postgres://… npm run db:seed`.
 
-```
-prisma/schema.prisma        modelo de datos
-src/lib/*-rules.ts          reglas puras (probadas en rules.test.ts)
-src/lib/{sports,lottery,casino,payments,wallet}.ts   lógica con base de datos
-src/app/actions/            server actions (validación con zod)
-src/app/[locale]/           páginas (pt/es/fr/en)
-messages/*.json             traducciones
-```
+## Before real money
 
-## Despliegue (Vercel + PostgreSQL)
-
-`scripts/set-db-provider.mjs` elige el proveedor de Prisma según `DATABASE_URL`: `file:` usa SQLite y `postgres://` usa PostgreSQL. No hay que tocar el schema.
-
-1. Conecta una base PostgreSQL al proyecto (Prisma Postgres, Neon…). La app usa `DATABASE_URL` o, si está vacía, las variables que crea la integración (`*_DATABASE_URL`, `*_POSTGRES_URL`), así que no hace falta copiarlas.
-2. En Vercel, importa el repositorio y define las variables de `.env.example` (`DATABASE_URL`, `AUTH_SECRET`, `PAYMENTS_WEBHOOK_SECRET`, `FEED_API_KEY`…). `vercel.json` ya usa `npm run build:vercel`, que aplica el schema antes de compilar, y la región `gru1` (São Paulo).
-3. Siembra datos de demo una vez: `DATABASE_URL=postgres://… npm run db:seed`.
-
-## Antes de producción
-
-- **Pagos en México (Conekta, ya integrado):**
-  1. En el panel de Conekta copia tu llave privada (`key_…`) a `CONEKTA_PRIVATE_KEY`.
-  2. Crea la llave de webhooks: `curl -X POST https://api.conekta.io/webhook_keys -u key_…: -H "Accept: application/vnd.conekta-v2.3.0+json" -H "Content-Type: application/json" -d '{"active":true}'` y guarda `public_key` en `CONEKTA_WEBHOOK_PUBLIC_KEY`.
-  3. Registra el webhook `https://<tu-dominio>/api/payments/webhook/conekta` (eventos `order.paid`, `order.expired`).
-  4. Pon `PAYMENTS_PROVIDER_MX=conekta`. Prueba primero con llaves de sandbox.
-- **PIX (Brasil):** falta elegir proveedor. Implementa `PaymentProvider` (`src/lib/payment-providers/types.ts`), regístralo en `index.ts` y pon `PAYMENTS_PROVIDER_PIX=<nombre>`. Mientras tanto PIX usa el proveedor mock, que muestra el botón "simular pago": no lo dejes así en producción.
-- **KYC:** la revisión es manual. Para escalar, conecta un proveedor (idwall, unico, Truora, Metamap…) y consulta PEP y listas de sanciones.
-- **Migraciones:** `prisma db push` basta para empezar; con usuarios reales pasa a `prisma migrate`.
-- **Licencias:** operar apuestas con dinero real exige autorización en cada país: en Brasil, la Secretaria de Prêmios e Apostas (Lei 14.790/2023, dominio `.bet.br`); en México, un permiso de SEGOB. Las loterías tipo borlette tienen reglas propias y pueden no estar permitidas a operadores privados. Consúltalo con un abogado antes de lanzar.
-- **Seguridad:** limitar la frecuencia de peticiones en login y apuestas, 2FA para admins y registros de auditoría de las acciones de admin.
+- **Licences**: betting in Brazil requires authorisation from the Secretaria de Prêmios e Apostas (Lei 14.790/2023),
+  which also requires identifying bettors (CPF). Private lotteries like borlette may not be licensable. Check with a lawyer.
+- **WhatsApp**: Evolution API uses the WhatsApp Web protocol (unofficial). For volume, consider the official
+  WhatsApp Business Cloud API; the agent only needs `sendText`, `sendImage` and a webhook, so it can be swapped.

@@ -1,12 +1,11 @@
 import bcrypt from "bcryptjs";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { basketballMarkets, footballMarkets } from "../src/lib/pricing";
 import { createEvent } from "../src/lib/sports";
 import { ensureUpcomingDraws } from "../src/lib/lottery";
 import { LOTTERIES, resultFromPicks, zonedDate, zonedToUtc } from "../src/lib/lottery-schedule";
 
 const prisma = new PrismaClient();
-const D = (v: number | string) => new Prisma.Decimal(v);
 const hours = (h: number) => new Date(Date.now() + h * 3_600_000);
 
 const FOOTBALL: [string, string, string, number, [number, number, number], [number, number]][] = [
@@ -25,51 +24,18 @@ const BASKETBALL: [string, string, string, number, [number, number], number, num
   ["LNBP", "Fuerza Regia", "Diablos Rojos", 31, [1.55, 2.45], -5.5, 171.5],
 ];
 
-async function upsertUser(email: string, password: string, name: string, role: "USER" | "ADMIN", currency: string) {
+async function upsertAdmin(email: string, password: string) {
   return prisma.user.upsert({
     where: { email },
     update: {},
-    create: {
-      email,
-      name,
-      role,
-      preferredCurrency: currency,
-      birthDate: new Date("1990-05-15"),
-      passwordHash: await bcrypt.hash(password, 12),
-    },
-  });
-}
-
-async function fund(userId: string, currency: string, amount: number) {
-  const wallet = await prisma.wallet.upsert({
-    where: { userId_currency: { userId, currency } },
-    create: { userId, currency },
-    update: {},
-  });
-  if (wallet.balance.gt(0)) return;
-  const updated = await prisma.wallet.update({ where: { id: wallet.id }, data: { balance: D(amount) } });
-  await prisma.transaction.create({
-    data: {
-      walletId: wallet.id,
-      type: "ADJUSTMENT",
-      amount: D(amount),
-      balanceAfter: updated.balance,
-      reference: "seed",
-    },
+    create: { email, name: "Admin", role: "ADMIN", passwordHash: await bcrypt.hash(password, 12) },
   });
 }
 
 async function main() {
   const env = process.env;
   if (!env.SEED_ADMIN_EMAIL || !env.SEED_ADMIN_PASSWORD) throw new Error("Set SEED_ADMIN_* variables");
-  await upsertUser(env.SEED_ADMIN_EMAIL, env.SEED_ADMIN_PASSWORD, "Admin", "ADMIN", "BRL");
-
-  // Demo player with play money: development only.
-  if (env.SEED_PLAYER_EMAIL && env.SEED_PLAYER_PASSWORD) {
-    const player = await upsertUser(env.SEED_PLAYER_EMAIL, env.SEED_PLAYER_PASSWORD, "Jogador Demo", "USER", "BRL");
-    await fund(player.id, "BRL", 500);
-    await fund(player.id, "MXN", 2000);
-  }
+  await upsertAdmin(env.SEED_ADMIN_EMAIL, env.SEED_ADMIN_PASSWORD);
 
   if ((await prisma.event.count()) === 0) {
     for (const [league, home, away, inHours, [o1, oX, o2], ou] of FOOTBALL) {

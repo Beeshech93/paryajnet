@@ -1,17 +1,11 @@
-export const CURRENCIES = ["BRL", "MXN"] as const;
-export type Currency = (typeof CURRENCIES)[number];
+/** The platform operates in Brazil only: amounts are in reais, paid by PIX. */
+export const CURRENCY = "BRL";
 
-export type Role = "USER" | "ADMIN";
-export type TxType = "DEPOSIT" | "WITHDRAWAL" | "BET" | "WIN" | "REFUND" | "ADJUSTMENT";
-export type PaymentKind = "DEPOSIT" | "WITHDRAWAL";
-export type PaymentMethod = "PIX" | "SPEI" | "OXXO";
-export type PaymentStatus = "PENDING" | "COMPLETED" | "REJECTED";
+export type Role = "ADMIN";
+export type OrderStatus =
+  "AWAITING_PAYMENT" | "RECEIPT_RECEIVED" | "CONFIRMED" | "WON" | "LOST" | "VOID" | "PAID" | "REJECTED" | "EXPIRED";
 export type Outcome = "PENDING" | "WON" | "LOST" | "VOID";
 export type BetStatus = "OPEN" | "WON" | "LOST" | "VOID";
-
-export function isCurrency(value: unknown): value is Currency {
-  return typeof value === "string" && (CURRENCIES as readonly string[]).includes(value);
-}
 
 /** Error with a stable code that the UI translates via `errors.<code>`. */
 export class AppError extends Error {

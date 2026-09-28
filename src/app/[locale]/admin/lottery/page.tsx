@@ -202,7 +202,7 @@ export default async function AdminLottery() {
       </section>
 
       <section>
-        <h2 className="mb-3 font-display text-lg font-bold">{t("payments.recent")}</h2>
+        <h2 className="mb-3 font-display text-lg font-bold">{t("lottery.recent")}</h2>
         <div className="space-y-2">
           {recent.map((d) => (
             <DrawRow key={d.id} d={d} settle={false} />

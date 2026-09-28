@@ -8,7 +8,6 @@ import { AppError, type Role } from "./types";
 
 const COOKIE = "pj_session";
 const MAX_AGE = 60 * 60 * 24 * 7;
-export const MIN_AGE = 18;
 
 function secret() {
   const value = process.env.AUTH_SECRET;
@@ -77,20 +76,4 @@ export async function adminForAction() {
   const user = await userForAction();
   if (user.role !== "ADMIN") throw new AppError("forbidden");
   return user;
-}
-
-export function assertCanPlay(user: { selfExcludedUntil: Date | null; kycStatus: string }) {
-  if (process.env.KYC_REQUIRED_TO_PLAY === "true" && user.kycStatus !== "VERIFIED") {
-    throw new AppError("kyc_required");
-  }
-  if (user.selfExcludedUntil && user.selfExcludedUntil > new Date()) {
-    throw new AppError("self_excluded", { until: user.selfExcludedUntil.toISOString().slice(0, 10) });
-  }
-}
-
-export function ageOn(birthDate: Date, today = new Date()): number {
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-  return age;
 }

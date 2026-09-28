@@ -1,16 +1,7 @@
 import { prisma } from "./db";
 
 /** Payment settings editable from /admin/settings. */
-export const PAYMENT_SETTING_KEYS = [
-  "pix.keyType",
-  "pix.key",
-  "pix.name",
-  "pix.city",
-  "pix.bank",
-  "spei.clabe",
-  "spei.name",
-  "spei.bank",
-] as const;
+export const PAYMENT_SETTING_KEYS = ["pix.keyType", "pix.key", "pix.name", "pix.city", "pix.bank"] as const;
 export type PaymentSettingKey = (typeof PAYMENT_SETTING_KEYS)[number];
 export type PaymentSettings = Partial<Record<PaymentSettingKey, string>>;
 

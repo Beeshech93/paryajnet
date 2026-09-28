@@ -1,49 +1,19 @@
 import { Prisma } from "@prisma/client";
-import type { Currency, PaymentMethod } from "./types";
 
 export const Decimal = Prisma.Decimal;
 export type Decimal = Prisma.Decimal;
 
-type Limits = {
-  minStake: number;
-  maxStake: number;
-  maxPayout: number;
-  minDeposit: number;
-  maxDeposit: number;
-  minWithdrawal: number;
-  depositMethods: PaymentMethod[];
-  withdrawalMethods: PaymentMethod[];
-};
-
-export const CURRENCY_LIMITS: Record<Currency, Limits> = {
-  BRL: {
-    minStake: 1,
-    maxStake: 10_000,
-    maxPayout: 100_000,
-    minDeposit: 10,
-    maxDeposit: 50_000,
-    minWithdrawal: 20,
-    depositMethods: ["PIX"],
-    withdrawalMethods: ["PIX"],
-  },
-  MXN: {
-    minStake: 10,
-    maxStake: 50_000,
-    maxPayout: 500_000,
-    minDeposit: 50,
-    maxDeposit: 200_000,
-    minWithdrawal: 100,
-    depositMethods: ["SPEI", "OXXO"],
-    withdrawalMethods: ["SPEI"],
-  },
+/** Stake and payout limits (BRL). */
+export const LIMITS = {
+  minStake: 1,
+  maxStake: 10_000,
+  maxPayout: 100_000,
 };
 
 export { LOCALE_TAGS } from "./locale-tags";
 import { LOCALE_TAGS } from "./locale-tags";
 
-export { DEFAULT_CURRENCY_BY_LOCALE } from "./currency-defaults";
-
-export function formatMoney(amount: Decimal | number | string, currency: string, locale: string): string {
+export function formatMoney(amount: Decimal | number | string, locale: string, currency = "BRL"): string {
   return new Intl.NumberFormat(LOCALE_TAGS[locale] ?? locale, { style: "currency", currency }).format(Number(amount));
 }
 

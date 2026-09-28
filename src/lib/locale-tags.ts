@@ -5,7 +5,7 @@ export const LOCALE_TAGS: Record<string, string> = {
   en: "en-US",
 };
 
-export function formatMoneyClient(amount: number | string, currency: string, locale: string) {
+export function formatMoneyClient(amount: number | string, locale: string, currency = "BRL") {
   return new Intl.NumberFormat(LOCALE_TAGS[locale] ?? locale, { style: "currency", currency }).format(Number(amount));
 }
 

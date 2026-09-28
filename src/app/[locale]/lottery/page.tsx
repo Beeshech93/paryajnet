@@ -1,14 +1,12 @@
 import { AdSlot } from "@/components/ads/AdSlot";
-import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LocalTime } from "@/components/LocalTime";
 import { StateBadge } from "@/components/lottery/StateBadge";
 import { TicketBuilder } from "@/components/lottery/TicketBuilder";
-import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { ensureUpcomingDraws } from "@/lib/lottery";
 import { LOTTERY_PAYOUTS, lots } from "@/lib/lottery-rules";
-import { CURRENCY_LIMITS } from "@/lib/money";
-import { getActiveCurrency } from "@/lib/wallet";
+import { LIMITS } from "@/lib/money";
 
 export async function generateMetadata() {
   const t = await getTranslations("nav");
@@ -17,8 +15,7 @@ export async function generateMetadata() {
 
 export default async function LotteryPage({ params }: { params: Promise<{ locale: string }> }) {
   setRequestLocale((await params).locale);
-  const [user, locale, t] = await Promise.all([getCurrentUser(), getLocale(), getTranslations("lottery")]);
-  const currency = await getActiveCurrency(user, locale);
+  const t = await getTranslations("lottery");
   await ensureUpcomingDraws();
   const [open, settled] = await Promise.all([
     prisma.lotteryDraw.findMany({
@@ -55,9 +52,7 @@ export default async function LotteryPage({ params }: { params: Promise<{ locale
             drawAt: d.drawAt?.toISOString() ?? null,
             closesAt: d.closesAt.toISOString(),
           }))}
-          currency={currency}
-          limits={{ min: CURRENCY_LIMITS[currency].minStake, max: CURRENCY_LIMITS[currency].maxStake }}
-          signedIn={!!user}
+          limits={{ min: LIMITS.minStake, max: LIMITS.maxStake }}
         />
 
         <div className="space-y-6">

@@ -62,7 +62,7 @@ export default async function LocaleLayout({
               <p className="sm:ml-auto">© {new Date().getFullYear()} ParyajNet</p>
             </div>
           </footer>
-          <BottomNav signedIn={!!user} />
+          <BottomNav isAdmin={user?.role === "ADMIN"} />
         </NextIntlClientProvider>
       </body>
     </html>

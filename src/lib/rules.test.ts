@@ -1,11 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { Prisma } from "@prisma/client";
-import { diceMultiplier, diceRoll, limboResult, roundFloat, sha256 } from "./fairness";
 import { lineMultiplier, normalizeNumbers } from "./lottery-rules";
 import { resultFromPicks, upcomingDraws, zonedDate, zonedToUtc } from "./lottery-schedule";
 import { parseAmount } from "./money";
-import { curpBirthDate, isValidCpf, isValidCurp, normalizeDocument, validateDocument } from "./kyc-rules";
 import { fairProbabilities, footballMarkets } from "./pricing";
 import { combinedOdds, evaluateBet, resolveSelection, validateMarket } from "./sports-rules";
 
@@ -77,20 +75,6 @@ test("Poisson pricing reproduces the input and is consistent", () => {
   assert.deepEqual(fairProbabilities([2, 2]), [0.5, 0.5]);
 });
 
-test("CPF and CURP validation", () => {
-  assert.equal(isValidCpf("52998224725"), true);
-  assert.equal(isValidCpf("52998224724"), false);
-  assert.equal(isValidCpf("11111111111"), false);
-  assert.equal(normalizeDocument("CPF", "529.982.247-25"), "52998224725");
-  assert.equal(isValidCurp("GODE561231HDFNRS09"), false);
-  const curp = "HEGG560427MVZRRL04";
-  assert.equal(isValidCurp(curp), true);
-  assert.equal(curpBirthDate(curp), "1956-04-27");
-  assert.equal(validateDocument("CURP", curp, new Date("1956-04-27")), null);
-  assert.equal(validateDocument("CURP", curp, new Date("1990-01-01")), "curp_birthdate_mismatch");
-  assert.equal(validateDocument("CPF", "123", new Date()), "invalid_cpf");
-});
-
 test("accumulator settlement", () => {
   const stake = D(10);
   assert.deepEqual(
@@ -139,35 +123,6 @@ test("borlette, loto 3 and mariage payouts", () => {
   assert.equal(normalizeNumbers("MARIAGE", "12-12"), null);
   assert.equal(normalizeNumbers("BORLETTE", "7"), null);
   assert.equal(normalizeNumbers("LOTO3", "007"), "007");
-});
-
-test("provably fair outputs are deterministic and in range", () => {
-  const seed = "a".repeat(64);
-  assert.equal(roundFloat(seed, "client", 0), roundFloat(seed, "client", 0));
-  assert.notEqual(roundFloat(seed, "client", 0), roundFloat(seed, "client", 1));
-  assert.equal(sha256("abc"), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
-  for (let n = 0; n < 1000; n++) {
-    const f = roundFloat(seed, "client", n);
-    assert.ok(f >= 0 && f < 1);
-    const roll = diceRoll(f);
-    assert.ok(roll >= 0 && roll <= 99.99);
-    assert.ok(limboResult(f) >= 1);
-  }
-  assert.equal(diceMultiplier(50), 1.98);
-});
-
-test("casino RTP is about 99%", () => {
-  const seed = "b".repeat(64);
-  const N = 200_000;
-  let dice = 0;
-  let limbo = 0;
-  for (let n = 0; n < N; n++) {
-    const f = roundFloat(seed, "rtp", n);
-    if (diceRoll(f) < 50) dice += diceMultiplier(50);
-    if (limboResult(f) >= 2) limbo += 2;
-  }
-  assert.ok(Math.abs(dice / N - 0.99) < 0.01, `dice RTP ${dice / N}`);
-  assert.ok(Math.abs(limbo / N - 0.99) < 0.01, `limbo RTP ${limbo / N}`);
 });
 
 test("amount parsing accepts comma or dot decimals", () => {
@@ -232,4 +187,69 @@ test("PIX BR Code matches the Banco Central example and validates keys", async (
   assert.equal(normalizePixKey("PHONE", "(11) 98765-4321"), "+5511987654321");
   assert.equal(normalizePixKey("PHONE", "123"), null);
   assert.equal(normalizePixKey("EVP", "123E4567-E12B-12D1-A456-426655440000"), "123e4567-e12b-12d1-a456-426655440000");
+});
+
+test("service codes, Brazilian phones and PIX keys typed in WhatsApp", async () => {
+  const { detectPixKey, findOrderCode, newOrderCode, normalizeBrPhone, formatPhone } = await import("./orders-rules");
+  const code = newOrderCode();
+  assert.match(code, /^PJ[2-9A-HJ-NP-Z]{6}$/);
+  assert.equal(findOrderCode(`meu código é ${code.toLowerCase()} obrigado`), code);
+  assert.equal(findOrderCode("pj-7k3m9q"), "PJ7K3M9Q");
+  assert.equal(findOrderCode("PJ0O1I00"), null);
+
+  assert.equal(normalizeBrPhone("(11) 98765-4321"), "5511987654321");
+  assert.equal(normalizeBrPhone("+55 21 3456-7890"), "552134567890");
+  assert.equal(normalizeBrPhone("123"), null);
+  assert.equal(formatPhone("5511987654321"), "+55 (11) 98765-4321");
+
+  assert.deepEqual(detectPixKey("minha chave é 529.982.247-25"), { type: "CPF", key: "52998224725" });
+  assert.deepEqual(detectPixKey("Maria@Email.com."), { type: "EMAIL", key: "maria@email.com" });
+  assert.deepEqual(detectPixKey("(11) 98765-4321"), { type: "PHONE", key: "+5511987654321" });
+  assert.deepEqual(detectPixKey("11.222.333/0001-81"), { type: "CNPJ", key: "11222333000181" });
+  assert.equal(detectPixKey("123e4567-e89b-12d3-a456-426614174000")?.type, "EVP");
+  assert.equal(detectPixKey("oi, tudo bem?"), null);
+});
+
+test("Evolution API webhook messages are parsed and filtered", async () => {
+  const { parseEvolutionMessage } = await import("./orders-rules");
+  const base = { event: "messages.upsert", instance: "paryajnet" };
+  const text = parseEvolutionMessage({
+    ...base,
+    data: {
+      key: { remoteJid: "5511987654321@s.whatsapp.net", fromMe: false, id: "ABC" },
+      pushName: "Maria",
+      message: { conversation: "PJ7K3M9Q" },
+    },
+  });
+  assert.deepEqual(text, { id: "ABC", phone: "5511987654321", name: "Maria", text: "PJ7K3M9Q", media: null });
+  const image = parseEvolutionMessage({
+    event: "MESSAGES_UPSERT",
+    data: {
+      key: { remoteJid: "5511987654321@s.whatsapp.net", fromMe: false, id: "IMG" },
+      message: { imageMessage: { mimetype: "image/jpeg", caption: "comprovante" }, base64: "aGVsbG8=" },
+    },
+  });
+  assert.deepEqual(image?.media, { type: "IMAGE", mimetype: "image/jpeg", base64: "aGVsbG8=" });
+  assert.equal(image?.text, "comprovante");
+  const pdf = parseEvolutionMessage({
+    ...base,
+    data: {
+      key: { remoteJid: "5511987654321@s.whatsapp.net", id: "DOC" },
+      message: { documentMessage: { mimetype: "application/pdf" } },
+    },
+  });
+  assert.equal(pdf?.media?.type, "DOCUMENT");
+  // Ignored: our own messages, groups, other events.
+  assert.equal(
+    parseEvolutionMessage({
+      ...base,
+      data: { key: { remoteJid: "5511987654321@s.whatsapp.net", fromMe: true }, message: { conversation: "x" } },
+    }),
+    null,
+  );
+  assert.equal(
+    parseEvolutionMessage({ ...base, data: { key: { remoteJid: "12036@g.us" }, message: { conversation: "x" } } }),
+    null,
+  );
+  assert.equal(parseEvolutionMessage({ event: "connection.update", data: {} }), null);
 });

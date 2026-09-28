@@ -1,6 +1,10 @@
 // ParyajNet data model.
 //
-// Money is stored as Decimal in the currency's major unit (e.g. 12.50 BRL).
+// Customers have no accounts: they create a "servicio" (Order) — a sports bet
+// or a lottery ticket — identified by a code and their WhatsApp number. The
+// WhatsApp agent sends payment details, collects the receipt and asks winners
+// for their PIX key; an admin confirms payments and finalises services.
+// Money is stored as Decimal in BRL.
 // Status/type columns are plain strings so the schema runs unchanged on
 // SQLite (development) and PostgreSQL (production); the allowed values are
 // defined as TypeScript unions in src/lib/types.ts.
@@ -14,82 +18,68 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// Back-office users (admins). Customers never log in.
 model User {
-  id                String    @id @default(cuid())
-  email             String    @unique
-  passwordHash      String
-  name              String
-  birthDate         DateTime
-  role              String    @default("USER") // USER | ADMIN
-  preferredCurrency String    @default("BRL")
-  selfExcludedUntil DateTime?
-  kycStatus         String    @default("NONE") // NONE | PENDING | VERIFIED | REJECTED
-  createdAt         DateTime  @default(now())
-
-  wallets       Wallet[]
-  payments      Payment[]
-  bets          Bet[]
-  tickets       LotteryTicket[]
-  casinoSeeds   CasinoSeed[]
-  casinoRounds  CasinoRound[]
-  kycSubmissions KycSubmission[]
-}
-
-model Wallet {
-  id                 String   @id @default(cuid())
-  userId             String
-  currency           String // BRL | MXN
-  balance            Decimal  @default(0)
-  dailyDepositLimit  Decimal?
-  createdAt          DateTime @default(now())
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
-  payments     Payment[]
-
-  @@unique([userId, currency])
-}
-
-// Immutable ledger: every balance change writes one row.
-model Transaction {
   id           String   @id @default(cuid())
-  walletId     String
-  type         String // DEPOSIT | WITHDRAWAL | BET | WIN | REFUND | ADJUSTMENT
-  amount       Decimal // signed: negative for debits
-  balanceAfter Decimal
-  reference    String?
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ADMIN")
   createdAt    DateTime @default(now())
-
-  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
-
-  @@index([walletId, createdAt])
 }
 
-model Payment {
-  id           String   @id @default(cuid())
-  userId       String
-  walletId     String
-  kind         String // DEPOSIT | WITHDRAWAL
-  method       String // PIX | SPEI | OXXO
-  provider     String   @default("mock") // payment provider that handles it (see src/lib/payment-providers)
-  amount       Decimal
-  status       String   @default("PENDING") // PENDING | COMPLETED | REJECTED
-  providerRef  String?  @unique
-  reference    String? // short code the player puts in the transfer, e.g. PJ7K3M9Q
-  instructions String? // JSON: what the player needs to pay / where we pay out
-  payerNote    String? // player's note: payer name, bank, transaction id
-  receiptMime  String?
-  receipt      Bytes? // proof of payment uploaded by the player
-  adminNote    String?
-  reviewedAt   DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+// ---------- Services (orders) ----------
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+model Order {
+  id            String    @id @default(cuid())
+  code          String    @unique // e.g. PJ7K3M9Q — the number the customer and admin use
+  kind          String // SPORTS | LOTTERY
+  customerName  String
+  phone         String // WhatsApp number, digits with country code (5511987654321)
+  locale        String    @default("pt") // language the agent replies in
+  amount        Decimal // what the customer pays
+  potentialWin  Decimal
+  // AWAITING_PAYMENT → RECEIPT_RECEIVED → CONFIRMED → WON | LOST | VOID → PAID
+  // or REJECTED / EXPIRED. WON and VOID need a payout (winnings / refund).
+  status        String    @default("AWAITING_PAYMENT")
+  payBy         DateTime // receipt must arrive before this (kick-off / draw close)
+  receiptMime   String?
+  receipt       Bytes?
+  receiptAt     DateTime?
+  confirmedAt   DateTime?
+  settledAt     DateTime?
+  payout        Decimal?
+  payoutKeyType String?
+  payoutKey     String?
+  paidAt        DateTime?
+  adminNote     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  @@index([status, kind])
-  @@index([reference])
+  bet      Bet?
+  ticket   LotteryTicket?
+  messages WhatsAppMessage[]
+
+  @@index([status])
+  @@index([phone, createdAt])
+}
+
+/// Every WhatsApp message the agent sends or receives (audit + admin view).
+model WhatsAppMessage {
+  id        String   @id @default(cuid())
+  phone     String
+  direction String // IN | OUT
+  type      String   @default("TEXT") // TEXT | IMAGE | DOCUMENT
+  body      String?
+  status    String // SENT | FAILED | SKIPPED (agent not configured) | RECEIVED
+  error     String?
+  orderId   String?
+  createdAt DateTime @default(now())
+
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([phone, createdAt])
+  @@index([createdAt])
 }
 
 // ---------- Sports ----------
@@ -144,9 +134,7 @@ model Selection {
 
 model Bet {
   id           String    @id @default(cuid())
-  userId       String
-  walletId     String
-  currency     String
+  orderId      String    @unique
   stake        Decimal
   totalOdds    Decimal
   potentialWin Decimal
@@ -155,10 +143,9 @@ model Bet {
   createdAt    DateTime  @default(now())
   settledAt    DateTime?
 
-  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  legs BetLeg[]
+  order Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  legs  BetLeg[]
 
-  @@index([userId, createdAt])
   @@index([status])
 }
 
@@ -203,20 +190,16 @@ model LotteryDraw {
 
 model LotteryTicket {
   id         String   @id @default(cuid())
-  userId     String
-  walletId   String
+  orderId    String   @unique
   drawId     String
-  currency   String
   totalStake Decimal
   payout     Decimal?
   status     String   @default("OPEN") // OPEN | WON | LOST | VOID
   createdAt  DateTime @default(now())
 
-  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
   draw  LotteryDraw   @relation(fields: [drawId], references: [id])
   lines LotteryLine[]
-
-  @@index([userId, createdAt])
 }
 
 model LotteryLine {
@@ -229,74 +212,6 @@ model LotteryLine {
   result   String   @default("PENDING")
 
   ticket LotteryTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-}
-
-// ---------- Casino (provably fair) ----------
-
-model CasinoSeed {
-  id             String   @id @default(cuid())
-  userId         String
-  serverSeed     String // secret until the seed is rotated
-  serverSeedHash String
-  clientSeed     String
-  nonce          Int      @default(0)
-  active         Boolean  @default(true)
-  createdAt      DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, active])
-}
-
-model CasinoRound {
-  id             String   @id @default(cuid())
-  userId         String
-  walletId       String
-  game           String // DICE | LIMBO
-  currency       String
-  stake          Decimal
-  target         Decimal // dice: roll-under target; limbo: target multiplier
-  outcome        Decimal // dice: roll 0-99.99; limbo: result multiplier
-  multiplier     Decimal // payout multiplier if won
-  payout         Decimal
-  won            Boolean
-  seedId         String
-  nonce          Int
-  createdAt      DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, createdAt])
-}
-
-// ---------- KYC ----------
-
-model KycSubmission {
-  id             String    @id @default(cuid())
-  userId         String
-  fullName       String
-  documentType   String // CPF | CURP | PASSPORT
-  documentNumber String // normalised (digits / uppercase)
-  status         String    @default("PENDING") // PENDING | VERIFIED | REJECTED
-  reviewNote     String?
-  reviewedAt     DateTime?
-  createdAt      DateTime  @default(now())
-
-  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  files KycFile[]
-
-  @@index([status])
-  @@index([documentType, documentNumber])
-}
-
-model KycFile {
-  id           String @id @default(cuid())
-  submissionId String
-  kind         String // DOCUMENT_FRONT | DOCUMENT_BACK | SELFIE
-  mime         String
-  data         Bytes
-
-  submission KycSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 }
 
 // ---------- Advertising ----------

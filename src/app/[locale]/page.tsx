@@ -61,15 +61,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       tint: "bg-gold/25",
       icon: "🎟️",
     },
-    {
-      href: "/casino",
-      title: t("casinoTitle"),
-      body: t("casinoBody"),
-      accent: "text-danger",
-      bar: "bg-casino",
-      tint: "bg-casino/15",
-      icon: "🎲",
-    },
   ];
 
   return (
@@ -78,7 +69,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
       <AdSlot placement="HOME" />
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2">
         {verticals.map((v) => (
           <Link
             key={v.href}

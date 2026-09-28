@@ -5,11 +5,13 @@ import { adminForAction } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { cancelDraw, settleDraw, settleWithPicks } from "@/lib/lottery";
 import { Decimal } from "@/lib/money";
-import { approveWithdrawal, confirmDeposit, rejectDeposit, rejectWithdrawal } from "@/lib/payments";
 import { BANNER_LOCALES, BANNER_THEMES, normalizeLink, PLACEMENTS, readImage } from "@/lib/banners";
-import { reviewKyc } from "@/lib/kyc";
 import { normalizePixKey } from "@/lib/pix";
 import { savePaymentSettings, type PaymentSettings } from "@/lib/settings";
+import { confirmOrder, markPaid, rejectOrder, setPayoutKey } from "@/lib/orders";
+import { sendPaymentInfo, sendText } from "@/lib/agent";
+import { evolution, evolutionConfig } from "@/lib/evolution";
+import { normalizeBrPhone } from "@/lib/orders-rules";
 import { basketballMarkets, footballMarkets } from "@/lib/pricing";
 import {
   cancelEvent,
@@ -122,17 +124,6 @@ export async function setAllMarketsAction(_prev: ActionResult | null, form: Form
   );
 }
 
-export async function reviewKycAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
-  return asAdmin(async () => {
-    const decision = form.get("decision") === "approve" ? "approve" : "reject";
-    const note =
-      String(form.get("note") ?? "")
-        .trim()
-        .slice(0, 500) || null;
-    await reviewKyc(String(form.get("submissionId")), decision, note);
-  });
-}
-
 export async function settleEventAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
   return asAdmin(async () => {
     const home = Number(form.get("homeScore"));
@@ -199,47 +190,21 @@ export async function cancelDrawAction(_prev: ActionResult | null, form: FormDat
   });
 }
 
-export async function paymentDecisionAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
-  return asAdmin(async () => {
-    const id = String(form.get("paymentId"));
-    const approve = String(form.get("decision")) === "approve";
-    const note =
-      String(form.get("note") ?? "")
-        .trim()
-        .slice(0, 300) || null;
-    const payment = await prisma.payment.findUniqueOrThrow({ where: { id } });
-    if (!approve && !note) throw new AppError("note_required");
-    if (payment.kind === "DEPOSIT") {
-      await (approve ? confirmDeposit(id, note) : rejectDeposit(id, note));
-    } else {
-      await (approve ? approveWithdrawal(id, note) : rejectWithdrawal(id, note));
-    }
-  });
-}
-
 export async function savePaymentSettingsAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
   return asAdmin(async () => {
     const get = (k: string) => String(form.get(k) ?? "").trim();
-    const values: PaymentSettings = {};
     const keyType = get("pix.keyType");
     const rawKey = get("pix.key");
+    const values: PaymentSettings = { "pix.key": "", "pix.keyType": "" };
     if (rawKey) {
       const key = normalizePixKey(keyType, rawKey);
       if (!key) throw new AppError("invalid_pix_key");
       values["pix.key"] = key;
       values["pix.keyType"] = keyType;
-    } else {
-      values["pix.key"] = "";
-      values["pix.keyType"] = "";
     }
     values["pix.name"] = get("pix.name").slice(0, 25);
     values["pix.city"] = get("pix.city").slice(0, 15);
     values["pix.bank"] = get("pix.bank").slice(0, 60);
-    const clabe = get("spei.clabe").replace(/\s/g, "");
-    if (clabe && !/^\d{18}$/.test(clabe)) throw new AppError("invalid_clabe");
-    values["spei.clabe"] = clabe;
-    values["spei.name"] = get("spei.name").slice(0, 60);
-    values["spei.bank"] = get("spei.bank").slice(0, 60);
     if (values["pix.key"] && !values["pix.name"]) throw new AppError("pix_name_required");
     await savePaymentSettings(values);
   });
@@ -307,5 +272,85 @@ export async function toggleBannerAction(_prev: ActionResult | null, form: FormD
 export async function deleteBannerAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
   return asAdmin(async () => {
     await prisma.banner.delete({ where: { id: String(form.get("bannerId")) } });
+  });
+}
+
+// ---------- Services (orders) ----------
+
+const note = (form: FormData) =>
+  String(form.get("note") ?? "")
+    .trim()
+    .slice(0, 300) || null;
+
+export async function confirmOrderAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(() => confirmOrder(String(form.get("orderId")), note(form)));
+}
+
+export async function rejectOrderAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const reason = note(form);
+    if (!reason) throw new AppError("note_required");
+    await rejectOrder(String(form.get("orderId")), reason);
+  });
+}
+
+export async function setPayoutKeyAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(() =>
+    setPayoutKey(String(form.get("orderId")), String(form.get("keyType") ?? ""), String(form.get("key") ?? "")),
+  );
+}
+
+/** Finalise: the winnings/refund were sent by PIX. */
+export async function markPaidAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(() => markPaid(String(form.get("orderId")), note(form)));
+}
+
+export async function resendPaymentInfoAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(() => sendPaymentInfo(String(form.get("orderId"))));
+}
+
+// ---------- WhatsApp agent (Evolution API) ----------
+
+function evo() {
+  const cfg = evolutionConfig();
+  if (!cfg) throw new AppError("whatsapp_not_configured");
+  return cfg;
+}
+
+export async function whatsappConnectAction(_prev: ActionResult | null, _form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const cfg = evo();
+    if ((await evolution.state(cfg)) === "missing") await evolution.createInstance(cfg);
+  });
+}
+
+export async function whatsappWebhookAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const cfg = evo();
+    const token = process.env.EVOLUTION_WEBHOOK_TOKEN;
+    if (!token) throw new AppError("whatsapp_token_missing");
+    const base = String(form.get("baseUrl") ?? "").replace(/\/+$/, "");
+    if (!/^https:\/\//.test(base)) throw new AppError("invalid_link");
+    await evolution.setWebhook(cfg, `${base}/api/whatsapp/webhook?token=${encodeURIComponent(token)}`);
+  });
+}
+
+export async function whatsappTestAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    evo();
+    const phone = normalizeBrPhone(String(form.get("phone") ?? ""));
+    if (!phone) throw new AppError("invalid_phone");
+    await sendText(
+      phone,
+      String(form.get("text") ?? "")
+        .trim()
+        .slice(0, 1000) || "ParyajNet ✅",
+    );
+  });
+}
+
+export async function whatsappLogoutAction(_prev: ActionResult | null, _form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    await evolution.logout(evo());
   });
 }

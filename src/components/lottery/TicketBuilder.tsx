@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import { buyTicketAction } from "@/app/actions/play";
-import { FormMessage } from "@/components/ActionForm";
+import { OrderForm } from "@/components/OrderForm";
 import { LocalTime } from "@/components/LocalTime";
 import { StateBadge } from "./StateBadge";
 import { formatMoneyClient } from "@/lib/locale-tags";
-import type { ActionResult } from "@/lib/types";
 
 type LineType = "BORLETTE" | "LOTO3" | "MARIAGE";
 type Line = { key: number; type: LineType; numbers: string; stake: string };
@@ -36,17 +33,7 @@ export type DrawOption = {
 
 const MAX_PER_STATE = 4;
 
-export function TicketBuilder({
-  draws,
-  currency,
-  limits,
-  signedIn,
-}: {
-  draws: DrawOption[];
-  currency: string;
-  limits: { min: number; max: number };
-  signedIn: boolean;
-}) {
+export function TicketBuilder({ draws, limits }: { draws: DrawOption[]; limits: { min: number; max: number } }) {
   const t = useTranslations("lottery");
   const locale = useLocale();
   const present = new Set(draws.map((d) => d.lottery ?? "OTHER"));
@@ -59,30 +46,16 @@ export function TicketBuilder({
   const [numbers, setNumbers] = useState("");
   const [stake, setStake] = useState(String(limits.min * 5));
   const [lines, setLines] = useState<Line[]>([]);
-  const [result, setResult] = useState<ActionResult<unknown> | null>(null);
-  const [pending, start] = useTransition();
 
   if (draws.length === 0) return <p className="card p-8 text-center text-muted">{t("noDraws")}</p>;
 
   function add(nums = numbers) {
     if (!nums.trim()) return;
-    setResult(null);
     setLines((l) => [...l, { key: Date.now() + Math.random(), type, numbers: nums.trim(), stake }]);
     setNumbers("");
   }
 
   const total = lines.reduce((acc, l) => acc + (Number(l.stake.replace(",", ".")) || 0), 0);
-
-  function buy() {
-    start(async () => {
-      const res = await buyTicketAction({
-        drawId,
-        lines: lines.map((l) => ({ type: l.type, numbers: l.numbers, stake: l.stake.replace(",", ".") })),
-      });
-      setResult(res);
-      if (res.ok) setLines([]);
-    });
-  }
 
   return (
     <div className="card space-y-5 p-5">
@@ -171,7 +144,7 @@ export function TicketBuilder({
         </div>
         <div>
           <label className="label" htmlFor="lstake">
-            {t("stake")} ({currency})
+            {t("stake")} (R$)
           </label>
           <input
             id="lstake"
@@ -202,7 +175,7 @@ export function TicketBuilder({
                 <span className="w-24 text-xs text-muted">{t(`types.${l.type}`)}</span>
                 <span className="flex-1 font-display text-base font-bold tracking-widest">{l.numbers}</span>
                 <span className="tabular-nums">
-                  {formatMoneyClient(Number(l.stake.replace(",", ".")) || 0, currency, locale)}
+                  {formatMoneyClient(Number(l.stake.replace(",", ".")) || 0, locale)}
                 </span>
                 <button
                   onClick={() => setLines((x) => x.filter((y) => y.key !== l.key))}
@@ -218,22 +191,20 @@ export function TicketBuilder({
       </div>
 
       {lines.length > 0 && (
-        <div className="flex items-center justify-between border-t border-line pt-4">
+        <div className="space-y-3 border-t border-line pt-4">
           <p className="text-sm">
-            {t("total")}: <span className="font-bold tabular-nums">{formatMoneyClient(total, currency, locale)}</span>
+            {t("total")}: <span className="font-bold tabular-nums">{formatMoneyClient(total, locale)}</span>
           </p>
-          {signedIn ? (
-            <button className="btn-gold" onClick={buy} disabled={pending}>
-              {pending ? "…" : t("buy")}
-            </button>
-          ) : (
-            <Link href="/login" className="btn-primary">
-              {t("loginToPlay")}
-            </Link>
-          )}
+          <OrderForm
+            payload={() => ({
+              kind: "LOTTERY",
+              drawId,
+              lines: lines.map((l) => ({ type: l.type, numbers: l.numbers, stake: l.stake.replace(",", ".") })),
+            })}
+            onCreated={() => setLines([])}
+          />
         </div>
       )}
-      <FormMessage state={result} success={t("bought")} />
     </div>
   );
 }

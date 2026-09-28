@@ -2,7 +2,18 @@
  * PIX helpers (Brazil). Pure functions, unit-tested in rules.test.ts.
  * BR Code format: Banco Central do Brasil, "Manual de Padrões para Iniciação do Pix" (EMV-MPM).
  */
-import { isValidCpf } from "./kyc-rules";
+
+/** Brazilian CPF: 11 digits with two mod-11 check digits. */
+export function isValidCpf(cpf: string): boolean {
+  if (!/^\d{11}$/.test(cpf) || /^(\d)\1{10}$/.test(cpf)) return false;
+  const digits = cpf.split("").map(Number);
+  for (const len of [9, 10]) {
+    let sum = 0;
+    for (let i = 0; i < len; i++) sum += digits[i] * (len + 1 - i);
+    if (((sum * 10) % 11) % 10 !== digits[len]) return false;
+  }
+  return true;
+}
 
 export const PIX_KEY_TYPES = ["CPF", "CNPJ", "EMAIL", "PHONE", "EVP"] as const;
 export type PixKeyType = (typeof PIX_KEY_TYPES)[number];
