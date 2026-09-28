@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+import { mapLimit } from "./concurrency";
 import { prisma, type Tx } from "./db";
 import { Decimal, LIMITS } from "./money";
 import type { MarketDraft } from "./pricing";
@@ -98,32 +100,54 @@ function checkDraft(m: MarketDraft) {
 const TYPE_ORDER = new Map(MARKET_TYPES.map((t, i) => [t, i]));
 
 /**
- * Create or update markets for an event. New selections are created, existing
- * ones get new prices; settled markets are never touched.
+ * Create or update markets for an event with few round trips: one read, then
+ * bulk inserts for new markets/selections and updates only for odds that
+ * changed. Settled markets are never touched. `db` can be a transaction.
  */
-export async function upsertMarkets(tx: Tx, eventId: string, markets: MarketDraft[], status?: "OPEN" | "SUSPENDED") {
-  for (const m of markets) {
-    checkDraft(m);
-    const key = marketKey(m.type, m.line);
-    const existing = await tx.market.findUnique({ where: { eventId_key: { eventId, key } } });
-    if (existing?.status === "SETTLED") continue;
-    const sort = (TYPE_ORDER.get(m.type as never) ?? 99) * 100 + (m.line ?? 0);
-    const market =
-      existing ??
-      (await tx.market.create({
-        data: { eventId, type: m.type, line: m.line === null ? null : new Decimal(m.line), key, sort },
-      }));
-    if (status && existing && existing.status !== status) {
-      await tx.market.update({ where: { id: market.id }, data: { status } });
-    }
-    for (const s of m.selections) {
-      await tx.selection.upsert({
-        where: { marketId_code: { marketId: market.id, code: s.code } },
-        create: { marketId: market.id, code: s.code, odds: new Decimal(s.odds) },
-        update: { odds: new Decimal(s.odds) },
+export async function upsertMarkets(db: Tx, eventId: string, markets: MarketDraft[], status?: "OPEN" | "SUSPENDED") {
+  markets.forEach(checkDraft);
+  const keys = markets.map((m) => marketKey(m.type, m.line));
+  const existing = await db.market.findMany({ where: { eventId, key: { in: keys } }, include: { selections: true } });
+  const byKey = new Map(existing.map((m) => [m.key, m]));
+  const newMarkets: { id: string; eventId: string; type: string; line: Decimal | null; key: string; sort: number }[] =
+    [];
+  const newSelections: { marketId: string; code: string; odds: Decimal }[] = [];
+  const updates: { id: string; odds: Decimal }[] = [];
+  const statusChanges: string[] = [];
+
+  markets.forEach((m, idx) => {
+    const key = keys[idx];
+    const ex = byKey.get(key);
+    if (ex?.status === "SETTLED") return;
+    if (!ex) {
+      const id = randomUUID();
+      newMarkets.push({
+        id,
+        eventId,
+        type: m.type,
+        line: m.line === null ? null : new Decimal(m.line),
+        key,
+        sort: (TYPE_ORDER.get(m.type as never) ?? 99) * 100 + (m.line ?? 0),
       });
+      for (const sel of m.selections) newSelections.push({ marketId: id, code: sel.code, odds: new Decimal(sel.odds) });
+      return;
     }
-  }
+    if (status && ex.status !== status) statusChanges.push(ex.id);
+    const current = new Map(ex.selections.map((sel) => [sel.code, sel]));
+    for (const sel of m.selections) {
+      const odds = new Decimal(sel.odds);
+      const cur = current.get(sel.code);
+      if (!cur) newSelections.push({ marketId: ex.id, code: sel.code, odds });
+      else if (!cur.odds.equals(odds)) updates.push({ id: cur.id, odds });
+    }
+  });
+
+  if (newMarkets.length) await db.market.createMany({ data: newMarkets });
+  if (newSelections.length) await db.selection.createMany({ data: newSelections });
+  if (statusChanges.length)
+    await db.market.updateMany({ where: { id: { in: statusChanges } }, data: { status: status! } });
+  await mapLimit(updates, 8, (u) => db.selection.update({ where: { id: u.id }, data: { odds: u.odds } }));
+  return { created: newMarkets.length, updated: updates.length };
 }
 
 export async function createEvent(input: EventInput) {

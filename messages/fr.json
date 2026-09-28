@@ -409,7 +409,9 @@
       "saved": "Enregistré.",
       "demo": "{count, plural, one {# match de démonstration} other {# matchs de démonstration}} (hors API) sont encore affichés aux clients.",
       "removeDemo": "Supprimer les matchs de démo",
-      "demoRemoved": "Matchs de démo supprimés."
+      "demoRemoved": "Matchs de démo supprimés.",
+      "pendingLeagues": "{count, plural, one {# ligue attend} other {# ligues attendent}} une mise à jour. Chaque exécution en traite autant que possible en ~40 s ; relancez (ou cela continue à la prochaine visite).",
+      "overBudget": "Cette configuration consomme environ {monthly} crédits par mois mais il n'en reste que {quota} : choisissez moins de ligues ou un intervalle plus long, ou passez à un plan supérieur. Les mises à jour s'arrêtent d'elles-mêmes avant l'épuisement."
     }
   },
   "errors": {

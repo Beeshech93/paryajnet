@@ -13,6 +13,8 @@ import { getSetting } from "@/lib/settings";
 import { sportsDataConfig } from "@/lib/sports-sync";
 
 export const dynamic = "force-dynamic";
+// "Update now" runs the sync inside this page's server action.
+export const maxDuration = 60;
 
 export default async function AdminSportsData() {
   const t = await getTranslations("admin.sportsData");
@@ -41,6 +43,11 @@ export default async function AdminSportsData() {
   const selectedMissing = cfg.sports.filter((k) => !known.has(k));
   const credits = cfg.sports.reduce((a, k) => a + (sportOf(k) === "basketball" ? 3 : 2), 0);
   const monthly = Math.round(credits * (720 / cfg.oddsHours));
+  const leagueStatus = await Promise.all(
+    cfg.sports.map(async (k) => ({ key: k, last: Number(await getSetting(`odds.o.${k}`)) || 0 })),
+  );
+  const pendingLeagues = leagueStatus.filter((l) => Date.now() - l.last >= cfg.oddsHours * 3_600_000).length;
+  const overBudget = quota !== null && monthly > Number(quota);
 
   return (
     <div className="space-y-6">
@@ -86,6 +93,16 @@ export default async function AdminSportsData() {
             </ul>
           </div>
         </div>
+        {configured && pendingLeagues > 0 && (
+          <p className="rounded-xl bg-gold/10 p-3 text-sm text-gold-strong">
+            {t("pendingLeagues", { count: pendingLeagues })}
+          </p>
+        )}
+        {configured && overBudget && (
+          <p className="rounded-xl bg-danger/10 p-3 text-sm text-danger">
+            {t("overBudget", { monthly, quota: quota ?? 0 })}
+          </p>
+        )}
         {configured && (
           <div className="flex flex-wrap gap-2">
             <ActionForm action={syncOddsNowAction} success={t("synced")}>

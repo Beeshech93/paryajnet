@@ -4,6 +4,7 @@
  * Throttled to protect the API quota; state is kept in Setting rows.
  */
 import { prisma } from "./db";
+import { mapLimit } from "./concurrency";
 import { ingestFeed, type FeedPayload } from "./feed";
 import { DEFAULT_SPORTS, marketsFor, marketsFromApi, oddsApi, oddsApiKey, scoreOf, sportOf } from "./odds-api";
 import { getSetting, setSetting, tryLock, unlock } from "./settings";
@@ -43,28 +44,51 @@ async function recordQuota(remaining: number | null) {
   if (remaining !== null) await setSetting("odds.quotaRemaining", String(remaining));
 }
 
-/** Fetch upcoming games and odds for the configured leagues. */
+/** Stop starting new API calls after this long, so the serverless function is never cut off mid-way. */
+const TIME_BUDGET_MS = 40_000;
+/** Keep this many credits in reserve so results (which settle services) can still be fetched. */
+const QUOTA_RESERVE = 20;
+const leagueKey = (kind: "o" | "s", sportKey: string) => `odds.${kind}.${sportKey}`;
+
+async function quotaLeft(): Promise<number | null> {
+  const v = await getSetting("odds.quotaRemaining");
+  return v === null ? null : Number(v);
+}
+
+/**
+ * Fetch upcoming games and odds. Each league keeps its own last-sync time, so a
+ * run that hits the time budget continues with the remaining leagues next time
+ * instead of starting over (and spending credits twice).
+ */
 export async function syncOdds({ force = false } = {}) {
   if (!oddsApiKey()) return { skipped: "no_key" as const };
   const cfg = await sportsDataConfig();
-  const last = Number(await getSetting("odds.lastOddsSync"));
-  if (!force && last && Date.now() - last < cfg.oddsHours * 3_600_000) return { skipped: "fresh" as const };
-  // After a failed run (bad key, API down) retry sooner instead of waiting a full interval.
-  const failed = Number(await getSetting("odds.lastOddsFailure"));
-  if (!force && failed && Date.now() - failed < RETRY_MS) return { skipped: "retry_later" as const };
-  if (!(await tryLock("odds.lockOdds", 5 * 60_000))) return { skipped: "running" as const };
-  const summary: Record<string, string> = {};
-  let succeeded = 0;
+  const now = Date.now();
+  const leagues = cfg.sports.filter((k) => sportOf(k));
+  const last = await Promise.all(leagues.map(async (k) => Number(await getSetting(leagueKey("o", k))) || 0));
+  const due = leagues
+    .map((k, i) => ({ k, last: last[i] }))
+    .filter((l) => force || now - l.last >= cfg.oddsHours * 3_600_000)
+    .sort((a, b) => a.last - b.last)
+    .map((l) => l.k);
+  if (due.length === 0) return { skipped: "fresh" as const };
+  if (!(await tryLock("odds.lockOdds", 2 * 60_000))) return { skipped: "running" as const };
+
+  const started = Date.now();
+  const summary: Record<string, string> = JSON.parse((await getSetting("odds.lastOddsResult")) ?? "{}");
+  let done = 0;
+  let stopped: string | null = null;
   try {
-    for (const sportKey of cfg.sports) {
-      const sport = sportOf(sportKey);
-      if (!sport) continue;
+    await mapLimit(due, 4, async (sportKey) => {
+      if (Date.now() - started > TIME_BUDGET_MS) return (stopped ??= "time");
+      const left = await quotaLeft();
+      if (left !== null && left < marketsFor(sportKey).length + QUOTA_RESERVE) return (stopped ??= "quota");
+      const sport = sportOf(sportKey)!;
       try {
         const { data, remaining } = await oddsApi.odds(sportKey, marketsFor(sportKey));
         await recordQuota(remaining);
-        const now = Date.now();
         const events: FeedPayload["events"] = data
-          .filter((e) => new Date(e.commence_time).getTime() > now)
+          .filter((e) => new Date(e.commence_time).getTime() > Date.now())
           .map((e) => ({
             externalId: externalId(sportKey, e.id),
             sport,
@@ -78,20 +102,26 @@ export async function syncOdds({ force = false } = {}) {
         const results = await ingestFeed({ events });
         const errors = results.filter((r) => r.action === "error").length;
         summary[sportKey] = `${events.length} games${errors ? `, ${errors} errors` : ""}`;
-        succeeded++;
+        await setSetting(leagueKey("o", sportKey), String(Date.now()));
+        done++;
       } catch (err) {
         summary[sportKey] = `error: ${String(err).slice(0, 120)}`;
+        // Retry this league sooner than a full interval.
+        await setSetting(leagueKey("o", sportKey), String(Date.now() - cfg.oddsHours * 3_600_000 + RETRY_MS));
       }
-    }
-    await setSetting(succeeded > 0 || cfg.sports.length === 0 ? "odds.lastOddsSync" : "odds.lastOddsFailure", String(Date.now()));
+    });
+    for (const k of Object.keys(summary)) if (!leagues.includes(k)) delete summary[k];
     await setSetting("odds.lastOddsResult", JSON.stringify(summary));
-    return { summary };
+    if (done > 0) await setSetting("odds.lastOddsSync", String(Date.now()));
+    const pending = due.length - done;
+    if (stopped === "quota") await setSetting("odds.quotaWarning", String(Date.now()));
+    return { done, pending, stopped };
   } finally {
     await unlock("odds.lockOdds");
   }
 }
 
-/** Live scores and results — only for leagues with started, unsettled games. */
+/** Live scores and results — only for leagues with started, unsettled games, each on its own interval. */
 export async function syncScores({ force = false } = {}) {
   if (!oddsApiKey()) return { skipped: "no_key" as const };
   const cfg = await sportsDataConfig();
@@ -104,14 +134,20 @@ export async function syncScores({ force = false } = {}) {
     select: { externalId: true, sport: true, league: true, homeTeam: true, awayTeam: true, startsAt: true },
   });
   if (pending.length === 0) return { skipped: "nothing_pending" as const };
-  const last = Number(await getSetting("odds.lastScoresSync"));
-  if (!force && last && Date.now() - last < cfg.scoresMinutes * 60_000) return { skipped: "fresh" as const };
-  if (!(await tryLock("odds.lockScores", 5 * 60_000))) return { skipped: "running" as const };
+  const now = Date.now();
+  const allKeys = [...new Set(pending.map((e) => e.externalId!.split(":")[1]))];
+  const last = await Promise.all(allKeys.map(async (k) => Number(await getSetting(leagueKey("s", k))) || 0));
+  const due = allKeys.filter((_, i) => force || now - last[i] >= cfg.scoresMinutes * 60_000);
+  if (due.length === 0) return { skipped: "fresh" as const };
+  if (!(await tryLock("odds.lockScores", 2 * 60_000))) return { skipped: "running" as const };
   const byId = new Map(pending.map((e) => [e.externalId!, e]));
-  const sportKeys = [...new Set(pending.map((e) => e.externalId!.split(":")[1]))];
+  const started = Date.now();
   const summary: Record<string, string> = {};
   try {
-    for (const sportKey of sportKeys) {
+    await mapLimit(due, 4, async (sportKey) => {
+      if (Date.now() - started > TIME_BUDGET_MS) return;
+      const left = await quotaLeft();
+      if (left !== null && left < 2) return;
       try {
         const { data, remaining } = await oddsApi.scores(sportKey, 3);
         await recordQuota(remaining);
@@ -134,10 +170,11 @@ export async function syncScores({ force = false } = {}) {
         }
         const results = await ingestFeed({ events });
         summary[sportKey] = `${results.filter((r) => r.action === "settled").length} settled, ${events.length} updated`;
+        await setSetting(leagueKey("s", sportKey), String(Date.now()));
       } catch (err) {
         summary[sportKey] = `error: ${String(err).slice(0, 120)}`;
       }
-    }
+    });
     await setSetting("odds.lastScoresSync", String(Date.now()));
     await setSetting("odds.lastScoresResult", JSON.stringify(summary));
     return { summary };

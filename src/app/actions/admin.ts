@@ -372,8 +372,8 @@ export async function saveSportsDataAction(_prev: ActionResult | null, form: For
     await saveSportsDataConfig({
       sports,
       marginPct: num("marginPct", 0, 20),
-      oddsHours: num("oddsHours", 1, 168),
-      scoresMinutes: num("scoresMinutes", 5, 1440),
+      oddsHours: num("oddsHours", 0.25, 168),
+      scoresMinutes: num("scoresMinutes", 2, 1440),
     });
   });
 }

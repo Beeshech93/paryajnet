@@ -409,7 +409,9 @@
       "saved": "Salvo.",
       "demo": "{count, plural, one {# jogo de demonstração} other {# jogos de demonstração}} (fora da API) ainda aparecem para os clientes.",
       "removeDemo": "Remover jogos de demonstração",
-      "demoRemoved": "Jogos de demonstração removidos."
+      "demoRemoved": "Jogos de demonstração removidos.",
+      "pendingLeagues": "{count, plural, one {# liga aguarda} other {# ligas aguardam}} atualização. Cada execução atualiza as que cabem em ~40 s; clique de novo (ou continua na próxima visita).",
+      "overBudget": "Esta configuração usa cerca de {monthly} créditos por mês, mas restam só {quota}: escolha menos ligas ou um intervalo maior, ou melhore o plano da API. As atualizações param sozinhas antes de acabar os créditos."
     }
   },
   "errors": {

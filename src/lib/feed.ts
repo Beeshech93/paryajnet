@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { prisma } from "./db";
-import { cancelEvent, createEvent, LONG_TX, settleEvent, upsertMarkets } from "./sports";
+import { mapLimit } from "./concurrency";
+import { cancelEvent, createEvent, settleEvent, upsertMarkets } from "./sports";
 
 /**
  * Odds-feed ingestion contract. An adapter for your data provider
@@ -37,8 +38,8 @@ export const feedSchema = z.object({
 export type FeedPayload = z.infer<typeof feedSchema>;
 
 export async function ingestFeed(payload: FeedPayload) {
-  const results: { externalId: string; action: string; error?: string }[] = [];
-  for (const e of payload.events) {
+  // A few events at a time: each one is a handful of queries against a remote database.
+  return mapLimit(payload.events, 4, async (e): Promise<{ externalId: string; action: string; error?: string }> => {
     try {
       const markets = (e.markets ?? []).map((m) => ({
         type: m.type,
@@ -56,9 +57,11 @@ export async function ingestFeed(payload: FeedPayload) {
           where: { id: event.id },
           data: { league: e.league, homeTeam: e.homeTeam, awayTeam: e.awayTeam, startsAt: e.startsAt },
         });
-        await prisma.$transaction(async (tx) => {
-          for (const m of markets) await upsertMarkets(tx, event!.id, [m], m.status);
-        }, LONG_TX);
+        // Group by requested status so each group is one bulk upsert.
+        for (const st of [undefined, "OPEN", "SUSPENDED"] as const) {
+          const group = markets.filter((m) => m.status === st);
+          if (group.length) await upsertMarkets(prisma, event!.id, group, st);
+        }
       }
 
       if (e.status === "LIVE" && event.status !== "SETTLED" && event.status !== "CANCELLED") {
@@ -75,14 +78,13 @@ export async function ingestFeed(payload: FeedPayload) {
         await cancelEvent(event.id);
         action = "cancelled";
       }
-      results.push({ externalId: e.externalId, action });
+      return { externalId: e.externalId, action };
     } catch (err) {
-      results.push({
+      return {
         externalId: e.externalId,
         action: "error",
         error: err instanceof Error ? err.message : String(err),
-      });
+      };
     }
-  }
-  return results;
+  });
 }

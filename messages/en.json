@@ -409,7 +409,9 @@
       "saved": "Saved.",
       "demo": "{count, plural, one {# demo game} other {# demo games}} (not from the API) are still shown to customers.",
       "removeDemo": "Remove demo games",
-      "demoRemoved": "Demo games removed."
+      "demoRemoved": "Demo games removed.",
+      "pendingLeagues": "{count, plural, one {# league is} other {# leagues are}} waiting for an update. Each run updates as many as fit in ~40 s; press again (or it continues on the next visit).",
+      "overBudget": "This setup uses about {monthly} credits a month but only {quota} are left: choose fewer leagues or a longer interval, or upgrade the API plan. Updates stop automatically before credits run out."
     }
   },
   "errors": {
