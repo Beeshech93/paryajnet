@@ -6,10 +6,10 @@ import { LocaleSwitcher, NavLinks } from "./HeaderControls";
 
 export async function Header() {
   const [user, t] = await Promise.all([getCurrentUser(), getTranslations("nav")]);
-  const isAdmin = user?.role === "ADMIN";
+  const role = user?.role ?? null;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-bg/85 pt-[env(safe-area-inset-top)] backdrop-blur">
+    <header className="sticky top-0 z-30 print:hidden border-b border-line bg-bg/85 pt-[env(safe-area-inset-top)] backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 md:gap-4 md:py-3">
         <Link
           href="/"
@@ -24,14 +24,14 @@ export async function Header() {
           </span>
         </Link>
         <div className="hidden md:block">
-          <NavLinks isAdmin={isAdmin} />
+          <NavLinks role={role} />
         </div>
         <div className="ml-auto flex items-center gap-2">
           <LocaleSwitcher />
           <Link href="/s" className="btn-accent hidden px-3 py-1.5 whitespace-nowrap md:inline-flex">
             {t("myService")}
           </Link>
-          {isAdmin && (
+          {user && (
             <form action={logoutAction}>
               <button className="btn-ghost px-3 py-1.5 text-xs" title={user.email}>
                 {t("logout")}

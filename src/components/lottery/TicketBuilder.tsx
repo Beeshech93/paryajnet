@@ -33,7 +33,15 @@ export type DrawOption = {
 
 const MAX_PER_STATE = 4;
 
-export function TicketBuilder({ draws, limits }: { draws: DrawOption[]; limits: { min: number; max: number } }) {
+export function TicketBuilder({
+  draws,
+  limits,
+  seller = false,
+}: {
+  draws: DrawOption[];
+  limits: { min: number; max: number };
+  seller?: boolean;
+}) {
   const t = useTranslations("lottery");
   const locale = useLocale();
   const present = new Set(draws.map((d) => d.lottery ?? "OTHER"));
@@ -202,6 +210,7 @@ export function TicketBuilder({ draws, limits }: { draws: DrawOption[]; limits: 
               lines: lines.map((l) => ({ type: l.type, numbers: l.numbers, stake: l.stake.replace(",", ".") })),
             })}
             onCreated={() => setLines([])}
+            seller={seller}
           />
         </div>
       )}

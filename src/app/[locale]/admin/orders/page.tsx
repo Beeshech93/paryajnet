@@ -51,6 +51,7 @@ export default async function AdminOrders({
     orderBy: { createdAt: status === "RECEIPT_RECEIVED" || status === "PAYOUT" ? "asc" : "desc" },
     take: 100,
     omit: { receipt: true },
+    include: { soldBy: { select: { name: true } } },
   });
   const counts = await prisma.order.groupBy({ by: ["status"], _count: { _all: true } });
   const countOf = (keys: string[] | null) =>
@@ -94,7 +95,8 @@ export default async function AdminOrders({
               <span className="col-span-2 min-w-0 md:order-none md:flex-1">
                 <span className="font-semibold">{o.customerName}</span>
                 <span className="block text-xs text-muted">
-                  {formatPhone(o.phone)} · {t(`kinds.${o.kind}`)} · <LocalTime value={o.createdAt} />
+                  {o.channel === "AGENT" ? `💵 ${o.soldBy?.name ?? "—"}` : formatPhone(o.phone)} ·{" "}
+                  {t(`kinds.${o.kind}`)} · <LocalTime value={o.createdAt} />
                 </span>
               </span>
               {late && <span className="chip bg-danger/15 text-danger">{t("late")}</span>}

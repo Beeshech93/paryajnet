@@ -113,3 +113,31 @@ export function parseEvolutionMessage(payload: unknown): IncomingMessage | null 
   if (!text && !media) return null;
   return { id: str(key.id) ?? "", phone, name: str(data.pushName), text, media };
 }
+
+// ---------- Cash sales by agents ----------
+
+/** An agent can cancel their own cash sale this soon after selling it (e.g. a typing mistake). */
+export const CANCEL_WINDOW_MINUTES = 10;
+
+export function cancellable(
+  order: { channel: string; status: string; soldById: string | null; createdAt: Date; payBy: Date },
+  userId: string,
+  now = new Date(),
+) {
+  return (
+    order.channel === "AGENT" &&
+    order.status === "CONFIRMED" &&
+    order.soldById === userId &&
+    now.getTime() - order.createdAt.getTime() <= CANCEL_WINDOW_MINUTES * 60_000 &&
+    now < order.payBy
+  );
+}
+
+/** Brazil (Brasília time) has no daylight saving: a day starts at 03:00 UTC. */
+const BRT_OFFSET_MS = 3 * 3_600_000;
+
+export function startOfBrDay(now = new Date()) {
+  const local = new Date(now.getTime() - BRT_OFFSET_MS);
+  local.setUTCHours(0, 0, 0, 0);
+  return new Date(local.getTime() + BRT_OFFSET_MS);
+}

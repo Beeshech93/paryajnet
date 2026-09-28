@@ -6,6 +6,7 @@ import {
   resendPaymentInfoAction,
   setPayoutKeyAction,
 } from "@/app/actions/admin";
+import { payOutCashAction } from "@/app/actions/orders";
 import { ActionForm, SubmitButton } from "@/components/ActionForm";
 import { LocalTime } from "@/components/LocalTime";
 import { OrderDetails } from "@/components/orders/OrderDetails";
@@ -22,11 +23,22 @@ export default async function AdminOrder({ params }: { params: Promise<{ code: s
   const [locale, t, to] = await Promise.all([getLocale(), getTranslations("admin.orders"), getTranslations("orders")]);
   const order = await getOrderByCode(code);
   if (!order) return <p className="card p-6">{to("notFound")}</p>;
-  const messages = await prisma.whatsAppMessage.findMany({
-    where: { phone: order.phone, status: { not: "DEDUP" } },
-    orderBy: { createdAt: "desc" },
-    take: 30,
-  });
+  const [messages, people, ta] = await Promise.all([
+    order.phone
+      ? prisma.whatsAppMessage.findMany({
+          where: { phone: order.phone, status: { not: "DEDUP" } },
+          orderBy: { createdAt: "desc" },
+          take: 30,
+        })
+      : [],
+    prisma.user.findMany({
+      where: { id: { in: [order.soldById, order.paidById].filter((x): x is string => Boolean(x)) } },
+      select: { id: true, name: true },
+    }),
+    getTranslations("sale"),
+  ]);
+  const nameOf = (id: string | null) => people.find((p) => p.id === id)?.name ?? "—";
+  const cash = order.channel === "AGENT";
   const open = order.status === "AWAITING_PAYMENT" || order.status === "RECEIPT_RECEIVED";
   const payable = order.status === "WON" || order.status === "VOID";
   const onTime = paidInTime(order);
@@ -50,14 +62,19 @@ export default async function AdminOrder({ params }: { params: Promise<{ code: s
             <div>
               <p className="label">{t("customer")}</p>
               <p className="font-semibold">{order.customerName}</p>
-              <a
-                href={`https://wa.me/${order.phone}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-brand-strong"
-              >
-                {formatPhone(order.phone)}
-              </a>
+              {order.phone && (
+                <a
+                  href={`https://wa.me/${order.phone}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-brand-strong"
+                >
+                  {formatPhone(order.phone)}
+                </a>
+              )}
+              {cash && (
+                <p className="mt-1 text-xs text-gold-strong">💵 {ta("soldBy", { name: nameOf(order.soldById) })}</p>
+              )}
             </div>
             <div>
               <p className="label">{to("amount")}</p>
@@ -82,6 +99,7 @@ export default async function AdminOrder({ params }: { params: Promise<{ code: s
               <>
                 {" "}
                 · {t("paidAt")} <LocalTime value={order.paidAt} />
+                {order.payoutKeyType === "CASH" && <> · 💵 {ta("paidBy", { name: nameOf(order.paidById) })}</>}
               </>
             )}
           </p>
@@ -167,7 +185,28 @@ export default async function AdminOrder({ params }: { params: Promise<{ code: s
           </section>
         )}
 
-        {payable && (
+        {payable && cash && (
+          <section className="card space-y-3 border-gold p-5">
+            <h2 className="font-display text-lg font-bold">
+              {order.status === "WON" ? t("payWinner") : t("payRefund")} · {formatMoney(order.payout ?? 0, locale)}
+            </h2>
+            <p className="text-sm text-muted">{ta("payHelp", { code: order.code })}</p>
+            <ActionForm action={payOutCashAction} className="flex flex-wrap items-end gap-2">
+              <input type="hidden" name="orderId" value={order.id} />
+              <div className="min-w-48 flex-1">
+                <label className="label" htmlFor="cash-note">
+                  {t("note")}
+                </label>
+                <input id="cash-note" name="note" maxLength={300} className="input" />
+              </div>
+              <SubmitButton className="btn-gold">
+                💵 {ta("payAndFinalise", { amount: formatMoney(order.payout ?? 0, locale) })}
+              </SubmitButton>
+            </ActionForm>
+          </section>
+        )}
+
+        {payable && !cash && (
           <section className="card space-y-4 border-gold p-5">
             <h2 className="font-display text-lg font-bold">
               {order.status === "WON" ? t("payWinner") : t("payRefund")} · {formatMoney(order.payout ?? 0, locale)}

@@ -32,7 +32,15 @@ export type BoardEvent = {
 
 type Leg = { eventId: string; selectionId: string; odds: string; label: string; match: string; live: boolean };
 
-export function SportsBoard({ events, limits }: { events: BoardEvent[]; limits: { min: number; max: number } }) {
+export function SportsBoard({
+  events,
+  limits,
+  seller = false,
+}: {
+  events: BoardEvent[];
+  limits: { min: number; max: number };
+  seller?: boolean;
+}) {
   const t = useTranslations("sports");
   const tr = (k: string, v?: Record<string, string | number>) => t(k, v);
   const locale = useLocale();
@@ -339,6 +347,7 @@ export function SportsBoard({ events, limits }: { events: BoardEvent[]; limits: 
                       legs: slip.map((l) => ({ selectionId: l.selectionId, odds: l.odds })),
                     })}
                     onCreated={() => setSlip([])}
+                    seller={seller}
                   />
                 </div>
               )}

@@ -1,42 +1,53 @@
 "use server";
 
 import { getLocale } from "next-intl/server";
-import { z } from "zod";
-import { LOTTERY_TYPES } from "@/lib/lottery-rules";
-import { createOrder } from "@/lib/orders";
-import { AppError } from "@/lib/types";
+import { getCurrentUser, isSeller, sellerForAction } from "@/lib/auth";
+import { orderInputSchema, type OrderInput } from "@/lib/order-schema";
+import { cancelSale, createOrder, payOutCash } from "@/lib/orders";
+import { AppError, type ActionResult } from "@/lib/types";
 import { run } from "./run";
 
-const customer = {
-  customerName: z.string().max(80),
-  phone: z.string().max(30),
-  adult: z.literal(true),
-};
+function parse(input: OrderInput) {
+  const parsed = orderInputSchema.safeParse(input);
+  if (!parsed.success) {
+    if (parsed.error.issues.some((i) => i.path[0] === "adult")) throw new AppError("adult_required");
+    throw new AppError("invalid_form");
+  }
+  return parsed.data;
+}
 
-const schema = z.discriminatedUnion("kind", [
-  z.object({
-    ...customer,
-    kind: z.literal("SPORTS"),
-    stake: z.string(),
-    legs: z.array(z.object({ selectionId: z.string(), odds: z.string() })).max(20),
-  }),
-  z.object({
-    ...customer,
-    kind: z.literal("LOTTERY"),
-    drawId: z.string(),
-    lines: z.array(z.object({ type: z.enum(LOTTERY_TYPES), numbers: z.string(), stake: z.string() })).max(20),
-  }),
-]);
-
-/** Public: a customer (no account) creates a service; the WhatsApp agent sends the payment details. */
-export async function createOrderAction(input: z.input<typeof schema>) {
+/**
+ * Creates a service. Public: the customer (no account) pays by PIX and the
+ * WhatsApp agent sends the payment details. When a sales agent (or admin) is
+ * signed in, it is a cash sale: confirmed at once and credited to that agent.
+ */
+export async function createOrderAction(input: OrderInput) {
   return run(async () => {
-    const parsed = schema.safeParse(input);
-    if (!parsed.success) {
-      if (parsed.error.issues.some((i) => i.path[0] === "adult")) throw new AppError("adult_required");
-      throw new AppError("invalid_form");
-    }
-    const order = await createOrder({ ...parsed.data, locale: await getLocale() });
-    return { code: order.code };
+    const data = parse(input);
+    const user = await getCurrentUser();
+    const seller = isSeller(user) ? user! : undefined;
+    const order = await createOrder({ ...data, locale: await getLocale() }, seller);
+    return { code: order.code, sale: Boolean(seller) };
+  });
+}
+
+function note(form: FormData) {
+  const value = String(form.get("note") ?? "").trim();
+  return value ? value.slice(0, 300) : null;
+}
+
+/** Agent/admin hands over the winnings of a cash sale and finalises it. */
+export async function payOutCashAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return run(async () => {
+    const user = await sellerForAction();
+    await payOutCash(String(form.get("orderId")), user, note(form));
+  });
+}
+
+/** The agent who sold it cancels a cash sale shortly after (returns the money). */
+export async function cancelSaleAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return run(async () => {
+    const user = await sellerForAction();
+    await cancelSale(String(form.get("orderId")), user);
   });
 }

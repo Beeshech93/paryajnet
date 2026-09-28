@@ -59,6 +59,7 @@ async function log(
 
 /** Send a text; logs SENT, FAILED, or SKIPPED when the agent isn't connected. Never throws. */
 export async function sendText(phone: string, text: string, orderId?: string | null) {
+  if (!phone) return; // cash sale without a WhatsApp number
   const cfg = evolutionConfig();
   if (!cfg) return log(phone, "OUT", "SKIPPED", text, orderId);
   try {
@@ -71,6 +72,7 @@ export async function sendText(phone: string, text: string, orderId?: string | n
 }
 
 async function sendImage(phone: string, pngBase64: string, caption: string, orderId?: string | null) {
+  if (!phone) return;
   const cfg = evolutionConfig();
   if (!cfg) return log(phone, "OUT", "SKIPPED", caption, orderId, "IMAGE");
   try {
@@ -174,7 +176,11 @@ export async function notifyConfirmed(orderId: string) {
   const t = await translator(order.locale, "bot");
   await sendText(
     order.phone,
-    t("confirmed", { code: order.code, potential: formatMoney(order.potentialWin, order.locale) }),
+    t(order.channel === "AGENT" ? "soldCash" : "confirmed", {
+      code: order.code,
+      amount: formatMoney(order.amount, order.locale),
+      potential: formatMoney(order.potentialWin, order.locale),
+    }),
     order.id,
   );
 }
@@ -197,8 +203,11 @@ export async function notifyResults(orderIds: string[]) {
     const order = await loadOrder(id);
     const t = await translator(order.locale, "bot");
     const payout = order.payout ? formatMoney(order.payout, order.locale) : "";
-    if (order.status === "WON") await sendText(order.phone, t("won", { code: order.code, payout }), order.id);
-    else if (order.status === "VOID") await sendText(order.phone, t("void", { code: order.code, payout }), order.id);
+    // Cash sales are paid at an agent point with the code; online ones by PIX.
+    const cash = order.channel === "AGENT" ? "Cash" : "";
+    if (order.status === "WON") await sendText(order.phone, t(`won${cash}`, { code: order.code, payout }), order.id);
+    else if (order.status === "VOID")
+      await sendText(order.phone, t(`void${cash}`, { code: order.code, payout }), order.id);
     else if (order.status === "LOST") await sendText(order.phone, t("lost", { code: order.code }), order.id);
   }
 }
@@ -206,6 +215,10 @@ export async function notifyResults(orderIds: string[]) {
 export async function notifyPaid(orderId: string) {
   const order = await loadOrder(orderId);
   const t = await translator(order.locale, "bot");
+  if (order.payoutKeyType === "CASH") {
+    const payout = order.payout ? formatMoney(order.payout, order.locale) : "";
+    return sendText(order.phone, t("paidCash", { code: order.code, payout }), order.id);
+  }
   await sendText(
     order.phone,
     t("paid", {
@@ -275,9 +288,10 @@ export async function handleIncoming(msg: IncomingMessage) {
   }
 
   // 2) A PIX key for a winning / refunded service that still needs one.
-  const payable =
-    (coded && (coded.status === "WON" || coded.status === "VOID") ? coded : null) ??
-    recent.find((o) => (o.status === "WON" || o.status === "VOID") && !o.payoutKey);
+  // Only online services: cash sales are paid out at an agent point.
+  const needsKey = (o: { status: string; channel: string }) =>
+    (o.status === "WON" || o.status === "VOID") && o.channel === "ONLINE";
+  const payable = (coded && needsKey(coded) ? coded : null) ?? recent.find((o) => needsKey(o) && !o.payoutKey);
   if (payable && !payable.payoutKey) {
     const pix = detectPixKey(msg.text);
     if (pix) {

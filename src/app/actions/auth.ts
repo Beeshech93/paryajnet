@@ -3,26 +3,29 @@
 import bcrypt from "bcryptjs";
 import { getLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
-import { createSession, destroySession } from "@/lib/auth";
+import { createSession, destroySession, homeFor } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { AppError, type ActionResult } from "@/lib/types";
+import { AppError, type ActionResult, type Role } from "@/lib/types";
 import { run } from "./run";
 
-/** Back-office login. Customers don't have accounts. */
+/** Back-office login (admins and sales agents). Customers don't have accounts. */
 export async function loginAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
   const locale = await getLocale();
+  let home = "/admin";
   const result = await run(async () => {
     const email = String(form.get("email") ?? "")
       .trim()
       .toLowerCase();
     const password = String(form.get("password") ?? "");
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || user.role !== "ADMIN" || !(await bcrypt.compare(password, user.passwordHash))) {
+    const staff = user?.active && (user.role === "ADMIN" || user.role === "AGENT");
+    if (!user || !staff || !(await bcrypt.compare(password, user.passwordHash))) {
       throw new AppError("bad_credentials");
     }
-    await createSession(user.id, "ADMIN");
+    await createSession(user.id, user.role as Role);
+    home = homeFor(user.role);
   });
-  if (result.ok) redirect({ href: "/admin", locale });
+  if (result.ok) redirect({ href: home, locale });
   return result;
 }
 

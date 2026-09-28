@@ -1,5 +1,6 @@
 "use server";
 
+import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { adminForAction } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -398,5 +399,48 @@ export async function removeDemoEventsAction(_prev: ActionResult | null, _form: 
     await prisma.event.deleteMany({
       where: { externalId: null, markets: { none: { selections: { some: { legs: { some: {} } } } } } },
     });
+  });
+}
+
+// ---------- Sales agents ----------
+
+const agentSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  email: z.string().trim().toLowerCase().email().max(120),
+  password: z.string().min(8).max(100),
+});
+
+export async function createAgentAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const parsed = agentSchema.safeParse(Object.fromEntries(form));
+    if (!parsed.success) {
+      if (parsed.error.issues.some((i) => i.path[0] === "password")) throw new AppError("password_too_short");
+      throw new AppError("invalid_form");
+    }
+    const { name, email, password } = parsed.data;
+    if (await prisma.user.findUnique({ where: { email } })) throw new AppError("email_taken");
+    await prisma.user.create({
+      data: { name, email, role: "AGENT", passwordHash: await bcrypt.hash(password, 10) },
+    });
+  });
+}
+
+export async function toggleAgentAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const agent = await prisma.user.findFirst({ where: { id: String(form.get("id")), role: "AGENT" } });
+    if (!agent) throw new AppError("invalid_form");
+    await prisma.user.update({ where: { id: agent.id }, data: { active: !agent.active } });
+  });
+}
+
+export async function resetAgentPasswordAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(async () => {
+    const password = String(form.get("password") ?? "");
+    if (password.length < 8 || password.length > 100) throw new AppError("password_too_short");
+    const res = await prisma.user.updateMany({
+      where: { id: String(form.get("id")), role: "AGENT" },
+      data: { passwordHash: await bcrypt.hash(password, 10) },
+    });
+    if (res.count === 0) throw new AppError("invalid_form");
   });
 }

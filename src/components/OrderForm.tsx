@@ -28,19 +28,24 @@ function remembered(): { name: string; phone: string } {
 /**
  * Customer details for a new service (no account needed). On success the
  * customer goes to the service page; the WhatsApp agent sends the payment details.
+ * With `seller` (a signed-in sales agent) it records a cash sale instead: the
+ * WhatsApp number is optional and the agent goes to the printable ticket.
  */
 export function OrderForm({
   payload,
   disabled,
   onCreated,
+  seller = false,
 }: {
   payload: () => Payload;
   disabled?: boolean;
   onCreated?: () => void;
+  seller?: boolean;
 }) {
   const t = useTranslations("orders");
+  const ts = useTranslations("sale");
   const router = useRouter();
-  const [saved] = useState(remembered);
+  const [saved] = useState(() => (seller ? { name: "", phone: "" } : remembered()));
   const [name, setName] = useState(saved.name);
   const [phone, setPhone] = useState(saved.phone);
   const [adult, setAdult] = useState(false);
@@ -53,20 +58,29 @@ export function OrderForm({
       const res = await createOrderAction({ ...payload(), customerName: name, phone, adult: adult as true });
       setResult(res);
       if (res.ok) {
+        const { code } = res.data as { code: string };
+        onCreated?.();
+        if (seller) {
+          setName("");
+          setPhone("");
+          setAdult(false);
+          router.push(`/agent/s/${code}`);
+          return;
+        }
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify({ name, phone }));
         } catch {}
-        onCreated?.();
-        router.push(`/s/${(res.data as { code: string }).code}`);
+        router.push(`/s/${code}`);
       }
     });
   }
 
   return (
     <form onSubmit={submit} className="space-y-3">
+      {seller && <p className="chip bg-gold/20 px-3 py-1 text-gold-strong">💵 {ts("cashSale")}</p>}
       <div>
         <label className="label" htmlFor="of-name">
-          {t("name")}
+          {seller ? ts("customerName") : t("name")}
         </label>
         <input
           id="of-name"
@@ -82,6 +96,7 @@ export function OrderForm({
       <div>
         <label className="label" htmlFor="of-phone">
           {t("whatsapp")}
+          {seller && <span className="font-normal normal-case"> · {ts("optional")}</span>}
         </label>
         <div className="flex">
           <span className="flex items-center rounded-l-xl border border-r-0 border-line bg-surface-2 px-3 text-sm text-muted">
@@ -91,14 +106,14 @@ export function OrderForm({
             id="of-phone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            required
+            required={!seller}
             inputMode="tel"
             autoComplete="tel-national"
             placeholder="(11) 98765-4321"
             className="input rounded-l-none"
           />
         </div>
-        <p className="mt-1 text-[11px] text-muted">{t("whatsappHint")}</p>
+        <p className="mt-1 text-[11px] text-muted">{seller ? ts("whatsappHint") : t("whatsappHint")}</p>
       </div>
       <label className="flex items-start gap-2 text-xs text-muted">
         <input
@@ -108,10 +123,14 @@ export function OrderForm({
           required
           className="mt-0.5 accent-brand"
         />
-        <span>{t("adult")}</span>
+        <span>{seller ? ts("adult") : t("adult")}</span>
       </label>
-      <button type="submit" disabled={pending || disabled} className="btn-accent w-full py-3 text-base">
-        {pending ? t("creating") : t("create")}
+      <button
+        type="submit"
+        disabled={pending || disabled}
+        className={`${seller ? "btn-gold" : "btn-accent"} w-full py-3 text-base`}
+      >
+        {pending ? t("creating") : seller ? ts("sell") : t("create")}
       </button>
       <FormMessage state={result} />
     </form>

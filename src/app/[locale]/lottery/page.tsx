@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LocalTime } from "@/components/LocalTime";
 import { StateBadge } from "@/components/lottery/StateBadge";
 import { TicketBuilder } from "@/components/lottery/TicketBuilder";
+import { getCurrentUser, isSeller } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { ensureUpcomingDraws } from "@/lib/lottery";
 import { LOTTERY_PAYOUTS, lots } from "@/lib/lottery-rules";
@@ -15,7 +16,7 @@ export async function generateMetadata() {
 
 export default async function LotteryPage({ params }: { params: Promise<{ locale: string }> }) {
   setRequestLocale((await params).locale);
-  const t = await getTranslations("lottery");
+  const [t, user] = await Promise.all([getTranslations("lottery"), getCurrentUser()]);
   await ensureUpcomingDraws();
   const [open, settled] = await Promise.all([
     prisma.lotteryDraw.findMany({
@@ -53,6 +54,7 @@ export default async function LotteryPage({ params }: { params: Promise<{ locale
             closesAt: d.closesAt.toISOString(),
           }))}
           limits={{ min: LIMITS.minStake, max: LIMITS.maxStake }}
+          seller={isSeller(user)}
         />
 
         <div className="space-y-6">

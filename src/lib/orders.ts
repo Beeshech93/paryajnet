@@ -3,7 +3,7 @@ import { routing } from "@/i18n/routing";
 import { prisma } from "./db";
 import { createTicketForOrder, quoteLotteryTicket, settleLotteryOrder, type TicketLineInput } from "./lottery";
 import { Decimal, parseAmount } from "./money";
-import { newOrderCode, normalizeBrPhone } from "./orders-rules";
+import { CANCEL_WINDOW_MINUTES, cancellable, newOrderCode, normalizeBrPhone } from "./orders-rules";
 import { normalizePixKey } from "./pix";
 import { createBetForOrder, LONG_TX, quoteSportsBet, settleSportsOrder, type SlipLeg } from "./sports";
 import { AppError } from "./types";
@@ -28,15 +28,23 @@ function amount(value: string) {
   return parsed;
 }
 
-export async function createOrder(input: CreateOrderInput) {
+/**
+ * Create a service. Online (no seller): it waits for the customer's PIX
+ * payment and the WhatsApp agent sends the payment details. Sold by an agent
+ * (seller): the cash is already in hand, so it is confirmed at once and the
+ * customer's WhatsApp number is optional.
+ */
+export async function createOrder(input: CreateOrderInput, seller?: { id: string }) {
   const customerName = input.customerName.trim().replace(/\s+/g, " ");
   if (customerName.length < 2 || customerName.length > 80) throw new AppError("invalid_name");
-  const phone = normalizeBrPhone(input.phone);
-  if (!phone) throw new AppError("invalid_phone");
+  const phone = seller && !input.phone.trim() ? "" : normalizeBrPhone(input.phone);
+  if (phone === null) throw new AppError("invalid_phone");
   const locale = (routing.locales as readonly string[]).includes(input.locale) ? input.locale : routing.defaultLocale;
 
-  const open = await prisma.order.count({ where: { phone, status: "AWAITING_PAYMENT" } });
-  if (open >= MAX_OPEN_PER_PHONE) throw new AppError("too_many_open", { max: MAX_OPEN_PER_PHONE });
+  if (!seller) {
+    const open = await prisma.order.count({ where: { phone, status: "AWAITING_PAYMENT" } });
+    if (open >= MAX_OPEN_PER_PHONE) throw new AppError("too_many_open", { max: MAX_OPEN_PER_PHONE });
+  }
 
   let total: Decimal, potentialWin: Decimal, payBy: Date;
   let sportsStake: Decimal | null = null;
@@ -64,14 +72,23 @@ export async function createOrder(input: CreateOrderInput) {
             amount: total,
             potentialWin,
             payBy,
+            ...(seller && {
+              channel: "AGENT",
+              soldById: seller.id,
+              status: "CONFIRMED",
+              receiptAt: new Date(),
+              confirmedAt: new Date(),
+            }),
           },
         });
         if (input.kind === "SPORTS") await createBetForOrder(tx, created.id, sportsStake!, input.legs);
         else await createTicketForOrder(tx, created.id, input.drawId, lotteryLines);
         return created;
       }, LONG_TX);
-      // WhatsApp: payment details go out right away (logged, never blocks the order).
-      await (await import("./agent")).sendPaymentInfo(order.id);
+      // WhatsApp (logged, never blocks the order): payment details online, a confirmation for cash sales.
+      const agent = await import("./agent");
+      if (seller) await agent.notifyConfirmed(order.id);
+      else await agent.sendPaymentInfo(order.id);
       return order;
     } catch (err) {
       // Code collision (unique) — extremely rare; try a new code.
@@ -163,7 +180,7 @@ export async function setPayoutKey(orderId: string, type: string, rawKey: string
   const key = normalizePixKey(type, rawKey);
   if (!key) throw new AppError("invalid_pix_key");
   const res = await prisma.order.updateMany({
-    where: { id: orderId, status: { in: ["WON", "VOID"] } },
+    where: { id: orderId, status: { in: ["WON", "VOID"] }, channel: "ONLINE" },
     data: { payoutKeyType: type, payoutKey: key },
   });
   if (res.count === 0) throw new AppError("order_not_payable");
@@ -178,6 +195,42 @@ export async function markPaid(orderId: string, adminNote: string | null) {
   const res = await prisma.order.updateMany({
     where: { id: orderId, status: order.status },
     data: { status: "PAID", paidAt: new Date(), adminNote: adminNote ?? order.adminNote },
+  });
+  if (res.count === 0) throw new AppError("order_not_payable");
+  await (await import("./agent")).notifyPaid(orderId);
+}
+
+// ---------- Cash sales by agents ----------
+
+/** The agent who sold it returns the cash: the sale no longer counts. */
+export async function cancelSale(orderId: string, user: { id: string }) {
+  const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId } });
+  if (!cancellable(order, user.id)) throw new AppError("sale_not_cancellable", { minutes: CANCEL_WINDOW_MINUTES });
+  const res = await prisma.order.updateMany({
+    where: { id: orderId, status: "CONFIRMED" },
+    data: { status: "REJECTED", adminNote: "Venda anulada pelo agente" },
+  });
+  if (res.count === 0) throw new AppError("sale_not_cancellable", { minutes: CANCEL_WINDOW_MINUTES });
+}
+
+/**
+ * Finalise a cash sale by its code: the winnings (or refund) are handed over
+ * in cash. Only services sold by an agent — online ones are paid by PIX.
+ */
+export async function payOutCash(orderId: string, user: { id: string }, note: string | null) {
+  const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId } });
+  if (order.channel !== "AGENT") throw new AppError("online_service_pix");
+  if (order.status !== "WON" && order.status !== "VOID") throw new AppError("order_not_payable");
+  const res = await prisma.order.updateMany({
+    where: { id: orderId, status: order.status },
+    data: {
+      status: "PAID",
+      paidAt: new Date(),
+      paidById: user.id,
+      payoutKeyType: "CASH",
+      payoutKey: null,
+      adminNote: note ?? order.adminNote,
+    },
   });
   if (res.count === 0) throw new AppError("order_not_payable");
   await (await import("./agent")).notifyPaid(orderId);

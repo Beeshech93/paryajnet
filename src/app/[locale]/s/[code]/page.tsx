@@ -27,7 +27,7 @@ function stepIndex(status: string) {
 export default async function ServicePage({ params }: { params: Promise<{ locale: string; code: string }> }) {
   const { locale: l, code } = await params;
   setRequestLocale(l);
-  const [locale, t] = await Promise.all([getLocale(), getTranslations("orders")]);
+  const [locale, t, ts] = await Promise.all([getLocale(), getTranslations("orders"), getTranslations("sale")]);
   const order = await getOrderByCode(code);
   if (!order) {
     return (
@@ -67,13 +67,20 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
           <p className="text-xs font-semibold tracking-wide text-white/70 uppercase">{t("service")}</p>
           <p className="mt-1 font-mono text-3xl font-black tracking-widest">{order.code}</p>
           <p className="mt-2 text-sm text-white/80">
-            {order.customerName.split(" ")[0]} · WhatsApp {maskPhone(order.phone)}
+            {order.customerName.split(" ")[0]}
+            {order.phone && <> · WhatsApp {maskPhone(order.phone)}</>}
           </p>
         </div>
         <div className="space-y-4 p-5">
           <div className="flex flex-wrap items-center gap-3">
             <span className={`chip px-3 py-1 text-sm ${tone}`}>{t(`status.${order.status}`)}</span>
-            <span className="text-sm text-muted">{t(`statusHelp.${order.status}`)}</span>
+            <span className="text-sm text-muted">
+              {order.channel === "AGENT" && (order.status === "WON" || order.status === "VOID")
+                ? ts("collectCash")
+                : order.channel === "AGENT" && order.status === "PAID"
+                  ? ts("collectedCash")
+                  : t(`statusHelp.${order.status}`)}
+            </span>
           </div>
           {current >= 0 && (
             <ol className="grid grid-cols-5 gap-1">

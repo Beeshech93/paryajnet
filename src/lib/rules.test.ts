@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { lineMultiplier, normalizeNumbers } from "./lottery-rules";
 import { resultFromPicks, upcomingDraws, zonedDate, zonedToUtc } from "./lottery-schedule";
 import { parseAmount } from "./money";
+import { cancellable, startOfBrDay } from "./orders-rules";
 import { fairProbabilities, footballMarkets } from "./pricing";
 import { combinedOdds, evaluateBet, resolveSelection, validateMarket } from "./sports-rules";
 
@@ -382,4 +383,28 @@ test("The Odds API events become our markets (consensus odds, lines, margin)", a
     }),
     null,
   );
+});
+
+test("agents can cancel only their own fresh cash sales", () => {
+  const now = new Date("2026-09-28T15:00:00Z");
+  const sale = {
+    channel: "AGENT",
+    status: "CONFIRMED",
+    soldById: "a1",
+    createdAt: new Date("2026-09-28T14:55:00Z"),
+    payBy: new Date("2026-09-28T18:00:00Z"),
+  };
+  assert.equal(cancellable(sale, "a1", now), true);
+  assert.equal(cancellable(sale, "a2", now), false, "another agent");
+  assert.equal(cancellable({ ...sale, channel: "ONLINE" }, "a1", now), false, "online service");
+  assert.equal(cancellable({ ...sale, status: "WON" }, "a1", now), false, "already settled");
+  assert.equal(cancellable({ ...sale, createdAt: new Date("2026-09-28T14:49:00Z") }, "a1", now), false, "too old");
+  assert.equal(cancellable({ ...sale, payBy: new Date("2026-09-28T14:59:00Z") }, "a1", now), false, "closed");
+});
+
+test("the cash day starts at midnight in Brasília", () => {
+  assert.equal(startOfBrDay(new Date("2026-09-28T15:00:00Z")).toISOString(), "2026-09-28T03:00:00.000Z");
+  // 01:00 UTC is still the previous day in Brasília (22:00).
+  assert.equal(startOfBrDay(new Date("2026-09-29T01:00:00Z")).toISOString(), "2026-09-28T03:00:00.000Z");
+  assert.equal(startOfBrDay(new Date("2026-09-29T03:00:00Z")).toISOString(), "2026-09-29T03:00:00.000Z");
 });

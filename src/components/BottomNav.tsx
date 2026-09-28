@@ -31,7 +31,7 @@ const ICONS: Record<string, React.ReactNode> = {
 };
 
 /** App-style tab bar for phones. */
-export function BottomNav({ isAdmin }: { isAdmin: boolean }) {
+export function BottomNav({ role }: { role: string | null }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const items = [
@@ -39,15 +39,16 @@ export function BottomNav({ isAdmin }: { isAdmin: boolean }) {
     { href: "/sports", key: "sports", label: t("sports") },
     { href: "/lottery", key: "lottery", label: t("lottery") },
     { href: "/s", key: "bets", label: t("myServiceShort") },
-    ...(isAdmin ? [{ href: "/admin", key: "login", label: t("admin") }] : []),
+    ...(role === "ADMIN" ? [{ href: "/admin", key: "login", label: t("admin") }] : []),
+    ...(role === "AGENT" ? [{ href: "/agent", key: "login", label: t("agentShort") }] : []),
   ];
 
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 print:hidden border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
-      <ul className={`mx-auto grid max-w-md ${isAdmin ? "grid-cols-5" : "grid-cols-4"}`}>
+      <ul className={`mx-auto grid max-w-md ${items.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>
         {items.map((item) => {
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           return (

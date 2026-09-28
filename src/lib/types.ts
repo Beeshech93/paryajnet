@@ -1,7 +1,8 @@
 /** The platform operates in Brazil only: amounts are in reais, paid by PIX. */
 export const CURRENCY = "BRL";
 
-export type Role = "ADMIN";
+export type Role = "ADMIN" | "AGENT";
+export type OrderChannel = "ONLINE" | "AGENT";
 export type OrderStatus =
   "AWAITING_PAYMENT" | "RECEIPT_RECEIVED" | "CONFIRMED" | "WON" | "LOST" | "VOID" | "PAID" | "REJECTED" | "EXPIRED";
 export type Outcome = "PENDING" | "WON" | "LOST" | "VOID";

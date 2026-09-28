@@ -18,14 +18,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// Back-office users (admins). Customers never log in.
+/// Back-office users: admins and sales agents (vendedores who sell for cash).
+/// Customers never log in.
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
   passwordHash String
   name         String
-  role         String   @default("ADMIN")
+  role         String   @default("ADMIN") // ADMIN | AGENT
+  active       Boolean  @default(true)
   createdAt    DateTime @default(now())
+
+  sales   Order[] @relation("SoldBy")
+  payouts Order[] @relation("PaidBy")
 }
 
 // ---------- Services (orders) ----------
@@ -34,8 +39,13 @@ model Order {
   id            String    @id @default(cuid())
   code          String    @unique // e.g. PJ7K3M9Q — the number the customer and admin use
   kind          String // SPORTS | LOTTERY
+  // ONLINE: created by the customer, paid by PIX. AGENT: sold for cash by a
+  // sales agent — confirmed at once and paid out in cash by an agent.
+  channel       String    @default("ONLINE")
+  soldById      String?
+  paidById      String? // who finalised the payout
   customerName  String
-  phone         String // WhatsApp number, digits with country code (5511987654321)
+  phone         String // WhatsApp number, digits with country code (5511987654321); "" for walk-in sales without one
   locale        String    @default("pt") // language the agent replies in
   amount        Decimal // what the customer pays
   potentialWin  Decimal
@@ -56,11 +66,14 @@ model Order {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  soldBy   User?             @relation("SoldBy", fields: [soldById], references: [id], onDelete: SetNull)
+  paidBy   User?             @relation("PaidBy", fields: [paidById], references: [id], onDelete: SetNull)
   bet      Bet?
   ticket   LotteryTicket?
   messages WhatsAppMessage[]
 
   @@index([status])
+  @@index([soldById, createdAt])
   @@index([phone, createdAt])
 }
 

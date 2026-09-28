@@ -26,14 +26,15 @@ export function LocaleSwitcher() {
   );
 }
 
-export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
+export function NavLinks({ role }: { role: string | null }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const links = [
     { href: "/sports", label: t("sports") },
     { href: "/lottery", label: t("lottery") },
     { href: "/s", label: t("myService") },
-    ...(isAdmin ? [{ href: "/admin", label: t("admin") }] : []),
+    ...(role === "ADMIN" ? [{ href: "/admin", label: t("admin") }] : []),
+    ...(role === "AGENT" ? [{ href: "/agent", label: t("agent") }] : []),
   ];
   return (
     <nav className="flex gap-1 overflow-x-auto text-sm font-semibold">

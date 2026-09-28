@@ -16,7 +16,9 @@
     "home": "Accueil",
     "betsShort": "Paris",
     "myService": "Mon service",
-    "myServiceShort": "Service"
+    "myServiceShort": "Service",
+    "agent": "Espace vendeur",
+    "agentShort": "Vendeur"
   },
   "footer": {
     "responsible": "Les jeux d'argent peuvent créer une dépendance. Jouez de manière responsable. Réservé aux personnes de 18 ans et plus. Fixez des limites de dépôt ou faites une pause depuis votre compte."
@@ -51,7 +53,7 @@
     "heroWhatsappChip": "Paiement PIX · suivi WhatsApp"
   },
   "auth": {
-    "loginTitle": "Accès administrateur",
+    "loginTitle": "Accès admin / vendeur",
     "email": "E-mail",
     "password": "Mot de passe",
     "loginCta": "Se connecter"
@@ -168,7 +170,9 @@
       "settings": "Paramètres",
       "orders": "Services",
       "whatsapp": "WhatsApp",
-      "sportsData": "Données sportives"
+      "sportsData": "Données sportives",
+      "cashSale": "Vente manuelle",
+      "agents": "Vendeurs"
     },
     "overview": "Vue d'ensemble",
     "kpi": {
@@ -412,6 +416,32 @@
       "demoRemoved": "Matchs de démo supprimés.",
       "pendingLeagues": "{count, plural, one {# ligue attend} other {# ligues attendent}} une mise à jour. Chaque exécution en traite autant que possible en ~40 s ; relancez (ou cela continue à la prochaine visite).",
       "overBudget": "Cette configuration consomme environ {monthly} crédits par mois mais il n'en reste que {quota} : choisissez moins de ligues ou un intervalle plus long, ou passez à un plan supérieur. Les mises à jour s'arrêtent d'elles-mêmes avant l'épuisement."
+    },
+    "agents": {
+      "title": "Vendeurs",
+      "subtitle": "Ils vendent en espèces depuis le site (Sports / Loterie) et finalisent les services avec le code. Chaque vente est confirmée immédiatement.",
+      "soldToday": "Vendu aujourd’hui ({count})",
+      "paidToday": "Gains payés aujourd’hui ({count})",
+      "balanceTotal": "Espèces détenues par les vendeurs",
+      "inactive": "inactif",
+      "today": "Aujourd’hui",
+      "sales": "{count, plural, one {# vente} other {# ventes}}",
+      "payouts": "{count} gains",
+      "balance": "caisse",
+      "total": "Total",
+      "passwordSaved": "Mot de passe modifié.",
+      "newPassword": "Nouveau mot de passe",
+      "setPassword": "Modifier",
+      "deactivate": "Désactiver",
+      "activate": "Activer",
+      "empty": "Aucun vendeur pour l’instant.",
+      "newAgent": "Nouveau vendeur",
+      "created": "Vendeur créé.",
+      "name": "Nom",
+      "email": "E-mail (identifiant)",
+      "password": "Mot de passe (min. 8)",
+      "create": "Créer le vendeur",
+      "help": "Le vendeur se connecte sur /login avec son e-mail et son mot de passe."
     }
   },
   "errors": {
@@ -488,7 +518,10 @@
     "payout_key_missing": "Ajoutez d'abord la clé PIX du client.",
     "whatsapp_not_configured": "L'agent WhatsApp n'est pas configuré (EVOLUTION_API_URL / EVOLUTION_API_KEY).",
     "whatsapp_token_missing": "Définissez d'abord EVOLUTION_WEBHOOK_TOKEN.",
-    "odds_api_key_missing": "Définissez d'abord ODDS_API_KEY."
+    "odds_api_key_missing": "Définissez d'abord ODDS_API_KEY.",
+    "sale_not_cancellable": "Seul le vendeur peut annuler la vente, dans les {minutes} minutes et avant la clôture.",
+    "online_service_pix": "Ce service est en ligne : le gain est payé par PIX depuis l’admin.",
+    "password_too_short": "Le mot de passe doit contenir au moins 8 caractères."
   },
   "ads": {
     "label": "Publicité"
@@ -571,6 +604,62 @@
     "pixInvalid": "Je n'ai pas reconnu de clé PIX valide pour le service *{code}*. Envoyez uniquement la clé : CPF, mobile avec indicatif, e-mail ou clé aléatoire.",
     "paid": "💸 Paiement de *{payout}* envoyé à la clé {key} (service *{code}*). Merci !",
     "status": "Service *{code}* : {status}.",
-    "help": "Bonjour ! 👋 Je suis l'assistant ParyajNet.\n• Pour parier, créez votre service sur {link}\n• Pour payer, envoyez ici la photo ou le PDF du justificatif\n• Pour suivre un service, envoyez son code\n\nVos services ouverts : {codes}"
+    "help": "Bonjour ! 👋 Je suis l'assistant ParyajNet.\n• Pour parier, créez votre service sur {link}\n• Pour payer, envoyez ici la photo ou le PDF du justificatif\n• Pour suivre un service, envoyez son code\n\nVos services ouverts : {codes}",
+    "soldCash": "🎟️ Merci ! Votre service *{code}* est enregistré et payé ({amount}). Gain possible : {potential}. Gardez ce code pour encaisser. Bonne chance ! 🍀",
+    "wonCash": "🎉 Félicitations ! Le service *{code}* a gagné *{payout}*. Encaissez en espèces au point de vente avec le code *{code}*.",
+    "voidCash": "↩️ Le service *{code}* a été annulé (événement annulé). Récupérez votre remboursement de *{payout}* au point de vente avec le code *{code}*.",
+    "paidCash": "💵 Gain de *{payout}* remis en espèces (service *{code}*). Merci !"
+  },
+  "sale": {
+    "cashSale": "Vente en espèces",
+    "customerName": "Nom du client",
+    "optional": "facultatif",
+    "whatsappHint": "Si vous le saisissez, le client reçoit le code et le résultat sur WhatsApp.",
+    "adult": "Je confirme que le client a plus de 18 ans et a payé en espèces.",
+    "sell": "Enregistrer la vente · espèces reçues",
+    "badge": "VENDEUR",
+    "nav": {
+      "panel": "Tableau",
+      "sellSports": "Vendre sports",
+      "sellLottery": "Vendre loterie"
+    },
+    "finaliseTitle": "Finaliser avec le code",
+    "finaliseBody": "Saisissez le code du ticket pour voir le résultat, payer le gain en espèces et finaliser le service.",
+    "code": "Code",
+    "open": "Ouvrir",
+    "notFound": "Aucun service avec ce code.",
+    "today": "Ma caisse du jour",
+    "kpi": {
+      "sales": "Vendu ({count, plural, one {# vente} other {# ventes}})",
+      "payouts": "Gains payés ({count})",
+      "balance": "Espèces en caisse"
+    },
+    "toPay": "Gains à payer (ventes en espèces)",
+    "toPayEmpty": "Aucun gain en attente.",
+    "mySales": "Mes dernières ventes",
+    "noSales": "Aucune vente pour l’instant.",
+    "channel": {
+      "AGENT": "Vente en espèces",
+      "ONLINE": "En ligne · PIX"
+    },
+    "soldBy": "vendu par {name}",
+    "paidBy": "payé par {name}",
+    "paid": "Payé",
+    "ticketFooter": "Conservez ce ticket. Le gain se retire avec le code {code}.",
+    "print": "Imprimer le ticket",
+    "shareText": "Votre ticket ParyajNet : {code}",
+    "payWinner": "Payer le gain",
+    "payRefund": "Rembourser",
+    "payHelp": "Vérifiez le code {code} avec le client, remettez l’argent et finalisez. C’est enregistré dans votre caisse.",
+    "note": "Note (facultatif)",
+    "notePlaceholder": "ex. pièce d’identité du client",
+    "payAndFinalise": "J’ai remis {amount} · finaliser",
+    "onlinePix": "Service en ligne : le gain est payé par PIX depuis l’admin.",
+    "finalised": "Service finalisé",
+    "waitingResult": "Actif : en attente du résultat du match ou du tirage.",
+    "cancelHelp": "Erreur de vente ? Vous pouvez annuler cette vente pendant {minutes} minutes et rendre l’argent.",
+    "cancel": "Annuler la vente",
+    "collectCash": "Retirez le gain en espèces au point de vente avec ce code.",
+    "collectedCash": "Gain remis en espèces."
   }
 }

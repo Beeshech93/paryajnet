@@ -2,6 +2,7 @@ import { after } from "next/server";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SportsBoard, type BoardEvent } from "@/components/sports/SportsBoard";
+import { getCurrentUser, isSeller } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { autoSync } from "@/lib/sports-sync";
 import { LIMITS } from "@/lib/money";
@@ -18,7 +19,7 @@ export default async function SportsPage({ params }: { params: Promise<{ locale:
   setRequestLocale((await params).locale);
   // Refresh real odds/results in the background when their interval has passed.
   after(autoSync);
-  const t = await getTranslations("sports");
+  const [t, user] = await Promise.all([getTranslations("sports"), getCurrentUser()]);
 
   const events = await prisma.event.findMany({
     where: { OR: [{ status: "LIVE" }, { status: "SCHEDULED", startsAt: { gt: new Date() } }] },
@@ -57,7 +58,7 @@ export default async function SportsPage({ params }: { params: Promise<{ locale:
       <h1 className="font-display text-3xl font-bold">{t("title")}</h1>
       <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>
       <AdSlot placement="SPORTS" className="mt-5" />
-      <SportsBoard events={board} limits={{ min: LIMITS.minStake, max: LIMITS.maxStake }} />
+      <SportsBoard events={board} limits={{ min: LIMITS.minStake, max: LIMITS.maxStake }} seller={isSeller(user)} />
     </div>
   );
 }

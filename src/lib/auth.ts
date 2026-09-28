@@ -46,12 +46,19 @@ async function readSession(): Promise<string | null> {
   }
 }
 
-/** The signed-in user, loaded once per request. Role is always read from the DB. */
+/** The signed-in user, loaded once per request. Role and status are always read from the DB. */
 export const getCurrentUser = cache(async () => {
   const userId = await readSession();
   if (!userId) return null;
-  return prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  return user?.active ? user : null;
 });
+
+/** Admins and sales agents can sell for cash and finalise cash sales. */
+export const isSeller = (user: { role: string } | null | undefined) => user?.role === "ADMIN" || user?.role === "AGENT";
+
+/** Where a back-office user lands after signing in. */
+export const homeFor = (role: string) => (role === "AGENT" ? "/agent" : "/admin");
 
 export async function requireUser() {
   const user = await getCurrentUser();
@@ -61,7 +68,13 @@ export async function requireUser() {
 
 export async function requireAdmin() {
   const user = await requireUser();
-  if (user.role !== "ADMIN") redirect({ href: "/", locale: await getLocale() });
+  if (user.role !== "ADMIN") redirect({ href: homeFor(user.role), locale: await getLocale() });
+  return user;
+}
+
+export async function requireSeller() {
+  const user = await requireUser();
+  if (!isSeller(user)) redirect({ href: "/", locale: await getLocale() });
   return user;
 }
 
@@ -75,5 +88,11 @@ export async function userForAction() {
 export async function adminForAction() {
   const user = await userForAction();
   if (user.role !== "ADMIN") throw new AppError("forbidden");
+  return user;
+}
+
+export async function sellerForAction() {
+  const user = await userForAction();
+  if (!isSeller(user)) throw new AppError("forbidden");
   return user;
 }
