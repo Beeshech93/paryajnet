@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { adminForAction } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { cancelDraw, settleDraw } from "@/lib/lottery";
+import { cancelDraw, settleDraw, settleWithPicks } from "@/lib/lottery";
 import { Decimal } from "@/lib/money";
 import { approveWithdrawal, confirmDeposit, rejectDeposit, rejectWithdrawal } from "@/lib/payments";
 import { reviewKyc } from "@/lib/kyc";
@@ -176,7 +176,12 @@ export async function createDrawAction(_prev: ActionResult | null, form: FormDat
 
 export async function settleDrawAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
   return asAdmin(async () => {
-    await settleDraw(String(form.get("drawId")), {
+    const drawId = String(form.get("drawId"));
+    if (form.has("pick3")) {
+      await settleWithPicks(drawId, String(form.get("pick3") ?? ""), String(form.get("pick4") ?? ""));
+      return;
+    }
+    await settleDraw(drawId, {
       first: String(form.get("first") ?? "").trim(),
       second: String(form.get("second") ?? "").trim(),
       third: String(form.get("third") ?? "").trim(),

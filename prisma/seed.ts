@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { basketballMarkets, footballMarkets } from "../src/lib/pricing";
 import { createEvent } from "../src/lib/sports";
+import { ensureUpcomingDraws } from "../src/lib/lottery";
+import { LOTTERIES, resultFromPicks, zonedDate, zonedToUtc } from "../src/lib/lottery-schedule";
 
 const prisma = new PrismaClient();
 const D = (v: number | string) => new Prisma.Decimal(v);
@@ -106,21 +108,29 @@ async function main() {
   }
 
   if ((await prisma.lotteryDraw.count()) === 0) {
-    await prisma.lotteryDraw.createMany({
-      data: [
-        { name: "Port-au-Prince · Midi", closesAt: hours(4) },
-        { name: "Rio · Noite", closesAt: hours(10) },
-        { name: "CDMX · Noche", closesAt: hours(34) },
-        {
-          name: "Port-au-Prince · Soir",
-          closesAt: hours(-20),
+    await ensureUpcomingDraws();
+    // Two past draws with official-style results, to show the results list.
+    const yesterday = zonedDate(new Date(Date.now() - 24 * 3_600_000));
+    for (const [lottery, session, pick3, pick4] of [
+      ["NY", "EVENING", "347", "1285"],
+      ["GA", "MIDDAY", "902", "4417"],
+    ] as const) {
+      const hm = (LOTTERIES[lottery].sessions as Record<string, string>)[session];
+      const drawAt = zonedToUtc(yesterday, hm);
+      await prisma.lotteryDraw.create({
+        data: {
+          name: `${LOTTERIES[lottery].name} · ${session}`,
+          lottery,
+          session,
+          drawAt,
+          closesAt: new Date(drawAt.getTime() - 10 * 60_000),
           status: "SETTLED",
-          first: "347",
-          second: "12",
-          third: "85",
+          pick3,
+          pick4,
+          ...resultFromPicks(pick3, pick4)!,
         },
-      ],
-    });
+      });
+    }
   }
 
   console.log("Seed complete.");

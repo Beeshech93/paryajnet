@@ -113,7 +113,7 @@
   },
   "lottery": {
     "title": "Loterie et borlette",
-    "subtitle": "Composez un ticket avec autant de lignes que vous voulez et jouez le prochain tirage.",
+    "subtitle": "Jouez à la borlette sur les tirages officiels de New York, de Floride et de Géorgie.",
     "types": {
       "BORLETTE": "Borlette",
       "LOTO3": "Loto 3",
@@ -140,7 +140,19 @@
     "total": "Total",
     "buy": "Acheter le ticket",
     "loginToPlay": "Connectez-vous pour jouer",
-    "bought": "Ticket acheté. Bonne chance !"
+    "bought": "Ticket acheté. Bonne chance !",
+    "lotteries": {
+      "NY": "New York",
+      "FL": "Floride",
+      "GA": "Géorgie",
+      "OTHER": "Spéciaux"
+    },
+    "sessions": {
+      "MIDDAY": "Midi",
+      "EVENING": "Soir",
+      "NIGHT": "Nuit"
+    },
+    "stateRule": "Résultats officiels de l'État : 1er lot = deux derniers chiffres du Pick 3 ; 2e et 3e lots = les deux paires du Pick 4."
   },
   "casino": {
     "title": "Casino",
@@ -332,7 +344,13 @@
       "second": "2e",
       "third": "3e",
       "settle": "Publier les résultats",
-      "cancel": "Annuler et rembourser"
+      "cancel": "Annuler et rembourser",
+      "pick3": "Pick 3",
+      "pick4": "Pick 4",
+      "scheduled": "Les tirages NY, FL et GA sont créés automatiquement. Saisissez les Pick 3 et Pick 4 officiels après chaque tirage.",
+      "awaiting": "En attente des résultats",
+      "upcoming": "À venir",
+      "custom": "Tirage spécial (facultatif)"
     },
     "payments": {
       "pending": "Paiements en attente",
@@ -410,7 +428,9 @@
     "kyc_file_missing": "Joignez toutes les photos requises.",
     "kyc_file_type": "Les photos doivent être en JPG, PNG ou WebP.",
     "kyc_file_too_large": "Chaque photo doit faire moins de {max} Mo.",
-    "note_required": "Ajoutez une note expliquant le refus."
+    "note_required": "Ajoutez une note expliquant le refus.",
+    "invalid_picks": "Le Pick 3 doit avoir 3 chiffres et le Pick 4, 4 chiffres.",
+    "draw_not_held": "Ce tirage n'a pas encore eu lieu."
   },
   "kyc": {
     "title": "Vérification d'identité",

@@ -113,7 +113,7 @@
   },
   "lottery": {
     "title": "Lotería y borlette",
-    "subtitle": "Arma un boleto con las jugadas que quieras y participa en el próximo sorteo.",
+    "subtitle": "Juega borlette con los sorteos oficiales de Nueva York, Florida y Georgia.",
     "types": {
       "BORLETTE": "Borlette",
       "LOTO3": "Loto 3",
@@ -140,7 +140,19 @@
     "total": "Total",
     "buy": "Comprar boleto",
     "loginToPlay": "Entra para jugar",
-    "bought": "Boleto comprado. ¡Suerte!"
+    "bought": "Boleto comprado. ¡Suerte!",
+    "lotteries": {
+      "NY": "Nueva York",
+      "FL": "Florida",
+      "GA": "Georgia",
+      "OTHER": "Especiales"
+    },
+    "sessions": {
+      "MIDDAY": "Mediodía",
+      "EVENING": "Tarde",
+      "NIGHT": "Noche"
+    },
+    "stateRule": "Resultados oficiales del estado: 1.er lote = dos últimas cifras del Pick 3; 2.º y 3.er lote = los dos pares del Pick 4."
   },
   "casino": {
     "title": "Casino",
@@ -332,7 +344,13 @@
       "second": "2.º",
       "third": "3.º",
       "settle": "Publicar resultados",
-      "cancel": "Cancelar y reembolsar"
+      "cancel": "Cancelar y reembolsar",
+      "pick3": "Pick 3",
+      "pick4": "Pick 4",
+      "scheduled": "Los sorteos de NY, FL y GA se crean solos. Ingresa el Pick 3 y el Pick 4 oficiales después de cada sorteo.",
+      "awaiting": "Esperando resultados",
+      "upcoming": "Próximos",
+      "custom": "Sorteo especial (opcional)"
     },
     "payments": {
       "pending": "Pagos pendientes",
@@ -410,7 +428,9 @@
     "kyc_file_missing": "Adjunta todas las fotos requeridas.",
     "kyc_file_type": "Las fotos deben ser JPG, PNG o WebP.",
     "kyc_file_too_large": "Cada foto debe pesar menos de {max} MB.",
-    "note_required": "Añade una nota explicando el rechazo."
+    "note_required": "Añade una nota explicando el rechazo.",
+    "invalid_picks": "El Pick 3 debe tener 3 cifras y el Pick 4, 4 cifras.",
+    "draw_not_held": "Este sorteo todavía no se ha realizado."
   },
   "kyc": {
     "title": "Verificación de identidad",

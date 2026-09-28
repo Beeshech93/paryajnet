@@ -1,8 +1,10 @@
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { LocalTime } from "@/components/LocalTime";
+import { StateBadge } from "@/components/lottery/StateBadge";
 import { TicketBuilder } from "@/components/lottery/TicketBuilder";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { ensureUpcomingDraws } from "@/lib/lottery";
 import { LOTTERY_PAYOUTS, lots } from "@/lib/lottery-rules";
 import { CURRENCY_LIMITS } from "@/lib/money";
 import { getActiveCurrency } from "@/lib/wallet";
@@ -16,12 +18,17 @@ export default async function LotteryPage({ params }: { params: Promise<{ locale
   setRequestLocale((await params).locale);
   const [user, locale, t] = await Promise.all([getCurrentUser(), getLocale(), getTranslations("lottery")]);
   const currency = await getActiveCurrency(user, locale);
+  await ensureUpcomingDraws();
   const [open, settled] = await Promise.all([
     prisma.lotteryDraw.findMany({
       where: { status: "OPEN", closesAt: { gt: new Date() } },
       orderBy: { closesAt: "asc" },
     }),
-    prisma.lotteryDraw.findMany({ where: { status: "SETTLED" }, orderBy: { closesAt: "desc" }, take: 6 }),
+    prisma.lotteryDraw.findMany({
+      where: { status: "SETTLED" },
+      orderBy: [{ drawAt: "desc" }, { closesAt: "desc" }],
+      take: 9,
+    }),
   ]);
 
   const [p1, p2, p3] = LOTTERY_PAYOUTS.BORLETTE;
@@ -38,7 +45,14 @@ export default async function LotteryPage({ params }: { params: Promise<{ locale
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <TicketBuilder
-          draws={open.map((d) => ({ id: d.id, name: d.name, closesAt: d.closesAt.toISOString() }))}
+          draws={open.map((d) => ({
+            id: d.id,
+            name: d.name,
+            lottery: d.lottery,
+            session: d.session,
+            drawAt: d.drawAt?.toISOString() ?? null,
+            closesAt: d.closesAt.toISOString(),
+          }))}
           currency={currency}
           limits={{ min: CURRENCY_LIMITS[currency].minStake, max: CURRENCY_LIMITS[currency].maxStake }}
           signedIn={!!user}
@@ -67,11 +81,19 @@ export default async function LotteryPage({ params }: { params: Promise<{ locale
               {settled.map((d) => {
                 const [l1, l2, l3] = lots({ first: d.first!, second: d.second!, third: d.third! });
                 return (
-                  <li key={d.id} className="flex items-center justify-between gap-2 text-sm">
-                    <div>
-                      <p className="font-semibold">{d.name}</p>
+                  <li key={d.id} className="flex items-center gap-3 text-sm">
+                    <StateBadge code={d.lottery} size="sm" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold">
+                        {d.lottery ? `${t(`lotteries.${d.lottery}`)} · ${t(`sessions.${d.session}`)}` : d.name}
+                      </p>
                       <p className="text-xs text-muted">
-                        <LocalTime value={d.closesAt} />
+                        <LocalTime value={d.drawAt ?? d.closesAt} dateOnly />
+                        {d.pick3 && (
+                          <span className="ml-1 font-mono">
+                            · P3 {d.pick3} · P4 {d.pick4}
+                          </span>
+                        )}
                       </p>
                     </div>
                     <div className="flex gap-1 font-display font-bold tabular-nums">
@@ -81,8 +103,8 @@ export default async function LotteryPage({ params }: { params: Promise<{ locale
                       >
                         {l1}
                       </span>
-                      <span className="rounded-full bg-surface-2 px-2 py-1">{l2}</span>
-                      <span className="rounded-full bg-surface-2 px-2 py-1">{l3}</span>
+                      <span className="rounded-full bg-brand/20 px-2 py-1">{l2}</span>
+                      <span className="rounded-full bg-danger/15 px-2 py-1">{l3}</span>
                     </div>
                   </li>
                 );

@@ -169,19 +169,28 @@ model BetLeg {
 // ---------- Lottery / borlette ----------
 
 model LotteryDraw {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
+  // Scheduled US state draws (null for custom draws created by an admin).
+  lottery   String? // NY | FL | GA
+  session   String? // MIDDAY | EVENING | NIGHT
+  drawAt    DateTime?
   closesAt  DateTime
-  status    String   @default("OPEN") // OPEN | SETTLED | CANCELLED
-  // Results: first prize is 3 digits (its last two digits are lot 1),
-  // second and third prizes are 2 digits (lots 2 and 3).
+  status    String    @default("OPEN") // OPEN | SETTLED | CANCELLED
+  // Official numbers for state draws: Pick 3 (3 digits) and Pick 4 (4 digits).
+  pick3     String?
+  pick4     String?
+  // Borlette results: first prize is 3 digits (its last two digits are lot 1),
+  // second and third prizes are 2 digits (lots 2 and 3). For state draws:
+  // first = Pick 3, second = first half of Pick 4, third = second half.
   first     String?
   second    String?
   third     String?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   tickets LotteryTicket[]
 
+  @@unique([lottery, session, drawAt])
   @@index([status, closesAt])
 }
 

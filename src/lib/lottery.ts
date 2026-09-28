@@ -1,4 +1,13 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "./db";
+import {
+  LOTTERIES,
+  resultFromPicks,
+  upcomingDraws,
+  zonedToUtc,
+  type LotteryCode,
+  type SessionCode,
+} from "./lottery-schedule";
 import { CURRENCY_LIMITS, Decimal } from "./money";
 import {
   isValidResult,
@@ -45,12 +54,50 @@ export async function buyTicket(userId: string, currency: Currency, drawId: stri
   });
 }
 
-export async function settleDraw(drawId: string, result: DrawResult) {
+/** Create any missing scheduled state draws (idempotent; safe to call on every page load). */
+export async function ensureUpcomingDraws(now = new Date()) {
+  const scheduled = upcomingDraws(now);
+  const existing = await prisma.lotteryDraw.findMany({
+    where: { lottery: { not: null }, drawAt: { gte: now } },
+    select: { lottery: true, session: true, drawAt: true },
+  });
+  const have = new Set(existing.map((d) => `${d.lottery}|${d.session}|${d.drawAt?.getTime()}`));
+  for (const d of scheduled) {
+    if (have.has(`${d.lottery}|${d.session}|${d.drawAt.getTime()}`)) continue;
+    try {
+      await prisma.lotteryDraw.create({
+        data: { ...d, name: `${LOTTERIES[d.lottery].name} · ${d.session}` },
+      });
+    } catch (err) {
+      // A concurrent request created it first (unique constraint) — fine.
+      if (!(err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002")) throw err;
+    }
+  }
+}
+
+/** Settle a state draw from the official Pick 3 and Pick 4 numbers. */
+export async function settleWithPicks(drawId: string, pick3: string, pick4: string) {
+  const result = resultFromPicks(pick3.trim(), pick4.trim());
+  if (!result) throw new AppError("invalid_picks");
+  await settleDraw(drawId, result, { pick3: pick3.trim(), pick4: pick4.trim() });
+}
+
+/** Find a scheduled draw by state, session and Eastern-Time date (for results feeds). */
+export async function findStateDraw(lottery: LotteryCode, session: SessionCode, ymd: string) {
+  const hm = (LOTTERIES[lottery].sessions as Record<string, string>)[session];
+  if (!hm) return null;
+  return prisma.lotteryDraw.findUnique({
+    where: { lottery_session_drawAt: { lottery, session, drawAt: zonedToUtc(ymd, hm) } },
+  });
+}
+
+export async function settleDraw(drawId: string, result: DrawResult, picks?: { pick3: string; pick4: string }) {
   if (!isValidResult(result)) throw new AppError("invalid_result");
   const draw = await prisma.lotteryDraw.findUniqueOrThrow({ where: { id: drawId } });
   if (draw.status !== "OPEN") throw new AppError("already_settled");
+  if (draw.drawAt && draw.drawAt > new Date()) throw new AppError("draw_not_held");
 
-  await prisma.lotteryDraw.update({ where: { id: drawId }, data: { status: "SETTLED", ...result } });
+  await prisma.lotteryDraw.update({ where: { id: drawId }, data: { status: "SETTLED", ...result, ...picks } });
 
   const tickets = await prisma.lotteryTicket.findMany({ where: { drawId, status: "OPEN" }, select: { id: true } });
   for (const { id } of tickets) {

@@ -1,12 +1,15 @@
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocalTime } from "@/components/LocalTime";
+import { StateBadge } from "@/components/lottery/StateBadge";
 import { prisma } from "@/lib/db";
+import { ensureUpcomingDraws } from "@/lib/lottery";
 import { formatOdds } from "@/lib/money";
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   setRequestLocale((await params).locale);
-  const [t, locale] = await Promise.all([getTranslations("home"), getLocale()]);
+  const [t, tl, locale] = await Promise.all([getTranslations("home"), getTranslations("lottery"), getLocale()]);
+  await ensureUpcomingDraws();
   const [events, draw] = await Promise.all([
     prisma.event.findMany({
       where: { status: "SCHEDULED", startsAt: { gt: new Date() } },
@@ -129,8 +132,18 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         <div>
           <h2 className="mb-3 font-display text-xl font-bold">{t("nextDraw")}</h2>
           {draw ? (
-            <Link href="/lottery" className="card block p-6 hover:border-gold/50">
-              <p className="font-display text-2xl font-bold text-gold-strong">{draw.name}</p>
+            <Link href="/lottery" className="card block p-6 hover:border-gold">
+              <div className="flex items-center gap-3">
+                <StateBadge code={draw.lottery} />
+                <p className="font-display text-2xl font-bold">
+                  {draw.lottery ? tl(`lotteries.${draw.lottery}`) : draw.name}
+                  {draw.session && (
+                    <span className="block text-sm font-semibold text-gold-strong">
+                      {tl(`sessions.${draw.session}`)}
+                    </span>
+                  )}
+                </p>
+              </div>
               <p className="mt-1 text-sm text-muted">
                 {t("closes")} <LocalTime value={draw.closesAt} />
               </p>

@@ -113,7 +113,7 @@
   },
   "lottery": {
     "title": "Lottery & borlette",
-    "subtitle": "Build a ticket with as many lines as you like and play the next draw.",
+    "subtitle": "Play borlette on the official New York, Florida and Georgia draws.",
     "types": {
       "BORLETTE": "Borlette",
       "LOTO3": "Loto 3",
@@ -140,7 +140,19 @@
     "total": "Total",
     "buy": "Buy ticket",
     "loginToPlay": "Log in to play",
-    "bought": "Ticket bought. Good luck!"
+    "bought": "Ticket bought. Good luck!",
+    "lotteries": {
+      "NY": "New York",
+      "FL": "Florida",
+      "GA": "Georgia",
+      "OTHER": "Special"
+    },
+    "sessions": {
+      "MIDDAY": "Midday",
+      "EVENING": "Evening",
+      "NIGHT": "Night"
+    },
+    "stateRule": "Official state results: lot 1 = last two digits of Pick 3; lots 2 and 3 = the two pairs of Pick 4."
   },
   "casino": {
     "title": "Casino",
@@ -332,7 +344,13 @@
       "second": "2nd",
       "third": "3rd",
       "settle": "Publish results",
-      "cancel": "Cancel & refund"
+      "cancel": "Cancel & refund",
+      "pick3": "Pick 3",
+      "pick4": "Pick 4",
+      "scheduled": "NY, FL and GA draws are created automatically. Enter the official Pick 3 and Pick 4 after each draw.",
+      "awaiting": "Awaiting results",
+      "upcoming": "Upcoming",
+      "custom": "Special draw (optional)"
     },
     "payments": {
       "pending": "Pending payments",
@@ -410,7 +428,9 @@
     "kyc_file_missing": "Please attach all the required photos.",
     "kyc_file_type": "Photos must be JPG, PNG or WebP.",
     "kyc_file_too_large": "Each photo must be under {max} MB.",
-    "note_required": "Add a note explaining the rejection."
+    "note_required": "Add a note explaining the rejection.",
+    "invalid_picks": "Pick 3 must have 3 digits and Pick 4 must have 4 digits.",
+    "draw_not_held": "This draw has not taken place yet."
   },
   "kyc": {
     "title": "Identity verification",

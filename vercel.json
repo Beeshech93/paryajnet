@@ -2,5 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "buildCommand": "npm run build:vercel",
-  "regions": ["gru1"]
+  "regions": [
+    "gru1"
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/lottery",
+      "schedule": "0 4 * * *"
+    }
+  ]
 }

@@ -3,6 +3,7 @@ import { test } from "node:test";
 import { Prisma } from "@prisma/client";
 import { diceMultiplier, diceRoll, limboResult, roundFloat, sha256 } from "./fairness";
 import { lineMultiplier, normalizeNumbers } from "./lottery-rules";
+import { resultFromPicks, upcomingDraws, zonedDate, zonedToUtc } from "./lottery-schedule";
 import { parseAmount } from "./money";
 import { curpBirthDate, isValidCpf, isValidCurp, normalizeDocument, validateDocument } from "./kyc-rules";
 import { fairProbabilities, footballMarkets } from "./pricing";
@@ -175,4 +176,29 @@ test("amount parsing accepts comma or dot decimals", () => {
   assert.equal(parseAmount("-5"), null);
   assert.equal(parseAmount("1.234"), null);
   assert.equal(parseAmount("0"), null);
+});
+
+test("state draw times are Eastern Time, including daylight saving", () => {
+  assert.equal(zonedToUtc("2026-07-01", "14:30").toISOString(), "2026-07-01T18:30:00.000Z"); // EDT, UTC-4
+  assert.equal(zonedToUtc("2026-12-01", "14:30").toISOString(), "2026-12-01T19:30:00.000Z"); // EST, UTC-5
+  assert.equal(zonedToUtc("2026-11-01", "23:34").toISOString(), "2026-11-02T04:34:00.000Z"); // DST ended that morning
+  assert.equal(zonedDate(new Date("2026-09-29T03:00:00Z")), "2026-09-28"); // 11pm ET still the 28th
+});
+
+test("upcoming draws: NY, FL, GA sessions in order, closing before the draw", () => {
+  const now = new Date("2026-09-28T17:00:00Z"); // 1:00 pm ET
+  const draws = upcomingDraws(now, 0);
+  // Today after 1pm ET: FL midday 13:30, NY 14:30, GA 18:59, FL 21:45, NY 22:30, GA 23:34 (GA 12:29 has passed).
+  assert.deepEqual(
+    draws.map((d) => `${d.lottery}-${d.session}`),
+    ["FL-MIDDAY", "NY-MIDDAY", "GA-EVENING", "FL-EVENING", "NY-EVENING", "GA-NIGHT"],
+  );
+  for (const d of draws) assert.ok(d.closesAt < d.drawAt && d.drawAt > now);
+  assert.equal(upcomingDraws(now, 2).length, 6 + 7 + 7);
+});
+
+test("borlette lots come from Pick 3 and Pick 4", () => {
+  assert.deepEqual(resultFromPicks("347", "1285"), { first: "347", second: "12", third: "85" });
+  assert.equal(resultFromPicks("34", "1285"), null);
+  assert.equal(resultFromPicks("347", "12a5"), null);
 });

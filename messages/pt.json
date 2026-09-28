@@ -113,7 +113,7 @@
   },
   "lottery": {
     "title": "Loteria e borlette",
-    "subtitle": "Monte um bilhete com quantas jogadas quiser e participe do próximo sorteio.",
+    "subtitle": "Jogue borlette com os sorteios oficiais de Nova York, Flórida e Geórgia.",
     "types": {
       "BORLETTE": "Borlette",
       "LOTO3": "Loto 3",
@@ -140,7 +140,19 @@
     "total": "Total",
     "buy": "Comprar bilhete",
     "loginToPlay": "Entre para jogar",
-    "bought": "Bilhete comprado. Boa sorte!"
+    "bought": "Bilhete comprado. Boa sorte!",
+    "lotteries": {
+      "NY": "Nova York",
+      "FL": "Flórida",
+      "GA": "Geórgia",
+      "OTHER": "Especiais"
+    },
+    "sessions": {
+      "MIDDAY": "Meio-dia",
+      "EVENING": "Noite",
+      "NIGHT": "Madrugada"
+    },
+    "stateRule": "Resultados oficiais do estado: 1º lote = dois últimos dígitos do Pick 3; 2º e 3º lotes = os dois pares do Pick 4."
   },
   "casino": {
     "title": "Cassino",
@@ -332,7 +344,13 @@
       "second": "2º",
       "third": "3º",
       "settle": "Publicar resultados",
-      "cancel": "Cancelar e reembolsar"
+      "cancel": "Cancelar e reembolsar",
+      "pick3": "Pick 3",
+      "pick4": "Pick 4",
+      "scheduled": "Os sorteios de NY, FL e GA são criados automaticamente. Informe o Pick 3 e o Pick 4 oficiais após cada sorteio.",
+      "awaiting": "Aguardando resultados",
+      "upcoming": "Próximos",
+      "custom": "Sorteio especial (opcional)"
     },
     "payments": {
       "pending": "Pagamentos pendentes",
@@ -410,7 +428,9 @@
     "kyc_file_missing": "Anexe todas as fotos exigidas.",
     "kyc_file_type": "As fotos devem ser JPG, PNG ou WebP.",
     "kyc_file_too_large": "Cada foto deve ter menos de {max} MB.",
-    "note_required": "Adicione uma nota explicando a recusa."
+    "note_required": "Adicione uma nota explicando a recusa.",
+    "invalid_picks": "O Pick 3 deve ter 3 dígitos e o Pick 4, 4 dígitos.",
+    "draw_not_held": "Este sorteio ainda não aconteceu."
   },
   "kyc": {
     "title": "Verificação de identidade",

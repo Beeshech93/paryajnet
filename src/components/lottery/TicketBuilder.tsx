@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { buyTicketAction } from "@/app/actions/play";
 import { FormMessage } from "@/components/ActionForm";
 import { LocalTime } from "@/components/LocalTime";
+import { StateBadge } from "./StateBadge";
 import { formatMoneyClient } from "@/lib/locale-tags";
 import type { ActionResult } from "@/lib/types";
 
@@ -24,20 +25,36 @@ function quickPick(type: LineType): string {
   return `${a}-${b}`;
 }
 
+export type DrawOption = {
+  id: string;
+  name: string;
+  lottery: string | null;
+  session: string | null;
+  drawAt: string | null;
+  closesAt: string;
+};
+
+const MAX_PER_STATE = 4;
+
 export function TicketBuilder({
   draws,
   currency,
   limits,
   signedIn,
 }: {
-  draws: { id: string; name: string; closesAt: string }[];
+  draws: DrawOption[];
   currency: string;
   limits: { min: number; max: number };
   signedIn: boolean;
 }) {
   const t = useTranslations("lottery");
   const locale = useLocale();
+  const present = new Set(draws.map((d) => d.lottery ?? "OTHER"));
+  const groups = ["NY", "FL", "GA", "OTHER"].filter((g) => present.has(g));
+  const [group, setGroup] = useState(groups[0] ?? "NY");
   const [drawId, setDrawId] = useState(draws[0]?.id ?? "");
+  const inGroup = draws.filter((d) => (d.lottery ?? "OTHER") === group).slice(0, MAX_PER_STATE);
+  const selected = draws.find((d) => d.id === drawId);
   const [type, setType] = useState<LineType>("BORLETTE");
   const [numbers, setNumbers] = useState("");
   const [stake, setStake] = useState(String(limits.min * 5));
@@ -71,20 +88,48 @@ export function TicketBuilder({
     <div className="card space-y-5 p-5">
       <div>
         <p className="label">{t("chooseDraw")}</p>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {draws.map((d) => (
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {groups.map((g) => (
+            <button
+              key={g}
+              onClick={() => {
+                setGroup(g);
+                const first = draws.find((d) => (d.lottery ?? "OTHER") === g);
+                if (first) setDrawId(first.id);
+              }}
+              className={`flex items-center gap-2 rounded-2xl border p-2 text-left transition ${
+                g === group ? "border-ink bg-surface shadow-card" : "border-line bg-surface-2 hover:border-brand"
+              }`}
+            >
+              <StateBadge code={g === "OTHER" ? null : g} size="sm" />
+              <span className="truncate text-sm font-semibold">
+                {t.has(`lotteries.${g}`) ? t(`lotteries.${g}`) : g}
+              </span>
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {inGroup.map((d) => (
             <button
               key={d.id}
               onClick={() => setDrawId(d.id)}
-              className={`rounded-xl border p-3 text-left transition ${d.id === drawId ? "border-gold bg-gold/10" : "border-line hover:border-gold/50"}`}
+              className={`rounded-xl border p-3 text-left transition ${d.id === drawId ? "border-gold bg-gold/15" : "border-line hover:border-gold"}`}
             >
-              <p className="font-semibold">{d.name}</p>
+              <p className="font-semibold">
+                {d.session ? t(`sessions.${d.session}`) : d.name}
+                {d.drawAt && (
+                  <span className="ml-2 text-sm font-normal text-muted">
+                    <LocalTime value={d.drawAt} />
+                  </span>
+                )}
+              </p>
               <p className="text-xs text-muted">
                 {t("closes")} <LocalTime value={d.closesAt} />
               </p>
             </button>
           ))}
         </div>
+        {selected?.lottery && <p className="mt-2 text-xs text-muted">{t("stateRule")}</p>}
       </div>
 
       <div>

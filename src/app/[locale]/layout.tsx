@@ -40,7 +40,7 @@ export default async function LocaleLayout({
           <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
           <footer className="mt-16 border-t border-line">
             <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-8 text-xs text-muted sm:flex-row sm:items-center">
-              <span className="chip border border-danger/50 text-danger">18+</span>
+              <span className="chip self-start border border-danger/50 text-danger">18+</span>
               <p className="max-w-3xl">{t("responsible")}</p>
               <p className="sm:ml-auto">© {new Date().getFullYear()} ParyajNet</p>
             </div>
