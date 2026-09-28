@@ -39,8 +39,14 @@ export const DEFAULT_SPORTS = [
   "basketball_nba",
 ];
 
+/** The key, tolerating common paste mistakes: spaces, quotes or a leading "ODDS_API_KEY=". */
 export function oddsApiKey() {
-  return process.env.ODDS_API_KEY || null;
+  const raw = (process.env.ODDS_API_KEY ?? "")
+    .trim()
+    .replace(/^ODDS_API_KEY\s*=\s*/, "")
+    .replace(/^["']|["']$/g, "")
+    .trim();
+  return raw || null;
 }
 
 async function get<T>(
