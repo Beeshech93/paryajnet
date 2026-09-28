@@ -152,20 +152,20 @@ export async function upsertMarkets(db: Tx, eventId: string, markets: MarketDraf
 
 export async function createEvent(input: EventInput) {
   input.markets.forEach(checkDraft);
-  return prisma.$transaction(async (tx) => {
-    const event = await tx.event.create({
-      data: {
-        externalId: input.externalId ?? null,
-        sport: input.sport,
-        league: input.league,
-        homeTeam: input.homeTeam,
-        awayTeam: input.awayTeam,
-        startsAt: input.startsAt,
-      },
-    });
-    await upsertMarkets(tx, event.id, input.markets);
-    return event;
-  }, LONG_TX);
+  // No interactive transaction: under parallel feed syncs those exhaust the serverless
+  // connection pool. If markets fail, the next sync fills them in (upserts are idempotent).
+  const event = await prisma.event.create({
+    data: {
+      externalId: input.externalId ?? null,
+      sport: input.sport,
+      league: input.league,
+      homeTeam: input.homeTeam,
+      awayTeam: input.awayTeam,
+      startsAt: input.startsAt,
+    },
+  });
+  await upsertMarkets(prisma, event.id, input.markets);
+  return event;
 }
 
 export async function startLive(eventId: string) {

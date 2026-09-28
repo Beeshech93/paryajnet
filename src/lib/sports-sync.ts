@@ -80,7 +80,7 @@ export async function syncOdds({ force = false } = {}) {
   let done = 0;
   let stopped: string | null = null;
   try {
-    await mapLimit(due, 4, async (sportKey) => {
+    await mapLimit(due, 3, async (sportKey) => {
       if (Date.now() - started > TIME_BUDGET_MS) return (stopped ??= "time");
       const left = await quotaLeft();
       if (left !== null && left < marketsFor(sportKey).length + QUOTA_RESERVE) return (stopped ??= "quota");
@@ -101,8 +101,10 @@ export async function syncOdds({ force = false } = {}) {
           }))
           .filter((e) => e.markets.length > 0);
         const results = await ingestFeed({ events });
-        const errors = results.filter((r) => r.action === "error").length;
-        summary[sportKey] = `${events.length} games${errors ? `, ${errors} errors` : ""}`;
+        const failed = results.filter((r) => r.action === "error");
+        summary[sportKey] =
+          `${events.length} games` +
+          (failed.length ? `, ${failed.length} errors (${String(failed[0].error).slice(0, 100)})` : "");
         await setSetting(leagueKey("o", sportKey), String(Date.now()));
         done++;
       } catch (err) {

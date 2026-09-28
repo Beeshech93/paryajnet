@@ -39,7 +39,7 @@ export type FeedPayload = z.infer<typeof feedSchema>;
 
 export async function ingestFeed(payload: FeedPayload) {
   // A few events at a time: each one is a handful of queries against a remote database.
-  return mapLimit(payload.events, 4, async (e): Promise<{ externalId: string; action: string; error?: string }> => {
+  return mapLimit(payload.events, 2, async (e): Promise<{ externalId: string; action: string; error?: string }> => {
     try {
       const markets = (e.markets ?? []).map((m) => ({
         type: m.type,
