@@ -50,7 +50,7 @@ messages/*.json             traducciones
 
 `scripts/set-db-provider.mjs` elige el proveedor de Prisma según `DATABASE_URL`: `file:` usa SQLite y `postgres://` usa PostgreSQL. No hay que tocar el schema.
 
-1. Crea una base PostgreSQL (Neon, Supabase, Vercel Postgres…).
+1. Conecta una base PostgreSQL al proyecto (Prisma Postgres, Neon…). La app usa `DATABASE_URL` o, si está vacía, las variables que crea la integración (`*_DATABASE_URL`, `*_POSTGRES_URL`), así que no hace falta copiarlas.
 2. En Vercel, importa el repositorio y define las variables de `.env.example` (`DATABASE_URL`, `AUTH_SECRET`, `PAYMENTS_WEBHOOK_SECRET`, `FEED_API_KEY`…). `vercel.json` ya usa `npm run build:vercel`, que aplica el schema antes de compilar, y la región `gru1` (São Paulo).
 3. Siembra datos de demo una vez: `DATABASE_URL=postgres://… npm run db:seed`.
 

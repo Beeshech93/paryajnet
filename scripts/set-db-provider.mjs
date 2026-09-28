@@ -1,12 +1,13 @@
-// Point prisma/schema.prisma at the database in DATABASE_URL:
+// Point prisma/schema.prisma at the database in use:
 // "file:..." → sqlite (local development), "postgres://..." → postgresql (production).
 import { readFileSync, writeFileSync } from "node:fs";
+import { resolveDatabaseUrl } from "./database-url.mjs";
 
-const url = process.env.DATABASE_URL ?? "";
+const url = resolveDatabaseUrl();
 if (process.env.VERCEL && !/^postgres(ql)?:\/\//.test(url)) {
   console.error(
-    "DATABASE_URL must be a postgres:// connection string on Vercel " +
-      (url ? "(got a non-Postgres value)." : "(it is empty). Set it in Project → Settings → Environment Variables."),
+    "No Postgres connection string found on Vercel " +
+      (url ? "(DATABASE_URL is not postgres://)." : "(set DATABASE_URL or connect a Postgres store to the project)."),
   );
   process.exit(1);
 }
