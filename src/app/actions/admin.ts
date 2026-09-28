@@ -11,6 +11,7 @@ import { basketballMarkets, footballMarkets } from "@/lib/pricing";
 import {
   cancelEvent,
   createEvent,
+  LONG_TX,
   settleEvent,
   setAllMarkets,
   startLive,
@@ -91,7 +92,7 @@ export async function addMarketAction(_prev: ActionResult | null, form: FormData
     if (selections.some((s) => !s.code || !Number.isFinite(s.odds))) throw new AppError("invalid_market");
     const event = await prisma.event.findUniqueOrThrow({ where: { id: eventId } });
     if (event.status !== "SCHEDULED" && event.status !== "LIVE") throw new AppError("already_settled");
-    await prisma.$transaction((tx) => upsertMarkets(tx, eventId, [{ type, line, selections }]));
+    await prisma.$transaction((tx) => upsertMarkets(tx, eventId, [{ type, line, selections }]), LONG_TX);
   });
 }
 

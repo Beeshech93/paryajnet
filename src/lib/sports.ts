@@ -16,6 +16,9 @@ import { credit, debit, getOrCreateWallet } from "./wallet";
 export type SlipLeg = { selectionId: string; odds: string };
 
 /** In-play bets are held for this long, then re-checked, so late goals can't be exploited. */
+/** Market-wide writes touch dozens of rows; give them more than Prisma's 5s default. */
+export const LONG_TX = { maxWait: 10_000, timeout: 30_000 };
+
 export const LIVE_BET_DELAY_MS = Number(process.env.LIVE_BET_DELAY_MS ?? 5000);
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -146,7 +149,7 @@ export async function createEvent(input: EventInput) {
     });
     await upsertMarkets(tx, event.id, input.markets);
     return event;
-  });
+  }, LONG_TX);
 }
 
 export async function startLive(eventId: string) {
@@ -199,7 +202,7 @@ export async function settleEvent(eventId: string, homeScore: number, awayScore:
       await tx.market.update({ where: { id: market.id }, data: { status: "SETTLED" } });
     }
     await tx.event.update({ where: { id: eventId }, data: { status: "SETTLED", homeScore, awayScore, clock: null } });
-  });
+  }, LONG_TX);
 
   await settleBetsTouching(event.markets.flatMap((m) => m.selections.map((s) => s.id)));
 }

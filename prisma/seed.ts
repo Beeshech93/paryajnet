@@ -61,12 +61,15 @@ async function fund(userId: string, currency: string, amount: number) {
 
 async function main() {
   const env = process.env;
-  if (!env.SEED_ADMIN_PASSWORD || !env.SEED_PLAYER_PASSWORD) throw new Error("Set SEED_* variables in .env");
+  if (!env.SEED_ADMIN_EMAIL || !env.SEED_ADMIN_PASSWORD) throw new Error("Set SEED_ADMIN_* variables");
+  await upsertUser(env.SEED_ADMIN_EMAIL, env.SEED_ADMIN_PASSWORD, "Admin", "ADMIN", "BRL");
 
-  await upsertUser(env.SEED_ADMIN_EMAIL!, env.SEED_ADMIN_PASSWORD, "Admin", "ADMIN", "BRL");
-  const player = await upsertUser(env.SEED_PLAYER_EMAIL!, env.SEED_PLAYER_PASSWORD, "Jogador Demo", "USER", "BRL");
-  await fund(player.id, "BRL", 500);
-  await fund(player.id, "MXN", 2000);
+  // Demo player with play money: development only.
+  if (env.SEED_PLAYER_EMAIL && env.SEED_PLAYER_PASSWORD) {
+    const player = await upsertUser(env.SEED_PLAYER_EMAIL, env.SEED_PLAYER_PASSWORD, "Jogador Demo", "USER", "BRL");
+    await fund(player.id, "BRL", 500);
+    await fund(player.id, "MXN", 2000);
+  }
 
   if ((await prisma.event.count()) === 0) {
     for (const [league, home, away, inHours, [o1, oX, o2], ou] of FOOTBALL) {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { prisma } from "./db";
-import { cancelEvent, createEvent, settleEvent, upsertMarkets } from "./sports";
+import { cancelEvent, createEvent, LONG_TX, settleEvent, upsertMarkets } from "./sports";
 
 /**
  * Odds-feed ingestion contract. An adapter for your data provider
@@ -58,7 +58,7 @@ export async function ingestFeed(payload: FeedPayload) {
         });
         await prisma.$transaction(async (tx) => {
           for (const m of markets) await upsertMarkets(tx, event!.id, [m], m.status);
-        });
+        }, LONG_TX);
       }
 
       if (e.status === "LIVE" && event.status !== "SETTLED" && event.status !== "CANCELLED") {
