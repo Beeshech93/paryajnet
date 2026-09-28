@@ -1,6 +1,6 @@
 const STYLE: Record<string, string> = {
   NY: "bg-brand text-brand-ink",
-  FL: "bg-gold text-ink",
+  FL: "bg-gold text-brand-ink",
   GA: "bg-danger text-white",
 };
 

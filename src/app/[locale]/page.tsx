@@ -74,7 +74,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             <Link href="/sports" className="btn-accent px-6 py-3 text-base">
               {t("ctaSports")}
             </Link>
-            <Link href="/register" className="btn bg-white px-6 py-3 text-base text-ink shadow-sm hover:bg-sky-50">
+            <Link
+              href="/register"
+              className="btn bg-white px-6 py-3 text-base text-brand-ink shadow-sm hover:bg-sky-50"
+            >
               {t("ctaRegister")}
             </Link>
           </div>

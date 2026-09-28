@@ -98,7 +98,7 @@ export default async function LotteryPage({ params }: { params: Promise<{ locale
                     </div>
                     <div className="flex gap-1 font-display font-bold tabular-nums">
                       <span
-                        className="rounded-full bg-gold px-2 py-1 text-ink"
+                        className="rounded-full bg-gold px-2 py-1 text-brand-ink"
                         title={`${t("types.LOTO3")}: ${d.first}`}
                       >
                         {l1}

@@ -256,15 +256,15 @@ export function SportsBoard({
       {slip.length > 0 && (
         <a
           href="#slip"
-          className="fixed inset-x-4 bottom-4 z-40 flex items-center justify-between rounded-2xl bg-ink px-5 py-3.5 text-white shadow-pop lg:hidden"
+          className="fixed inset-x-4 bottom-4 z-40 flex items-center justify-between rounded-2xl bg-brand px-5 py-3.5 text-brand-ink shadow-pop lg:hidden"
         >
           <span className="flex items-center gap-2 font-semibold">
-            <span className="flex size-6 items-center justify-center rounded-full bg-danger text-xs font-bold">
+            <span className="flex size-6 items-center justify-center rounded-full bg-danger text-xs font-bold text-white">
               {slip.length}
             </span>
             {t("slip")}
           </span>
-          <span className="rounded-lg bg-gold px-2 py-0.5 font-bold text-ink tabular-nums">
+          <span className="rounded-lg bg-gold px-2 py-0.5 font-bold text-brand-ink tabular-nums">
             {formatNumber(totalOdds, locale)}
           </span>
         </a>
@@ -311,7 +311,9 @@ export function SportsBoard({
                       </span>
                     </>
                   ) : (
-                    <span className="rounded-md bg-gold px-1.5 py-0.5 text-ink">{formatNumber(l.odds, locale)}</span>
+                    <span className="rounded-md bg-gold px-1.5 py-0.5 text-brand-ink">
+                      {formatNumber(l.odds, locale)}
+                    </span>
                   )}
                 </span>
                 <button

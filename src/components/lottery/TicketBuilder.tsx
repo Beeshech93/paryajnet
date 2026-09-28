@@ -142,7 +142,7 @@ export function TicketBuilder({
                 setType(ty);
                 setNumbers("");
               }}
-              className={`chip border px-3 py-1.5 ${type === ty ? "border-gold bg-gold text-ink" : "border-line text-muted"}`}
+              className={`chip border px-3 py-1.5 ${type === ty ? "border-gold bg-gold text-brand-ink" : "border-line text-muted"}`}
             >
               {t(`types.${ty}`)}
             </button>

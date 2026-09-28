@@ -15,11 +15,11 @@ export async function Header() {
     : null;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-line bg-bg/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 font-display text-xl font-bold tracking-tight">
           <span className="relative flex size-8 items-center justify-center rounded-xl bg-brand shadow-pop" aria-hidden>
-            <span className="absolute -top-1 -right-1 size-3 rounded-full bg-gold ring-2 ring-white" />
+            <span className="absolute -top-1 -right-1 size-3 rounded-full bg-gold ring-2 ring-bg" />
             <span className="text-sm font-black text-brand-ink">P</span>
           </span>
           <span>
@@ -34,7 +34,7 @@ export async function Header() {
             <>
               <Link
                 href="/wallet"
-                className="rounded-full bg-gold px-3 py-1.5 text-sm font-bold text-ink tabular-nums shadow-sm"
+                className="rounded-full bg-gold px-3 py-1.5 text-sm font-bold text-brand-ink tabular-nums shadow-sm"
               >
                 {formatMoney(wallet?.balance ?? 0, currency, locale)}
               </Link>

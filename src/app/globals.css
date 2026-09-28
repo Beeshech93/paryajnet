@@ -1,36 +1,36 @@
 @import "tailwindcss";
 
 @theme {
-  /* Surfaces: light, airy blue */
-  --color-bg: #eef6fd;
-  --color-surface: #ffffff;
-  --color-surface-2: #e7f2fc;
-  --color-line: #d2e5f5;
-  --color-ink: #0b2540;
-  --color-muted: #587089;
+  /* Surfaces: deep navy */
+  --color-bg: #07111f;
+  --color-surface: #0e1b2e;
+  --color-surface-2: #152840;
+  --color-line: #223b59;
+  --color-ink: #e8f1fb;
+  --color-muted: #8ea6c1;
 
   /* Light blue: primary, sports */
   --color-brand: #38bdf8;
-  --color-brand-ink: #062a45;
-  --color-brand-strong: #0369a1; /* blue for text on white */
+  --color-brand-ink: #062a45; /* dark text on light-blue / yellow fills */
+  --color-brand-strong: #7dd3fc; /* blue for text on dark */
 
   /* Yellow: odds, lottery, highlights */
   --color-gold: #facc15;
-  --color-gold-strong: #a16207; /* yellow-family text on white */
+  --color-gold-strong: #fde047; /* yellow for text on dark */
 
   /* Red: casino, live, key calls to action */
   --color-casino: #ef4444;
-  --color-danger: #dc2626;
+  --color-danger: #ef4444;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display), var(--font-inter), ui-sans-serif, sans-serif;
 
-  --shadow-card: 0 1px 2px rgb(11 37 64 / 0.04), 0 4px 16px rgb(11 37 64 / 0.06);
-  --shadow-pop: 0 10px 30px rgb(3 105 161 / 0.18);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.25);
+  --shadow-pop: 0 10px 30px rgb(56 189 248 / 0.25);
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 body {
@@ -54,7 +54,7 @@ body {
   @apply btn bg-danger text-white shadow-sm hover:bg-red-500;
 }
 @utility btn-gold {
-  @apply btn bg-gold text-ink shadow-sm hover:bg-yellow-300;
+  @apply btn bg-gold text-brand-ink shadow-sm hover:bg-yellow-300;
 }
 @utility btn-ghost {
   @apply btn border border-line bg-surface text-ink hover:bg-surface-2;
@@ -73,7 +73,7 @@ body {
 }
 
 @utility odds-btn {
-  @apply flex min-w-0 flex-1 flex-col items-center rounded-xl border border-transparent bg-surface-2 px-2 py-2 text-sm transition hover:border-brand hover:bg-sky-100;
+  @apply flex min-w-0 flex-1 flex-col items-center rounded-xl border border-transparent bg-surface-2 px-2 py-2 text-sm transition hover:border-brand hover:bg-brand/15;
   &[data-active="true"] {
     @apply border-brand bg-brand text-brand-ink;
   }

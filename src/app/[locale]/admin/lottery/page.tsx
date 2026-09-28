@@ -159,7 +159,7 @@ export default async function AdminLottery() {
 
   return (
     <div className="space-y-8">
-      <p className="rounded-2xl bg-brand/15 p-4 text-sm text-brand-ink">{t("lottery.scheduled")}</p>
+      <p className="rounded-2xl bg-brand/15 p-4 text-sm text-ink">{t("lottery.scheduled")}</p>
 
       <section>
         <h2 className="mb-3 font-display text-lg font-bold">{t("lottery.awaiting")}</h2>
