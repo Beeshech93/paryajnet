@@ -43,7 +43,12 @@ export default async function AdminOverview() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-bold">{t("overview")}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-2xl font-bold">{t("overview")}</h1>
+        <Link href="/admin/agents#new-user" className="btn-primary">
+          + {t("agents.createAccount")}
+        </Link>
+      </div>
       {!evolutionConfig() && (
         <Link href="/admin/whatsapp" className="block rounded-2xl bg-gold/15 p-4 text-sm text-gold-strong">
           ⚠️ {t("whatsapp.notConfigured")}

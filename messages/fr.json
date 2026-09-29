@@ -472,7 +472,8 @@
       "resetLinkLabel": "Lien (valable 24 h, usage unique)",
       "resetLinkHelp": "Envoyez-le à l’utilisateur par WhatsApp. En l’utilisant, il crée son nouveau mot de passe et ses autres sessions sont fermées.",
       "mailOn": "La récupération par e-mail est active : les utilisateurs peuvent utiliser « Mot de passe oublié ? » sur /login.",
-      "mailOff": "La récupération par e-mail n’est pas configurée (RESEND_API_KEY et MAIL_FROM). En attendant, utilisez « Lien de récupération »."
+      "mailOff": "La récupération par e-mail n’est pas configurée (RESEND_API_KEY et MAIL_FROM). En attendant, utilisez « Lien de récupération ».",
+      "createAccount": "Créer un compte (vendeur ou admin)"
     }
   },
   "errors": {

@@ -472,7 +472,8 @@
       "resetLinkLabel": "Link (vale 24 h, uso único)",
       "resetLinkHelp": "Envie ao usuário pelo WhatsApp. Ao usar, ele cria a nova senha e as outras sessões são encerradas.",
       "mailOn": "A recuperação por e-mail está ativa: os usuários podem usar «Esqueceu a senha?» em /login.",
-      "mailOff": "A recuperação por e-mail não está configurada (RESEND_API_KEY e MAIL_FROM). Enquanto isso, use «Link de recuperação»."
+      "mailOff": "A recuperação por e-mail não está configurada (RESEND_API_KEY e MAIL_FROM). Enquanto isso, use «Link de recuperação».",
+      "createAccount": "Criar conta (vendedor ou admin)"
     }
   },
   "errors": {

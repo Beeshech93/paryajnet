@@ -472,7 +472,8 @@
       "resetLinkLabel": "Link (valid 24 h, single use)",
       "resetLinkHelp": "Send it to the user on WhatsApp. Using it sets their new password and signs out their other sessions.",
       "mailOn": "E-mail recovery is on: users can use “Forgot your password?” at /login.",
-      "mailOff": "E-mail recovery isn’t configured (RESEND_API_KEY and MAIL_FROM). Meanwhile, use “Recovery link”."
+      "mailOff": "E-mail recovery isn’t configured (RESEND_API_KEY and MAIL_FROM). Meanwhile, use “Recovery link”.",
+      "createAccount": "Create account (agent or admin)"
     }
   },
   "errors": {

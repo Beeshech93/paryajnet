@@ -103,7 +103,7 @@ export default async function AdminAgents() {
         {rows.length === 0 && <p className="p-5 text-muted">{t("empty")}</p>}
       </div>
 
-      <section className="card p-5">
+      <section id="new-user" className="card scroll-mt-24 p-5">
         <h2 className="font-display text-lg font-bold">{t("newAgent")}</h2>
         <ActionForm
           action={createAgentAction}
