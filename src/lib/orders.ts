@@ -208,7 +208,7 @@ export async function cancelSale(orderId: string, user: { id: string }) {
   if (!cancellable(order, user.id)) throw new AppError("sale_not_cancellable", { minutes: CANCEL_WINDOW_MINUTES });
   const res = await prisma.order.updateMany({
     where: { id: orderId, status: "CONFIRMED" },
-    data: { status: "REJECTED", adminNote: "Venda anulada pelo agente" },
+    data: { status: "CANCELLED", adminNote: "Venda anulada pelo agente" },
   });
   if (res.count === 0) throw new AppError("sale_not_cancellable", { minutes: CANCEL_WINDOW_MINUTES });
 }

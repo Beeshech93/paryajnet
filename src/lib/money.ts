@@ -14,7 +14,11 @@ export { LOCALE_TAGS } from "./locale-tags";
 import { LOCALE_TAGS } from "./locale-tags";
 
 export function formatMoney(amount: Decimal | number | string, locale: string, currency = "BRL"): string {
-  return new Intl.NumberFormat(LOCALE_TAGS[locale] ?? locale, { style: "currency", currency }).format(Number(amount));
+  return new Intl.NumberFormat(LOCALE_TAGS[locale] ?? locale, {
+    style: "currency",
+    currency,
+    currencyDisplay: "narrowSymbol",
+  }).format(Number(amount));
 }
 
 export function formatOdds(odds: Decimal | number | string, locale: string): string {

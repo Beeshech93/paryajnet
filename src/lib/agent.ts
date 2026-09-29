@@ -304,6 +304,8 @@ export async function handleIncoming(msg: IncomingMessage) {
   }
 
   // 4) Anything else: short help with the open services of this number.
-  const open = recent.filter((o) => !["PAID", "LOST", "REJECTED", "EXPIRED"].includes(o.status)).map((o) => o.code);
+  const open = recent
+    .filter((o) => !["PAID", "LOST", "REJECTED", "EXPIRED", "CANCELLED"].includes(o.status))
+    .map((o) => o.code);
   return sendText(msg.phone, t("help", { link: siteUrl(), codes: open.length ? open.join(", ") : "—" }));
 }

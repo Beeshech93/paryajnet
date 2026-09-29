@@ -4,7 +4,16 @@ export const CURRENCY = "BRL";
 export type Role = "ADMIN" | "AGENT";
 export type OrderChannel = "ONLINE" | "AGENT";
 export type OrderStatus =
-  "AWAITING_PAYMENT" | "RECEIPT_RECEIVED" | "CONFIRMED" | "WON" | "LOST" | "VOID" | "PAID" | "REJECTED" | "EXPIRED";
+  | "AWAITING_PAYMENT"
+  | "RECEIPT_RECEIVED"
+  | "CONFIRMED"
+  | "WON"
+  | "LOST"
+  | "VOID"
+  | "PAID"
+  | "REJECTED"
+  | "EXPIRED"
+  | "CANCELLED";
 export type Outcome = "PENDING" | "WON" | "LOST" | "VOID";
 export type BetStatus = "OPEN" | "WON" | "LOST" | "VOID";
 

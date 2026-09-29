@@ -12,7 +12,7 @@ const zero = new Decimal(0);
 export async function cashSummary(userId: string | null, from?: Date) {
   const soldWhere = {
     channel: "AGENT",
-    status: { not: "REJECTED" },
+    status: { notIn: ["REJECTED", "CANCELLED"] },
     ...(userId && { soldById: userId }),
     ...(from && { createdAt: { gte: from } }),
   };

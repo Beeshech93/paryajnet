@@ -10,6 +10,7 @@ const TONE: Record<string, string> = {
   PAID: "bg-brand/15 text-brand-strong",
   REJECTED: "bg-danger/15 text-danger",
   EXPIRED: "bg-danger/15 text-danger",
+  CANCELLED: "bg-surface-2 text-muted",
 };
 
 export async function OrderStatusChip({ status }: { status: string }) {

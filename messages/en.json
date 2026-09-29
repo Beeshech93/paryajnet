@@ -616,7 +616,8 @@
       "VOID": "Void · refund",
       "PAID": "Paid",
       "REJECTED": "Rejected",
-      "EXPIRED": "Expired"
+      "EXPIRED": "Expired",
+      "CANCELLED": "Cancelled"
     },
     "statusHelp": {
       "AWAITING_PAYMENT": "Pay by PIX and send the receipt on WhatsApp.",
@@ -627,7 +628,8 @@
       "VOID": "The event was cancelled: reply on WhatsApp with your PIX key for the refund.",
       "PAID": "Payout sent by PIX.",
       "REJECTED": "The payment could not be confirmed.",
-      "EXPIRED": "The payment deadline passed."
+      "EXPIRED": "The payment deadline passed.",
+      "CANCELLED": "The agent cancelled this sale and returned the money."
     },
     "steps": {
       "AWAITING_PAYMENT": "Created",

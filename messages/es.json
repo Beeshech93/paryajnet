@@ -616,7 +616,8 @@
       "VOID": "Anulado · reembolso",
       "PAID": "Pagado",
       "REJECTED": "Rechazado",
-      "EXPIRED": "Expirado"
+      "EXPIRED": "Expirado",
+      "CANCELLED": "Anulado"
     },
     "statusHelp": {
       "AWAITING_PAYMENT": "Paga por PIX y envía el comprobante por WhatsApp.",
@@ -627,7 +628,8 @@
       "VOID": "El evento se canceló: responde por WhatsApp con tu clave PIX para el reembolso.",
       "PAID": "Premio enviado por PIX.",
       "REJECTED": "No se pudo confirmar el pago.",
-      "EXPIRED": "Venció el plazo de pago."
+      "EXPIRED": "Venció el plazo de pago.",
+      "CANCELLED": "El vendedor anuló esta venta y devolvió el dinero."
     },
     "steps": {
       "AWAITING_PAYMENT": "Creado",

@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { getLocale, getTranslations } from "next-intl/server";
 import { cancelDrawAction, createDrawAction, settleDrawAction } from "@/app/actions/admin";
 import { ActionForm, SubmitButton } from "@/components/ActionForm";
@@ -11,7 +12,13 @@ export default async function AdminLottery() {
   const [locale, t, tl] = await Promise.all([getLocale(), getTranslations("admin"), getTranslations("lottery")]);
   await ensureUpcomingDraws();
   const now = new Date();
-  const include = { tickets: { select: { totalStake: true, currency: true } } };
+  // Only paid services count towards a draw's stakes.
+  const include = {
+    tickets: {
+      where: { order: { status: { in: ["CONFIRMED", "WON", "LOST", "VOID", "PAID"] } } },
+      select: { totalStake: true },
+    },
+  } satisfies Prisma.LotteryDrawInclude;
   const [awaiting, upcoming, recent] = await Promise.all([
     // Held (or closed custom) draws still waiting for official numbers.
     prisma.lotteryDraw.findMany({
@@ -36,14 +43,10 @@ export default async function AdminLottery() {
   type Draw = (typeof awaiting)[number];
   const label = (d: Draw) => (d.lottery ? `${tl(`lotteries.${d.lottery}`)} · ${tl(`sessions.${d.session}`)}` : d.name);
   const stakes = (d: Draw) =>
-    Object.entries(
-      d.tickets.reduce<Record<string, number>>((acc, tk) => {
-        acc[tk.currency] = (acc[tk.currency] ?? 0) + Number(tk.totalStake);
-        return acc;
-      }, {}),
-    )
-      .map(([c, v]) => formatMoney(v, c, locale))
-      .join(" · ");
+    formatMoney(
+      d.tickets.reduce((sum, tk) => sum + Number(tk.totalStake), 0),
+      locale,
+    );
 
   const DrawRow = ({ d, settle }: { d: Draw; settle: boolean }) => (
     <article className="card p-4 text-sm">

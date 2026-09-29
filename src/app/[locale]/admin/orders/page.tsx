@@ -13,7 +13,7 @@ const FILTERS: Record<string, string[] | null> = {
   AWAITING_PAYMENT: ["AWAITING_PAYMENT"],
   CONFIRMED: ["CONFIRMED"],
   DONE: ["PAID", "LOST"],
-  CLOSED: ["REJECTED", "EXPIRED"],
+  CLOSED: ["REJECTED", "EXPIRED", "CANCELLED"],
   ALL: null,
 };
 

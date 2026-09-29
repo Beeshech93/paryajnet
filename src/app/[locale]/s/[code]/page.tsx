@@ -56,7 +56,7 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
   const tone =
     order.status === "WON" || order.status === "PAID"
       ? "bg-brand/15 text-brand-strong"
-      : order.status === "REJECTED" || order.status === "EXPIRED" || order.status === "LOST"
+      : ["REJECTED", "EXPIRED", "CANCELLED", "LOST"].includes(order.status)
         ? "bg-danger/15 text-danger"
         : "bg-gold/15 text-gold-strong";
 

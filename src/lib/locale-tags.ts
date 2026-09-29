@@ -6,7 +6,11 @@ export const LOCALE_TAGS: Record<string, string> = {
 };
 
 export function formatMoneyClient(amount: number | string, locale: string, currency = "BRL") {
-  return new Intl.NumberFormat(LOCALE_TAGS[locale] ?? locale, { style: "currency", currency }).format(Number(amount));
+  return new Intl.NumberFormat(LOCALE_TAGS[locale] ?? locale, {
+    style: "currency",
+    currency,
+    currencyDisplay: "narrowSymbol",
+  }).format(Number(amount));
 }
 
 export function formatNumber(value: number | string, locale: string, digits = 2) {
