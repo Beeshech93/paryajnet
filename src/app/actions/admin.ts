@@ -1,12 +1,14 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { getLocale } from "next-intl/server";
 import { z } from "zod";
 import { adminForAction } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { cancelDraw, settleDraw, settleWithPicks } from "@/lib/lottery";
 import { Decimal } from "@/lib/money";
 import { BANNER_LOCALES, BANNER_THEMES, normalizeLink, PLACEMENTS, readImage } from "@/lib/banners";
+import { createResetLink, PASSWORD_MIN, setPassword } from "@/lib/password-reset";
 import { normalizePixKey } from "@/lib/pix";
 import { savePaymentSettings, type PaymentSettings } from "@/lib/settings";
 import { confirmOrder, markPaid, rejectOrder, setPayoutKey } from "@/lib/orders";
@@ -441,11 +443,17 @@ export async function toggleAgentAction(_prev: ActionResult | null, form: FormDa
 export async function resetAgentPasswordAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
   return asAdmin(async () => {
     const password = String(form.get("password") ?? "");
-    if (password.length < 8 || password.length > 100) throw new AppError("password_too_short");
-    const res = await prisma.user.updateMany({
-      where: { id: String(form.get("id")), role: { in: [...STAFF_ROLES] } },
-      data: { passwordHash: await bcrypt.hash(password, 10) },
-    });
-    if (res.count === 0) throw new AppError("invalid_form");
+    if (password.length < PASSWORD_MIN || password.length > 100) throw new AppError("password_too_short");
+    const user = await prisma.user.findFirst({ where: { id: String(form.get("id")), role: { in: [...STAFF_ROLES] } } });
+    if (!user) throw new AppError("invalid_form");
+    await setPassword(user.id, password);
+  });
+}
+
+/** One-time recovery link (24 h) the admin sends to the user by hand. */
+export async function resetLinkAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult<string>> {
+  return run(async () => {
+    const admin = await adminForAction();
+    return createResetLink(String(form.get("id")), admin.id, await getLocale());
   });
 }

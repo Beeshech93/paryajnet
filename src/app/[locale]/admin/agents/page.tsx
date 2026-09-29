@@ -1,8 +1,10 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { createAgentAction, resetAgentPasswordAction, toggleAgentAction } from "@/app/actions/admin";
 import { ActionForm, SubmitButton } from "@/components/ActionForm";
+import { ResetLinkButton } from "@/components/admin/ResetLinkButton";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { mailConfigured } from "@/lib/mailer";
 import { formatMoney } from "@/lib/money";
 import { cashSummary, startOfBrDay } from "@/lib/sales";
 
@@ -86,6 +88,7 @@ export default async function AdminAgents() {
                 />
                 <SubmitButton className="btn-ghost py-1.5 text-xs">{t("setPassword")}</SubmitButton>
               </ActionForm>
+              <ResetLinkButton userId={agent.id} />
               {agent.id !== me?.id && (
                 <ActionForm action={toggleAgentAction}>
                   <input type="hidden" name="id" value={agent.id} />
@@ -145,6 +148,9 @@ export default async function AdminAgents() {
           <SubmitButton>{t("create")}</SubmitButton>
         </ActionForm>
         <p className="mt-3 text-xs text-muted">{t("help")}</p>
+        <p className={`mt-2 text-xs ${mailConfigured() ? "text-muted" : "text-gold-strong"}`}>
+          {mailConfigured() ? t("mailOn") : t("mailOff")}
+        </p>
       </section>
     </div>
   );

@@ -56,7 +56,27 @@
     "loginTitle": "Acceso admin / vendedor",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "loginCta": "Entrar"
+    "loginCta": "Entrar",
+    "forgotLink": "¿Olvidaste tu contraseña?",
+    "forgotTitle": "Recuperar contraseña",
+    "forgotBody": "Escribe el correo de tu cuenta y te enviaremos un enlace para crear una nueva contraseña.",
+    "sendLink": "Enviar enlace",
+    "forgotSent": "Si el correo está registrado, recibirás un enlace en unos minutos. Revisa también el spam.",
+    "forgotAdminHint": "¿No te llega el correo? Pide a un administrador un enlace de recuperación.",
+    "backToLogin": "Volver a entrar",
+    "resetTitle": "Nueva contraseña",
+    "resetFor": "Cuenta: {email}",
+    "resetInvalid": "Este enlace no es válido, ya se usó o venció. Pide uno nuevo.",
+    "newPassword": "Nueva contraseña",
+    "passwordRule": "Mínimo {min} caracteres.",
+    "confirmPassword": "Repite la contraseña",
+    "savePassword": "Guardar y entrar",
+    "resetMailSubject": "ParyajNet · Recupera tu contraseña",
+    "resetMailHello": "Hola, {name}:",
+    "resetMailBody": "Recibimos una solicitud para cambiar la contraseña de tu cuenta. El enlace vale {minutes} minutos y se puede usar una sola vez.",
+    "resetMailCta": "Crear nueva contraseña",
+    "resetMailIgnore": "Si no fuiste tú, ignora este correo: tu contraseña no cambia.",
+    "resetMailText": "Hola, {name}:\n\nPara crear una nueva contraseña abre este enlace (vale {minutes} minutos, un solo uso):\n{url}\n\nSi no fuiste tú, ignora este correo."
   },
   "sports": {
     "title": "Deportes",
@@ -447,7 +467,12 @@
         "AGENT": "Vendedor",
         "ADMIN": "Admin"
       },
-      "you": "tú"
+      "you": "tú",
+      "resetLink": "Enlace de recuperación",
+      "resetLinkLabel": "Enlace (válido 24 h, un solo uso)",
+      "resetLinkHelp": "Envíalo al usuario por WhatsApp. Al usarlo crea su nueva contraseña y se cierran sus otras sesiones.",
+      "mailOn": "La recuperación por correo está activa: los usuarios pueden usar «¿Olvidaste tu contraseña?» en /login.",
+      "mailOff": "La recuperación por correo no está configurada (RESEND_API_KEY y MAIL_FROM). Mientras tanto, usa «Enlace de recuperación»."
     }
   },
   "errors": {
@@ -528,7 +553,9 @@
     "sale_not_cancellable": "Solo quien vendió puede anular la venta, dentro de {minutes} minutos y antes del cierre.",
     "online_service_pix": "Este servicio es online: el premio se paga por PIX desde el admin.",
     "password_too_short": "La contraseña debe tener al menos 8 caracteres.",
-    "cannot_disable_self": "No puedes desactivar tu propia cuenta."
+    "cannot_disable_self": "No puedes desactivar tu propia cuenta.",
+    "passwords_mismatch": "Las contraseñas no coinciden.",
+    "reset_invalid": "El enlace no es válido, ya se usó o venció. Pide uno nuevo."
   },
   "ads": {
     "label": "Publicidad"

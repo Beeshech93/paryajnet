@@ -56,7 +56,27 @@
     "loginTitle": "Acesso admin / vendedor",
     "email": "E-mail",
     "password": "Senha",
-    "loginCta": "Entrar"
+    "loginCta": "Entrar",
+    "forgotLink": "Esqueceu a senha?",
+    "forgotTitle": "Recuperar senha",
+    "forgotBody": "Digite o e-mail da sua conta e enviaremos um link para criar uma nova senha.",
+    "sendLink": "Enviar link",
+    "forgotSent": "Se o e-mail estiver cadastrado, você receberá um link em alguns minutos. Confira também o spam.",
+    "forgotAdminHint": "Não chegou o e-mail? Peça a um administrador um link de recuperação.",
+    "backToLogin": "Voltar para o login",
+    "resetTitle": "Nova senha",
+    "resetFor": "Conta: {email}",
+    "resetInvalid": "Este link não é válido, já foi usado ou expirou. Peça um novo.",
+    "newPassword": "Nova senha",
+    "passwordRule": "Mínimo de {min} caracteres.",
+    "confirmPassword": "Repita a senha",
+    "savePassword": "Salvar e entrar",
+    "resetMailSubject": "ParyajNet · Recupere sua senha",
+    "resetMailHello": "Olá, {name}!",
+    "resetMailBody": "Recebemos um pedido para trocar a senha da sua conta. O link vale {minutes} minutos e pode ser usado uma única vez.",
+    "resetMailCta": "Criar nova senha",
+    "resetMailIgnore": "Se não foi você, ignore este e-mail: sua senha não muda.",
+    "resetMailText": "Olá, {name}!\n\nPara criar uma nova senha, abra este link (vale {minutes} minutos, uso único):\n{url}\n\nSe não foi você, ignore este e-mail."
   },
   "sports": {
     "title": "Esportes",
@@ -447,7 +467,12 @@
         "AGENT": "Vendedor",
         "ADMIN": "Admin"
       },
-      "you": "você"
+      "you": "você",
+      "resetLink": "Link de recuperação",
+      "resetLinkLabel": "Link (vale 24 h, uso único)",
+      "resetLinkHelp": "Envie ao usuário pelo WhatsApp. Ao usar, ele cria a nova senha e as outras sessões são encerradas.",
+      "mailOn": "A recuperação por e-mail está ativa: os usuários podem usar «Esqueceu a senha?» em /login.",
+      "mailOff": "A recuperação por e-mail não está configurada (RESEND_API_KEY e MAIL_FROM). Enquanto isso, use «Link de recuperação»."
     }
   },
   "errors": {
@@ -528,7 +553,9 @@
     "sale_not_cancellable": "Só quem vendeu pode anular a venda, em até {minutes} minutos e antes do fechamento.",
     "online_service_pix": "Este serviço é online: o prêmio é pago por PIX pelo admin.",
     "password_too_short": "A senha deve ter pelo menos 8 caracteres.",
-    "cannot_disable_self": "Você não pode desativar sua própria conta."
+    "cannot_disable_self": "Você não pode desativar sua própria conta.",
+    "passwords_mismatch": "As senhas não coincidem.",
+    "reset_invalid": "O link não é válido, já foi usado ou expirou. Peça um novo."
   },
   "ads": {
     "label": "Publicidade"

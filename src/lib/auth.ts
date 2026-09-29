@@ -35,12 +35,12 @@ export async function destroySession() {
   (await cookies()).delete(COOKIE);
 }
 
-async function readSession(): Promise<string | null> {
+async function readSession(): Promise<{ userId: string; issuedAt: number } | null> {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secret());
-    return payload.sub ?? null;
+    return payload.sub ? { userId: payload.sub, issuedAt: payload.iat ?? 0 } : null;
   } catch {
     return null;
   }
@@ -48,10 +48,13 @@ async function readSession(): Promise<string | null> {
 
 /** The signed-in user, loaded once per request. Role and status are always read from the DB. */
 export const getCurrentUser = cache(async () => {
-  const userId = await readSession();
-  if (!userId) return null;
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  return user?.active ? user : null;
+  const session = await readSession();
+  if (!session) return null;
+  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  if (!user?.active) return null;
+  // Sessions from before the last password change are signed out (JWT iat is in seconds).
+  if (user.sessionsValidAfter && session.issuedAt < Math.floor(user.sessionsValidAfter.getTime() / 1000)) return null;
+  return user;
 });
 
 /** Admins and sales agents can sell for cash and finalise cash sales. */

@@ -56,7 +56,27 @@
     "loginTitle": "Admin / agent sign-in",
     "email": "Email",
     "password": "Password",
-    "loginCta": "Log in"
+    "loginCta": "Log in",
+    "forgotLink": "Forgot your password?",
+    "forgotTitle": "Reset password",
+    "forgotBody": "Enter your account e-mail and we’ll send you a link to create a new password.",
+    "sendLink": "Send link",
+    "forgotSent": "If the e-mail is registered, you’ll get a link in a few minutes. Check your spam folder too.",
+    "forgotAdminHint": "No e-mail? Ask an administrator for a recovery link.",
+    "backToLogin": "Back to sign-in",
+    "resetTitle": "New password",
+    "resetFor": "Account: {email}",
+    "resetInvalid": "This link isn’t valid, was already used or has expired. Request a new one.",
+    "newPassword": "New password",
+    "passwordRule": "At least {min} characters.",
+    "confirmPassword": "Repeat the password",
+    "savePassword": "Save and sign in",
+    "resetMailSubject": "ParyajNet · Reset your password",
+    "resetMailHello": "Hi {name},",
+    "resetMailBody": "We received a request to change your account password. The link is valid for {minutes} minutes and works once.",
+    "resetMailCta": "Create a new password",
+    "resetMailIgnore": "If this wasn’t you, ignore this e-mail: your password stays the same.",
+    "resetMailText": "Hi {name},\n\nTo create a new password, open this link (valid for {minutes} minutes, single use):\n{url}\n\nIf this wasn’t you, ignore this e-mail."
   },
   "sports": {
     "title": "Sports",
@@ -447,7 +467,12 @@
         "AGENT": "Sales agent",
         "ADMIN": "Admin"
       },
-      "you": "you"
+      "you": "you",
+      "resetLink": "Recovery link",
+      "resetLinkLabel": "Link (valid 24 h, single use)",
+      "resetLinkHelp": "Send it to the user on WhatsApp. Using it sets their new password and signs out their other sessions.",
+      "mailOn": "E-mail recovery is on: users can use “Forgot your password?” at /login.",
+      "mailOff": "E-mail recovery isn’t configured (RESEND_API_KEY and MAIL_FROM). Meanwhile, use “Recovery link”."
     }
   },
   "errors": {
@@ -528,7 +553,9 @@
     "sale_not_cancellable": "Only the agent who sold it can cancel a sale, within {minutes} minutes and before it closes.",
     "online_service_pix": "This is an online service: winnings are paid by PIX from the admin.",
     "password_too_short": "The password must be at least 8 characters.",
-    "cannot_disable_self": "You can't deactivate your own account."
+    "cannot_disable_self": "You can't deactivate your own account.",
+    "passwords_mismatch": "The passwords don’t match.",
+    "reset_invalid": "The link isn’t valid, was already used or has expired. Request a new one."
   },
   "ads": {
     "label": "Advertisement"

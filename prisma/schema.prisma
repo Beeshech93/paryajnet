@@ -21,16 +21,34 @@ datasource db {
 /// Back-office users: admins and sales agents (vendedores who sell for cash).
 /// Customers never log in.
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  name         String
-  role         String   @default("ADMIN") // ADMIN | AGENT
-  active       Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  passwordHash       String
+  name               String
+  role               String    @default("ADMIN") // ADMIN | AGENT
+  active             Boolean   @default(true)
+  // Sessions issued before this moment are rejected (set when the password changes).
+  sessionsValidAfter DateTime?
+  createdAt          DateTime  @default(now())
 
-  sales   Order[] @relation("SoldBy")
-  payouts Order[] @relation("PaidBy")
+  sales          Order[]         @relation("SoldBy")
+  payouts        Order[]         @relation("PaidBy")
+  passwordResets PasswordReset[]
+}
+
+/// One-time password recovery link. Only the SHA-256 of the token is stored.
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdBy String? // admin who generated it; null when requested by the user
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 // ---------- Services (orders) ----------

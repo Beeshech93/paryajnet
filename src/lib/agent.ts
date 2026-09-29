@@ -14,18 +14,10 @@ import { attachReceipt, RECEIPT_MAX_BYTES, RECEIPT_TYPES, setPayoutKey } from ".
 import { detectPixKey, findOrderCode, type IncomingMessage } from "./orders-rules";
 import { formatPixKey, pixBrCode } from "./pix";
 import { getPaymentSettings } from "./settings";
+import { siteUrl } from "./site";
 import { AppError } from "./types";
 
 const TZ = "America/Sao_Paulo";
-
-function siteUrl() {
-  return (
-    process.env.SITE_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "http://localhost:3000")
-  ).replace(/\/+$/, "");
-}
 
 function when(date: Date, locale: string) {
   return new Intl.DateTimeFormat(LOCALE_TAGS[locale] ?? locale, {

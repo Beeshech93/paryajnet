@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { ActionForm, SubmitButton } from "@/components/ActionForm";
 import { loginAction } from "@/app/actions/auth";
+import { Link } from "@/i18n/navigation";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
@@ -31,6 +32,9 @@ export default function LoginPage() {
         </div>
         <SubmitButton className="btn-primary w-full">{t("loginCta")}</SubmitButton>
       </ActionForm>
+      <Link href="/forgot" className="mt-4 inline-block text-sm text-brand-strong">
+        {t("forgotLink")}
+      </Link>
     </div>
   );
 }

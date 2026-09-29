@@ -56,7 +56,27 @@
     "loginTitle": "Accès admin / vendeur",
     "email": "E-mail",
     "password": "Mot de passe",
-    "loginCta": "Se connecter"
+    "loginCta": "Se connecter",
+    "forgotLink": "Mot de passe oublié ?",
+    "forgotTitle": "Récupérer le mot de passe",
+    "forgotBody": "Saisissez l’e-mail de votre compte et nous vous enverrons un lien pour créer un nouveau mot de passe.",
+    "sendLink": "Envoyer le lien",
+    "forgotSent": "Si l’e-mail est enregistré, vous recevrez un lien dans quelques minutes. Vérifiez aussi les spams.",
+    "forgotAdminHint": "Pas d’e-mail ? Demandez un lien de récupération à un administrateur.",
+    "backToLogin": "Retour à la connexion",
+    "resetTitle": "Nouveau mot de passe",
+    "resetFor": "Compte : {email}",
+    "resetInvalid": "Ce lien n’est pas valide, a déjà servi ou a expiré. Demandez-en un nouveau.",
+    "newPassword": "Nouveau mot de passe",
+    "passwordRule": "Au moins {min} caractères.",
+    "confirmPassword": "Répétez le mot de passe",
+    "savePassword": "Enregistrer et entrer",
+    "resetMailSubject": "ParyajNet · Récupérez votre mot de passe",
+    "resetMailHello": "Bonjour {name},",
+    "resetMailBody": "Nous avons reçu une demande de changement du mot de passe de votre compte. Le lien est valable {minutes} minutes et ne sert qu’une fois.",
+    "resetMailCta": "Créer un nouveau mot de passe",
+    "resetMailIgnore": "Si ce n’était pas vous, ignorez cet e-mail : votre mot de passe ne change pas.",
+    "resetMailText": "Bonjour {name},\n\nPour créer un nouveau mot de passe, ouvrez ce lien (valable {minutes} minutes, usage unique) :\n{url}\n\nSi ce n’était pas vous, ignorez cet e-mail."
   },
   "sports": {
     "title": "Sports",
@@ -447,7 +467,12 @@
         "AGENT": "Vendeur",
         "ADMIN": "Admin"
       },
-      "you": "vous"
+      "you": "vous",
+      "resetLink": "Lien de récupération",
+      "resetLinkLabel": "Lien (valable 24 h, usage unique)",
+      "resetLinkHelp": "Envoyez-le à l’utilisateur par WhatsApp. En l’utilisant, il crée son nouveau mot de passe et ses autres sessions sont fermées.",
+      "mailOn": "La récupération par e-mail est active : les utilisateurs peuvent utiliser « Mot de passe oublié ? » sur /login.",
+      "mailOff": "La récupération par e-mail n’est pas configurée (RESEND_API_KEY et MAIL_FROM). En attendant, utilisez « Lien de récupération »."
     }
   },
   "errors": {
@@ -528,7 +553,9 @@
     "sale_not_cancellable": "Seul le vendeur peut annuler la vente, dans les {minutes} minutes et avant la clôture.",
     "online_service_pix": "Ce service est en ligne : le gain est payé par PIX depuis l’admin.",
     "password_too_short": "Le mot de passe doit contenir au moins 8 caractères.",
-    "cannot_disable_self": "Vous ne pouvez pas désactiver votre propre compte."
+    "cannot_disable_self": "Vous ne pouvez pas désactiver votre propre compte.",
+    "passwords_mismatch": "Les mots de passe ne correspondent pas.",
+    "reset_invalid": "Le lien n’est pas valide, a déjà servi ou a expiré. Demandez-en un nouveau."
   },
   "ads": {
     "label": "Publicité"
