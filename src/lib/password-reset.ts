@@ -9,6 +9,7 @@ import { routing } from "@/i18n/routing";
 import { prisma } from "./db";
 import { translator } from "./i18n-server";
 import { sendMail } from "./mailer";
+import { isOwnerEmail } from "./owners";
 import { siteUrl } from "./site";
 import { AppError } from "./types";
 
@@ -45,7 +46,7 @@ export async function requestPasswordReset(rawEmail: string, locale: string) {
   const email = rawEmail.trim().toLowerCase();
   if (!email || email.length > 120) return;
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user?.active || user.pendingApproval || (user.role !== "ADMIN" && user.role !== "AGENT")) return;
+  if (!user || !canUseResetLink(user)) return;
   const recent = await prisma.passwordReset.count({
     where: { userId: user.id, createdBy: null, createdAt: { gte: new Date(Date.now() - 60 * 60_000) } },
   });
@@ -73,10 +74,21 @@ export async function findValidReset(token: string) {
   if (!token || token.length > 100) return null;
   const reset = await prisma.passwordReset.findUnique({
     where: { tokenHash: hash(token) },
-    include: { user: { select: { id: true, email: true, name: true, active: true } } },
+    include: {
+      user: { select: { id: true, email: true, name: true, active: true, pendingApproval: true, role: true } },
+    },
   });
-  if (!reset || reset.usedAt || reset.expiresAt < new Date() || !reset.user.active) return null;
+  if (!reset || reset.usedAt || reset.expiresAt < new Date() || !canUseResetLink(reset.user)) return null;
   return reset;
+}
+
+/**
+ * Active back-office users can recover their password. A pending request made
+ * with an owner e-mail can too: using the link proves the mailbox and activates it as admin.
+ */
+function canUseResetLink(user: { email: string; active: boolean; pendingApproval: boolean; role: string }) {
+  if (user.pendingApproval) return isOwnerEmail(user.email);
+  return user.active && (user.role === "ADMIN" || user.role === "AGENT");
 }
 
 export function checkNewPassword(password: string, confirm: string) {
@@ -103,6 +115,12 @@ export async function resetPassword(token: string, password: string, confirm: st
   });
   if (claimed.count === 0) throw new AppError("reset_invalid");
   await setPassword(reset.userId, password);
+  if (reset.user.pendingApproval && isOwnerEmail(reset.user.email)) {
+    await prisma.user.update({
+      where: { id: reset.userId },
+      data: { role: "ADMIN", active: true, pendingApproval: false },
+    });
+  }
   // Any other outstanding links for this user stop working.
   await prisma.passwordReset.updateMany({
     where: { userId: reset.userId, usedAt: null },

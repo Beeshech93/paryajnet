@@ -6,6 +6,7 @@ import { redirect } from "@/i18n/navigation";
 import { createSession, destroySession, homeFor } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { requestPasswordReset, resetPassword } from "@/lib/password-reset";
+import { isOwnerEmail } from "@/lib/owners";
 import { requestAccount } from "@/lib/signup";
 import { AppError, type ActionResult, type Role } from "@/lib/types";
 import { run } from "./run";
@@ -22,7 +23,14 @@ export async function loginAction(_prev: ActionResult | null, form: FormData): P
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) throw new AppError("bad_credentials");
     // Only once the password is right: say why a real account can't sign in yet.
-    if (user.pendingApproval) throw new AppError("account_pending");
+    if (user.pendingApproval) {
+      // The owner's own account: confirm the mailbox by e-mail, then it becomes admin.
+      if (isOwnerEmail(user.email)) {
+        await requestPasswordReset(user.email, locale);
+        throw new AppError("owner_verify_sent", { email: user.email });
+      }
+      throw new AppError("account_pending");
+    }
     if (!user.active || (user.role !== "ADMIN" && user.role !== "AGENT")) throw new AppError("account_disabled");
     await createSession(user.id, user.role as Role);
     home = homeFor(user.role);

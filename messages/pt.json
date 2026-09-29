@@ -574,7 +574,8 @@
     "account_pending": "Sua conta ainda não foi aprovada por um administrador.",
     "account_disabled": "Esta conta está desativada. Fale com um administrador.",
     "invalid_email": "Digite um e-mail válido.",
-    "signup_closed": "Há muitas solicitações pendentes. Tente mais tarde."
+    "signup_closed": "Há muitas solicitações pendentes. Tente mais tarde.",
+    "owner_verify_sent": "Enviamos um e-mail para {email} para confirmar que é seu. Abra o link e crie sua senha: sua conta ficará ativa como administrador."
   },
   "ads": {
     "label": "Publicidade"
