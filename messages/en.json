@@ -76,7 +76,16 @@
     "resetMailBody": "We received a request to change your account password. The link is valid for {minutes} minutes and works once.",
     "resetMailCta": "Create a new password",
     "resetMailIgnore": "If this wasn’t you, ignore this e-mail: your password stays the same.",
-    "resetMailText": "Hi {name},\n\nTo create a new password, open this link (valid for {minutes} minutes, single use):\n{url}\n\nIf this wasn’t you, ignore this e-mail."
+    "resetMailText": "Hi {name},\n\nTo create a new password, open this link (valid for {minutes} minutes, single use):\n{url}\n\nIf this wasn’t you, ignore this e-mail.",
+    "signupLink": "Create account",
+    "signupTitle": "Create account",
+    "signupBody": "Request a sales agent or admin account. An administrator must approve it before you can sign in.",
+    "name": "Full name",
+    "signupCta": "Request account",
+    "signupSent": "Request sent! You can sign in once an administrator approves your account.",
+    "signupHaveAccount": "I already have an account",
+    "signupMailSubject": "ParyajNet · New account request: {name}",
+    "signupMailText": "{name} ({email}) requested a ParyajNet account.\n\nApprove or reject it at: {url}"
   },
   "sports": {
     "title": "Sports",
@@ -473,7 +482,12 @@
       "resetLinkHelp": "Send it to the user on WhatsApp. Using it sets their new password and signs out their other sessions.",
       "mailOn": "E-mail recovery is on: users can use “Forgot your password?” at /login.",
       "mailOff": "E-mail recovery isn’t configured (RESEND_API_KEY and MAIL_FROM). Meanwhile, use “Recovery link”.",
-      "createAccount": "Create account (agent or admin)"
+      "createAccount": "Create account (agent or admin)",
+      "pendingTitle": "Account requests",
+      "pendingHelp": "People who asked for an account on the site. Pick the role and approve, or reject (deleted).",
+      "approve": "Approve",
+      "rejectRequest": "Reject",
+      "pendingAlert": "{count, plural, one {# account request is} other {# account requests are}} waiting for approval."
     }
   },
   "errors": {
@@ -556,7 +570,11 @@
     "password_too_short": "The password must be at least 8 characters.",
     "cannot_disable_self": "You can't deactivate your own account.",
     "passwords_mismatch": "The passwords don’t match.",
-    "reset_invalid": "The link isn’t valid, was already used or has expired. Request a new one."
+    "reset_invalid": "The link isn’t valid, was already used or has expired. Request a new one.",
+    "account_pending": "Your account hasn’t been approved by an administrator yet.",
+    "account_disabled": "This account is deactivated. Contact an administrator.",
+    "invalid_email": "Enter a valid e-mail.",
+    "signup_closed": "Too many pending requests. Try again later."
   },
   "ads": {
     "label": "Advertisement"

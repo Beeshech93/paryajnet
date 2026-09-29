@@ -9,6 +9,7 @@ import { cancelDraw, settleDraw, settleWithPicks } from "@/lib/lottery";
 import { Decimal } from "@/lib/money";
 import { BANNER_LOCALES, BANNER_THEMES, normalizeLink, PLACEMENTS, readImage } from "@/lib/banners";
 import { createResetLink, PASSWORD_MIN, setPassword } from "@/lib/password-reset";
+import { approveAccount, rejectAccount } from "@/lib/signup";
 import { normalizePixKey } from "@/lib/pix";
 import { savePaymentSettings, type PaymentSettings } from "@/lib/settings";
 import { confirmOrder, markPaid, rejectOrder, setPayoutKey } from "@/lib/orders";
@@ -456,4 +457,12 @@ export async function resetLinkAction(_prev: ActionResult | null, form: FormData
     const admin = await adminForAction();
     return createResetLink(String(form.get("id")), admin.id, await getLocale());
   });
+}
+
+export async function approveAccountAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(() => approveAccount(String(form.get("id")), form.get("role") === "ADMIN" ? "ADMIN" : "AGENT"));
+}
+
+export async function rejectAccountAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  return asAdmin(() => rejectAccount(String(form.get("id"))));
 }

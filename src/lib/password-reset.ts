@@ -45,7 +45,7 @@ export async function requestPasswordReset(rawEmail: string, locale: string) {
   const email = rawEmail.trim().toLowerCase();
   if (!email || email.length > 120) return;
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user?.active || (user.role !== "ADMIN" && user.role !== "AGENT")) return;
+  if (!user?.active || user.pendingApproval || (user.role !== "ADMIN" && user.role !== "AGENT")) return;
   const recent = await prisma.passwordReset.count({
     where: { userId: user.id, createdBy: null, createdAt: { gte: new Date(Date.now() - 60 * 60_000) } },
   });

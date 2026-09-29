@@ -27,6 +27,8 @@ model User {
   name               String
   role               String    @default("ADMIN") // ADMIN | AGENT
   active             Boolean   @default(true)
+  // Signed up from the site and waiting for an admin to approve (can't log in yet).
+  pendingApproval    Boolean   @default(false)
   // Sessions issued before this moment are rejected (set when the password changes).
   sessionsValidAfter DateTime?
   createdAt          DateTime  @default(now())

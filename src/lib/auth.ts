@@ -51,7 +51,7 @@ export const getCurrentUser = cache(async () => {
   const session = await readSession();
   if (!session) return null;
   const user = await prisma.user.findUnique({ where: { id: session.userId } });
-  if (!user?.active) return null;
+  if (!user?.active || user.pendingApproval) return null;
   // Sessions from before the last password change are signed out (JWT iat is in seconds).
   if (user.sessionsValidAfter && session.issuedAt < Math.floor(user.sessionsValidAfter.getTime() / 1000)) return null;
   return user;

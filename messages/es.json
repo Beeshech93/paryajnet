@@ -76,7 +76,16 @@
     "resetMailBody": "Recibimos una solicitud para cambiar la contraseña de tu cuenta. El enlace vale {minutes} minutos y se puede usar una sola vez.",
     "resetMailCta": "Crear nueva contraseña",
     "resetMailIgnore": "Si no fuiste tú, ignora este correo: tu contraseña no cambia.",
-    "resetMailText": "Hola, {name}:\n\nPara crear una nueva contraseña abre este enlace (vale {minutes} minutos, un solo uso):\n{url}\n\nSi no fuiste tú, ignora este correo."
+    "resetMailText": "Hola, {name}:\n\nPara crear una nueva contraseña abre este enlace (vale {minutes} minutos, un solo uso):\n{url}\n\nSi no fuiste tú, ignora este correo.",
+    "signupLink": "Crear cuenta",
+    "signupTitle": "Crear cuenta",
+    "signupBody": "Solicita una cuenta de vendedor o administrador. Un administrador debe aprobarla antes de que puedas entrar.",
+    "name": "Nombre completo",
+    "signupCta": "Solicitar cuenta",
+    "signupSent": "¡Solicitud enviada! Podrás entrar cuando un administrador apruebe tu cuenta.",
+    "signupHaveAccount": "Ya tengo cuenta",
+    "signupMailSubject": "ParyajNet · Nueva solicitud de cuenta: {name}",
+    "signupMailText": "{name} ({email}) pidió una cuenta en ParyajNet.\n\nApruébala o recházala en: {url}"
   },
   "sports": {
     "title": "Deportes",
@@ -473,7 +482,12 @@
       "resetLinkHelp": "Envíalo al usuario por WhatsApp. Al usarlo crea su nueva contraseña y se cierran sus otras sesiones.",
       "mailOn": "La recuperación por correo está activa: los usuarios pueden usar «¿Olvidaste tu contraseña?» en /login.",
       "mailOff": "La recuperación por correo no está configurada (RESEND_API_KEY y MAIL_FROM). Mientras tanto, usa «Enlace de recuperación».",
-      "createAccount": "Crear cuenta (vendedor o admin)"
+      "createAccount": "Crear cuenta (vendedor o admin)",
+      "pendingTitle": "Solicitudes de cuenta",
+      "pendingHelp": "Personas que pidieron cuenta desde el sitio. Elige el rol y aprueba, o rechaza (se borra).",
+      "approve": "Aprobar",
+      "rejectRequest": "Rechazar",
+      "pendingAlert": "{count, plural, one {# solicitud de cuenta espera} other {# solicitudes de cuenta esperan}} aprobación."
     }
   },
   "errors": {
@@ -556,7 +570,11 @@
     "password_too_short": "La contraseña debe tener al menos 8 caracteres.",
     "cannot_disable_self": "No puedes desactivar tu propia cuenta.",
     "passwords_mismatch": "Las contraseñas no coinciden.",
-    "reset_invalid": "El enlace no es válido, ya se usó o venció. Pide uno nuevo."
+    "reset_invalid": "El enlace no es válido, ya se usó o venció. Pide uno nuevo.",
+    "account_pending": "Tu cuenta todavía no fue aprobada por un administrador.",
+    "account_disabled": "Esta cuenta está desactivada. Habla con un administrador.",
+    "invalid_email": "Escribe un correo válido.",
+    "signup_closed": "Hay demasiadas solicitudes pendientes. Inténtalo más tarde."
   },
   "ads": {
     "label": "Publicidad"

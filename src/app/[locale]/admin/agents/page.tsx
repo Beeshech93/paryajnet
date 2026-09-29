@@ -1,6 +1,13 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { createAgentAction, resetAgentPasswordAction, toggleAgentAction } from "@/app/actions/admin";
+import {
+  approveAccountAction,
+  createAgentAction,
+  rejectAccountAction,
+  resetAgentPasswordAction,
+  toggleAgentAction,
+} from "@/app/actions/admin";
 import { ActionForm, SubmitButton } from "@/components/ActionForm";
+import { LocalTime } from "@/components/LocalTime";
 import { ResetLinkButton } from "@/components/admin/ResetLinkButton";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -13,10 +20,13 @@ export const dynamic = "force-dynamic";
 /** Back-office users: sales agents (vendedores) and admins, with the cash each one should hand in. */
 export default async function AdminAgents() {
   const [locale, t, me] = await Promise.all([getLocale(), getTranslations("admin.agents"), getCurrentUser()]);
-  const agents = await prisma.user.findMany({
-    where: { role: { in: ["AGENT", "ADMIN"] } },
-    orderBy: [{ role: "desc" }, { createdAt: "asc" }],
-  });
+  const [agents, pending] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: { in: ["AGENT", "ADMIN"] }, pendingApproval: false },
+      orderBy: [{ role: "desc" }, { createdAt: "asc" }],
+    }),
+    prisma.user.findMany({ where: { pendingApproval: true }, orderBy: { createdAt: "asc" } }),
+  ]);
   const today = startOfBrDay();
   const [rows, allToday, allTime] = await Promise.all([
     Promise.all(
@@ -32,6 +42,39 @@ export default async function AdminAgents() {
         <h1 className="font-display text-2xl font-bold">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>
       </div>
+
+      {pending.length > 0 && (
+        <section className="card border-gold p-5">
+          <h2 className="font-display text-lg font-bold">
+            {t("pendingTitle")} · {pending.length}
+          </h2>
+          <p className="mt-1 text-xs text-muted">{t("pendingHelp")}</p>
+          <ul className="mt-3 divide-y divide-line text-sm">
+            {pending.map((u) => (
+              <li key={u.id} className="flex flex-wrap items-center gap-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold">{u.name}</p>
+                  <p className="truncate text-xs text-muted">
+                    {u.email} · <LocalTime value={u.createdAt} />
+                  </p>
+                </div>
+                <ActionForm action={approveAccountAction} className="flex items-center gap-2">
+                  <input type="hidden" name="id" value={u.id} />
+                  <select name="role" defaultValue="AGENT" aria-label={t("role")} className="input w-auto py-1.5">
+                    <option value="AGENT">{t("roles.AGENT")}</option>
+                    <option value="ADMIN">{t("roles.ADMIN")}</option>
+                  </select>
+                  <SubmitButton className="btn-primary py-1.5 text-xs">✓ {t("approve")}</SubmitButton>
+                </ActionForm>
+                <ActionForm action={rejectAccountAction}>
+                  <input type="hidden" name="id" value={u.id} />
+                  <SubmitButton className="btn-danger py-1.5 text-xs">{t("rejectRequest")}</SubmitButton>
+                </ActionForm>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-3">
         {[

@@ -27,7 +27,10 @@ export default async function AdminOverview() {
       where: { status: "FAILED", createdAt: { gte: new Date(Date.now() - 86_400_000) } },
     }),
   ]);
-  const owed = await prisma.order.aggregate({ where: { status: { in: ["WON", "VOID"] } }, _sum: { payout: true } });
+  const [owed, pendingAccounts] = await Promise.all([
+    prisma.order.aggregate({ where: { status: { in: ["WON", "VOID"] } }, _sum: { payout: true } }),
+    prisma.user.count({ where: { pendingApproval: true } }),
+  ]);
 
   const kpis = [
     { label: t("kpi.receipts"), value: receipts, href: "/admin/orders?status=RECEIPT_RECEIVED", alert: receipts > 0 },
@@ -52,6 +55,11 @@ export default async function AdminOverview() {
       {!evolutionConfig() && (
         <Link href="/admin/whatsapp" className="block rounded-2xl bg-gold/15 p-4 text-sm text-gold-strong">
           ⚠️ {t("whatsapp.notConfigured")}
+        </Link>
+      )}
+      {pendingAccounts > 0 && (
+        <Link href="/admin/agents" className="block rounded-2xl bg-gold/15 p-4 text-sm text-gold-strong">
+          👤 {t("agents.pendingAlert", { count: pendingAccounts })}
         </Link>
       )}
       {failed > 0 && (

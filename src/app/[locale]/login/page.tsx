@@ -32,9 +32,14 @@ export default function LoginPage() {
         </div>
         <SubmitButton className="btn-primary w-full">{t("loginCta")}</SubmitButton>
       </ActionForm>
-      <Link href="/forgot" className="mt-4 inline-block text-sm text-brand-strong">
-        {t("forgotLink")}
-      </Link>
+      <div className="mt-4 flex flex-wrap justify-between gap-3 text-sm">
+        <Link href="/forgot" className="text-brand-strong">
+          {t("forgotLink")}
+        </Link>
+        <Link href="/register" className="font-semibold text-brand-strong">
+          {t("signupLink")}
+        </Link>
+      </div>
     </div>
   );
 }

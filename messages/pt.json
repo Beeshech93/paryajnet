@@ -76,7 +76,16 @@
     "resetMailBody": "Recebemos um pedido para trocar a senha da sua conta. O link vale {minutes} minutos e pode ser usado uma única vez.",
     "resetMailCta": "Criar nova senha",
     "resetMailIgnore": "Se não foi você, ignore este e-mail: sua senha não muda.",
-    "resetMailText": "Olá, {name}!\n\nPara criar uma nova senha, abra este link (vale {minutes} minutos, uso único):\n{url}\n\nSe não foi você, ignore este e-mail."
+    "resetMailText": "Olá, {name}!\n\nPara criar uma nova senha, abra este link (vale {minutes} minutos, uso único):\n{url}\n\nSe não foi você, ignore este e-mail.",
+    "signupLink": "Criar conta",
+    "signupTitle": "Criar conta",
+    "signupBody": "Solicite uma conta de vendedor ou administrador. Um administrador precisa aprová-la antes de você entrar.",
+    "name": "Nome completo",
+    "signupCta": "Solicitar conta",
+    "signupSent": "Solicitação enviada! Você poderá entrar quando um administrador aprovar sua conta.",
+    "signupHaveAccount": "Já tenho conta",
+    "signupMailSubject": "ParyajNet · Nova solicitação de conta: {name}",
+    "signupMailText": "{name} ({email}) pediu uma conta na ParyajNet.\n\nAprove ou recuse em: {url}"
   },
   "sports": {
     "title": "Esportes",
@@ -473,7 +482,12 @@
       "resetLinkHelp": "Envie ao usuário pelo WhatsApp. Ao usar, ele cria a nova senha e as outras sessões são encerradas.",
       "mailOn": "A recuperação por e-mail está ativa: os usuários podem usar «Esqueceu a senha?» em /login.",
       "mailOff": "A recuperação por e-mail não está configurada (RESEND_API_KEY e MAIL_FROM). Enquanto isso, use «Link de recuperação».",
-      "createAccount": "Criar conta (vendedor ou admin)"
+      "createAccount": "Criar conta (vendedor ou admin)",
+      "pendingTitle": "Solicitações de conta",
+      "pendingHelp": "Pessoas que pediram conta pelo site. Escolha a função e aprove, ou recuse (é apagada).",
+      "approve": "Aprovar",
+      "rejectRequest": "Recusar",
+      "pendingAlert": "{count, plural, one {# solicitação de conta aguarda} other {# solicitações de conta aguardam}} aprovação."
     }
   },
   "errors": {
@@ -556,7 +570,11 @@
     "password_too_short": "A senha deve ter pelo menos 8 caracteres.",
     "cannot_disable_self": "Você não pode desativar sua própria conta.",
     "passwords_mismatch": "As senhas não coincidem.",
-    "reset_invalid": "O link não é válido, já foi usado ou expirou. Peça um novo."
+    "reset_invalid": "O link não é válido, já foi usado ou expirou. Peça um novo.",
+    "account_pending": "Sua conta ainda não foi aprovada por um administrador.",
+    "account_disabled": "Esta conta está desativada. Fale com um administrador.",
+    "invalid_email": "Digite um e-mail válido.",
+    "signup_closed": "Há muitas solicitações pendentes. Tente mais tarde."
   },
   "ads": {
     "label": "Publicidade"

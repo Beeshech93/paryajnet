@@ -76,7 +76,16 @@
     "resetMailBody": "Nous avons reçu une demande de changement du mot de passe de votre compte. Le lien est valable {minutes} minutes et ne sert qu’une fois.",
     "resetMailCta": "Créer un nouveau mot de passe",
     "resetMailIgnore": "Si ce n’était pas vous, ignorez cet e-mail : votre mot de passe ne change pas.",
-    "resetMailText": "Bonjour {name},\n\nPour créer un nouveau mot de passe, ouvrez ce lien (valable {minutes} minutes, usage unique) :\n{url}\n\nSi ce n’était pas vous, ignorez cet e-mail."
+    "resetMailText": "Bonjour {name},\n\nPour créer un nouveau mot de passe, ouvrez ce lien (valable {minutes} minutes, usage unique) :\n{url}\n\nSi ce n’était pas vous, ignorez cet e-mail.",
+    "signupLink": "Créer un compte",
+    "signupTitle": "Créer un compte",
+    "signupBody": "Demandez un compte vendeur ou administrateur. Un administrateur doit l’approuver avant que vous puissiez entrer.",
+    "name": "Nom complet",
+    "signupCta": "Demander un compte",
+    "signupSent": "Demande envoyée ! Vous pourrez entrer quand un administrateur aura approuvé votre compte.",
+    "signupHaveAccount": "J’ai déjà un compte",
+    "signupMailSubject": "ParyajNet · Nouvelle demande de compte : {name}",
+    "signupMailText": "{name} ({email}) a demandé un compte sur ParyajNet.\n\nApprouvez ou refusez ici : {url}"
   },
   "sports": {
     "title": "Sports",
@@ -473,7 +482,12 @@
       "resetLinkHelp": "Envoyez-le à l’utilisateur par WhatsApp. En l’utilisant, il crée son nouveau mot de passe et ses autres sessions sont fermées.",
       "mailOn": "La récupération par e-mail est active : les utilisateurs peuvent utiliser « Mot de passe oublié ? » sur /login.",
       "mailOff": "La récupération par e-mail n’est pas configurée (RESEND_API_KEY et MAIL_FROM). En attendant, utilisez « Lien de récupération ».",
-      "createAccount": "Créer un compte (vendeur ou admin)"
+      "createAccount": "Créer un compte (vendeur ou admin)",
+      "pendingTitle": "Demandes de compte",
+      "pendingHelp": "Personnes ayant demandé un compte sur le site. Choisissez le rôle et approuvez, ou refusez (supprimé).",
+      "approve": "Approuver",
+      "rejectRequest": "Refuser",
+      "pendingAlert": "{count, plural, one {# demande de compte attend} other {# demandes de compte attendent}} une approbation."
     }
   },
   "errors": {
@@ -556,7 +570,11 @@
     "password_too_short": "Le mot de passe doit contenir au moins 8 caractères.",
     "cannot_disable_self": "Vous ne pouvez pas désactiver votre propre compte.",
     "passwords_mismatch": "Les mots de passe ne correspondent pas.",
-    "reset_invalid": "Le lien n’est pas valide, a déjà servi ou a expiré. Demandez-en un nouveau."
+    "reset_invalid": "Le lien n’est pas valide, a déjà servi ou a expiré. Demandez-en un nouveau.",
+    "account_pending": "Votre compte n’a pas encore été approuvé par un administrateur.",
+    "account_disabled": "Ce compte est désactivé. Contactez un administrateur.",
+    "invalid_email": "Saisissez un e-mail valide.",
+    "signup_closed": "Trop de demandes en attente. Réessayez plus tard."
   },
   "ads": {
     "label": "Publicité"
