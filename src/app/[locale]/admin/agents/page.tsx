@@ -1,16 +1,20 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { createAgentAction, resetAgentPasswordAction, toggleAgentAction } from "@/app/actions/admin";
 import { ActionForm, SubmitButton } from "@/components/ActionForm";
+import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { cashSummary, startOfBrDay } from "@/lib/sales";
 
 export const dynamic = "force-dynamic";
 
-/** Sales agents (vendedores): accounts and the cash each one should hand in. */
+/** Back-office users: sales agents (vendedores) and admins, with the cash each one should hand in. */
 export default async function AdminAgents() {
-  const [locale, t] = await Promise.all([getLocale(), getTranslations("admin.agents")]);
-  const agents = await prisma.user.findMany({ where: { role: "AGENT" }, orderBy: { createdAt: "asc" } });
+  const [locale, t, me] = await Promise.all([getLocale(), getTranslations("admin.agents"), getCurrentUser()]);
+  const agents = await prisma.user.findMany({
+    where: { role: { in: ["AGENT", "ADMIN"] } },
+    orderBy: [{ role: "desc" }, { createdAt: "asc" }],
+  });
   const today = startOfBrDay();
   const [rows, allToday, allTime] = await Promise.all([
     Promise.all(
@@ -46,6 +50,12 @@ export default async function AdminAgents() {
             <div className="min-w-0">
               <p className="font-semibold">
                 {agent.name}{" "}
+                <span
+                  className={`chip ml-1 ${agent.role === "ADMIN" ? "bg-danger/15 text-danger" : "bg-gold/20 text-gold-strong"}`}
+                >
+                  {t(`roles.${agent.role}`)}
+                </span>
+                {agent.id === me?.id && <span className="ml-1 text-xs text-muted">({t("you")})</span>}{" "}
                 {!agent.active && <span className="chip ml-1 bg-danger/15 text-danger">{t("inactive")}</span>}
               </p>
               <p className="truncate text-xs text-muted">{agent.email}</p>
@@ -76,12 +86,14 @@ export default async function AdminAgents() {
                 />
                 <SubmitButton className="btn-ghost py-1.5 text-xs">{t("setPassword")}</SubmitButton>
               </ActionForm>
-              <ActionForm action={toggleAgentAction}>
-                <input type="hidden" name="id" value={agent.id} />
-                <SubmitButton className={`${agent.active ? "btn-danger" : "btn-primary"} py-1.5 text-xs`}>
-                  {agent.active ? t("deactivate") : t("activate")}
-                </SubmitButton>
-              </ActionForm>
+              {agent.id !== me?.id && (
+                <ActionForm action={toggleAgentAction}>
+                  <input type="hidden" name="id" value={agent.id} />
+                  <SubmitButton className={`${agent.active ? "btn-danger" : "btn-primary"} py-1.5 text-xs`}>
+                    {agent.active ? t("deactivate") : t("activate")}
+                  </SubmitButton>
+                </ActionForm>
+              )}
             </div>
           </div>
         ))}
@@ -93,7 +105,7 @@ export default async function AdminAgents() {
         <ActionForm
           action={createAgentAction}
           success={t("created")}
-          className="mt-3 grid gap-3 sm:grid-cols-4 sm:items-end"
+          className="mt-3 grid gap-3 sm:grid-cols-5 sm:items-end"
         >
           <div>
             <label className="label" htmlFor="ag-name">
@@ -120,6 +132,15 @@ export default async function AdminAgents() {
               autoComplete="new-password"
               className="input"
             />
+          </div>
+          <div>
+            <label className="label" htmlFor="ag-role">
+              {t("role")}
+            </label>
+            <select id="ag-role" name="role" defaultValue="AGENT" className="input">
+              <option value="AGENT">{t("roles.AGENT")}</option>
+              <option value="ADMIN">{t("roles.ADMIN")}</option>
+            </select>
           </div>
           <SubmitButton>{t("create")}</SubmitButton>
         </ActionForm>

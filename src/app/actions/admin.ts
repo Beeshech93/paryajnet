@@ -402,34 +402,39 @@ export async function removeDemoEventsAction(_prev: ActionResult | null, _form: 
   });
 }
 
-// ---------- Sales agents ----------
+// ---------- Back-office users (admins and sales agents) ----------
 
-const agentSchema = z.object({
+const STAFF_ROLES = ["AGENT", "ADMIN"] as const;
+
+const userSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().toLowerCase().email().max(120),
   password: z.string().min(8).max(100),
+  role: z.enum(STAFF_ROLES).default("AGENT"),
 });
 
 export async function createAgentAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
   return asAdmin(async () => {
-    const parsed = agentSchema.safeParse(Object.fromEntries(form));
+    const parsed = userSchema.safeParse(Object.fromEntries(form));
     if (!parsed.success) {
       if (parsed.error.issues.some((i) => i.path[0] === "password")) throw new AppError("password_too_short");
       throw new AppError("invalid_form");
     }
-    const { name, email, password } = parsed.data;
+    const { name, email, password, role } = parsed.data;
     if (await prisma.user.findUnique({ where: { email } })) throw new AppError("email_taken");
-    await prisma.user.create({
-      data: { name, email, role: "AGENT", passwordHash: await bcrypt.hash(password, 10) },
-    });
+    await prisma.user.create({ data: { name, email, role, passwordHash: await bcrypt.hash(password, 10) } });
   });
 }
 
 export async function toggleAgentAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
-  return asAdmin(async () => {
-    const agent = await prisma.user.findFirst({ where: { id: String(form.get("id")), role: "AGENT" } });
-    if (!agent) throw new AppError("invalid_form");
-    await prisma.user.update({ where: { id: agent.id }, data: { active: !agent.active } });
+  return run(async () => {
+    const me = await adminForAction();
+    const id = String(form.get("id"));
+    // An admin can't lock themselves out.
+    if (id === me.id) throw new AppError("cannot_disable_self");
+    const user = await prisma.user.findFirst({ where: { id, role: { in: [...STAFF_ROLES] } } });
+    if (!user) throw new AppError("invalid_form");
+    await prisma.user.update({ where: { id: user.id }, data: { active: !user.active } });
   });
 }
 
@@ -438,7 +443,7 @@ export async function resetAgentPasswordAction(_prev: ActionResult | null, form:
     const password = String(form.get("password") ?? "");
     if (password.length < 8 || password.length > 100) throw new AppError("password_too_short");
     const res = await prisma.user.updateMany({
-      where: { id: String(form.get("id")), role: "AGENT" },
+      where: { id: String(form.get("id")), role: { in: [...STAFF_ROLES] } },
       data: { passwordHash: await bcrypt.hash(password, 10) },
     });
     if (res.count === 0) throw new AppError("invalid_form");

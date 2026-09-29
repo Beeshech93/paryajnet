@@ -172,7 +172,7 @@
       "whatsapp": "WhatsApp",
       "sportsData": "Dados esportivos",
       "cashSale": "Venda manual",
-      "agents": "Vendedores"
+      "agents": "Usuários"
     },
     "overview": "Resumo",
     "kpi": {
@@ -418,7 +418,7 @@
       "overBudget": "Esta configuração usa cerca de {monthly} créditos por mês, mas restam só {quota}: escolha menos ligas ou um intervalo maior, ou melhore o plano da API. As atualizações param sozinhas antes de acabar os créditos."
     },
     "agents": {
-      "title": "Vendedores",
+      "title": "Usuários",
       "subtitle": "Vendem em dinheiro pelo site (Esportes / Loteria) e finalizam os serviços pelo código. Cada venda é confirmada na hora.",
       "soldToday": "Vendido hoje ({count})",
       "paidToday": "Prêmios pagos hoje ({count})",
@@ -434,14 +434,20 @@
       "setPassword": "Alterar",
       "deactivate": "Desativar",
       "activate": "Ativar",
-      "empty": "Ainda não há vendedores.",
-      "newAgent": "Novo vendedor",
-      "created": "Vendedor criado.",
+      "empty": "Ainda não há usuários.",
+      "newAgent": "Novo usuário",
+      "created": "Usuário criado.",
       "name": "Nome",
       "email": "E-mail (usuário)",
       "password": "Senha (mín. 8)",
-      "create": "Criar vendedor",
-      "help": "O vendedor entra em /login com o e-mail e a senha."
+      "create": "Criar usuário",
+      "help": "Entram em /login com e-mail e senha. Vendedor: vende em dinheiro e finaliza pelo código. Admin: acesso completo.",
+      "role": "Função",
+      "roles": {
+        "AGENT": "Vendedor",
+        "ADMIN": "Admin"
+      },
+      "you": "você"
     }
   },
   "errors": {
@@ -521,7 +527,8 @@
     "odds_api_key_missing": "Primeiro defina ODDS_API_KEY.",
     "sale_not_cancellable": "Só quem vendeu pode anular a venda, em até {minutes} minutos e antes do fechamento.",
     "online_service_pix": "Este serviço é online: o prêmio é pago por PIX pelo admin.",
-    "password_too_short": "A senha deve ter pelo menos 8 caracteres."
+    "password_too_short": "A senha deve ter pelo menos 8 caracteres.",
+    "cannot_disable_self": "Você não pode desativar sua própria conta."
   },
   "ads": {
     "label": "Publicidade"

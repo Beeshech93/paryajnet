@@ -172,7 +172,7 @@
       "whatsapp": "WhatsApp",
       "sportsData": "Données sportives",
       "cashSale": "Vente manuelle",
-      "agents": "Vendeurs"
+      "agents": "Utilisateurs"
     },
     "overview": "Vue d'ensemble",
     "kpi": {
@@ -418,7 +418,7 @@
       "overBudget": "Cette configuration consomme environ {monthly} crédits par mois mais il n'en reste que {quota} : choisissez moins de ligues ou un intervalle plus long, ou passez à un plan supérieur. Les mises à jour s'arrêtent d'elles-mêmes avant l'épuisement."
     },
     "agents": {
-      "title": "Vendeurs",
+      "title": "Utilisateurs",
       "subtitle": "Ils vendent en espèces depuis le site (Sports / Loterie) et finalisent les services avec le code. Chaque vente est confirmée immédiatement.",
       "soldToday": "Vendu aujourd’hui ({count})",
       "paidToday": "Gains payés aujourd’hui ({count})",
@@ -434,14 +434,20 @@
       "setPassword": "Modifier",
       "deactivate": "Désactiver",
       "activate": "Activer",
-      "empty": "Aucun vendeur pour l’instant.",
-      "newAgent": "Nouveau vendeur",
-      "created": "Vendeur créé.",
+      "empty": "Aucun utilisateur pour l’instant.",
+      "newAgent": "Nouvel utilisateur",
+      "created": "Utilisateur créé.",
       "name": "Nom",
       "email": "E-mail (identifiant)",
       "password": "Mot de passe (min. 8)",
-      "create": "Créer le vendeur",
-      "help": "Le vendeur se connecte sur /login avec son e-mail et son mot de passe."
+      "create": "Créer l’utilisateur",
+      "help": "Connexion sur /login avec e-mail et mot de passe. Vendeur : vend en espèces et finalise avec le code. Admin : accès complet.",
+      "role": "Rôle",
+      "roles": {
+        "AGENT": "Vendeur",
+        "ADMIN": "Admin"
+      },
+      "you": "vous"
     }
   },
   "errors": {
@@ -521,7 +527,8 @@
     "odds_api_key_missing": "Définissez d'abord ODDS_API_KEY.",
     "sale_not_cancellable": "Seul le vendeur peut annuler la vente, dans les {minutes} minutes et avant la clôture.",
     "online_service_pix": "Ce service est en ligne : le gain est payé par PIX depuis l’admin.",
-    "password_too_short": "Le mot de passe doit contenir au moins 8 caractères."
+    "password_too_short": "Le mot de passe doit contenir au moins 8 caractères.",
+    "cannot_disable_self": "Vous ne pouvez pas désactiver votre propre compte."
   },
   "ads": {
     "label": "Publicité"

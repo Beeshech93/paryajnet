@@ -172,7 +172,7 @@
       "whatsapp": "WhatsApp",
       "sportsData": "Sports data",
       "cashSale": "Manual sale",
-      "agents": "Sales agents"
+      "agents": "Users"
     },
     "overview": "Overview",
     "kpi": {
@@ -418,7 +418,7 @@
       "overBudget": "This setup uses about {monthly} credits a month but only {quota} are left: choose fewer leagues or a longer interval, or upgrade the API plan. Updates stop automatically before credits run out."
     },
     "agents": {
-      "title": "Sales agents",
+      "title": "Users",
       "subtitle": "They sell for cash from the site (Sports / Lottery) and finalise services by code. Each sale is confirmed immediately.",
       "soldToday": "Sold today ({count})",
       "paidToday": "Winnings paid today ({count})",
@@ -434,14 +434,20 @@
       "setPassword": "Change",
       "deactivate": "Deactivate",
       "activate": "Activate",
-      "empty": "No agents yet.",
-      "newAgent": "New agent",
-      "created": "Agent created.",
+      "empty": "No users yet.",
+      "newAgent": "New user",
+      "created": "User created.",
       "name": "Name",
       "email": "E-mail (username)",
       "password": "Password (min. 8)",
-      "create": "Create agent",
-      "help": "Agents sign in at /login with their e-mail and password."
+      "create": "Create user",
+      "help": "They sign in at /login with e-mail and password. Sales agent: sells for cash and finalises by code. Admin: full access.",
+      "role": "Role",
+      "roles": {
+        "AGENT": "Sales agent",
+        "ADMIN": "Admin"
+      },
+      "you": "you"
     }
   },
   "errors": {
@@ -521,7 +527,8 @@
     "odds_api_key_missing": "Set ODDS_API_KEY first.",
     "sale_not_cancellable": "Only the agent who sold it can cancel a sale, within {minutes} minutes and before it closes.",
     "online_service_pix": "This is an online service: winnings are paid by PIX from the admin.",
-    "password_too_short": "The password must be at least 8 characters."
+    "password_too_short": "The password must be at least 8 characters.",
+    "cannot_disable_self": "You can't deactivate your own account."
   },
   "ads": {
     "label": "Advertisement"
