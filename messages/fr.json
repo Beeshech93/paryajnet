@@ -18,7 +18,8 @@
     "myService": "Mon service",
     "myServiceShort": "Service",
     "agent": "Espace vendeur",
-    "agentShort": "Vendeur"
+    "agentShort": "Vendeur",
+    "live": "En Direct"
   },
   "footer": {
     "responsible": "Les jeux d'argent peuvent créer une dépendance. Jouez de manière responsable. Réservé aux personnes de 18 ans et plus. Fixez des limites de dépôt ou faites une pause depuis votre compte."
@@ -103,14 +104,14 @@
     },
     "codes": {
       "1": "1",
-      "X": "X",
       "2": "2",
+      "12": "12",
+      "X": "X",
       "OVER": "Plus",
       "UNDER": "Moins",
       "YES": "Oui",
       "NO": "Non",
       "1X": "1X",
-      "12": "12",
       "X2": "X2",
       "HOME": "Domicile",
       "AWAY": "Extérieur",
@@ -717,5 +718,22 @@
     "cancel": "Annuler la vente",
     "collectCash": "Retirez le gain en espèces au point de vente avec ce code.",
     "collectedCash": "Gain remis en espèces."
+  },
+  "live": {
+    "title": "SPORTSBOOK PRO · En Direct",
+    "subtitle": "Action en temps réel : matchs en direct et tables de casino avec croupier en direct.",
+    "sportsTab": "Sports En Direct",
+    "casinoTab": "Casino En Direct",
+    "inPlayMatches": "Matchs en cours",
+    "liveDealers": "Tables En Direct",
+    "activePlayers": "Joueurs en ligne",
+    "recentBets": "Paris récents en direct",
+    "roundStatus": "État de la table",
+    "bettingOpen": "Faites vos jeux",
+    "spinning": "Tirage en direct...",
+    "dealing": "Distribution des cartes...",
+    "pitchTracker": "Radar de Match En Direct",
+    "possession": "Possession",
+    "attacks": "Attaques dangereuses"
   }
 }

@@ -18,7 +18,8 @@
     "myService": "Mi servicio",
     "myServiceShort": "Servicio",
     "agent": "Panel vendedor",
-    "agentShort": "Vendedor"
+    "agentShort": "Vendedor",
+    "live": "En Vivo"
   },
   "footer": {
     "responsible": "El juego puede causar adicción. Juega con responsabilidad. Solo para mayores de 18 años. Puedes fijar límites de depósito o tomar un descanso desde tu cuenta."
@@ -103,14 +104,14 @@
     },
     "codes": {
       "1": "1",
-      "X": "X",
       "2": "2",
+      "12": "12",
+      "X": "X",
       "OVER": "Más",
       "UNDER": "Menos",
       "YES": "Sí",
       "NO": "No",
       "1X": "1X",
-      "12": "12",
       "X2": "X2",
       "HOME": "Local",
       "AWAY": "Visitante",
@@ -717,5 +718,22 @@
     "cancel": "Anular venta",
     "collectCash": "Cobra el premio en efectivo en el punto de venta con este código.",
     "collectedCash": "Premio entregado en efectivo."
+  },
+  "live": {
+    "title": "SPORTSBOOK PRO · En Vivo",
+    "subtitle": "Acción en tiempo real: partidos en juego minuto a minuto y salas de casino en vivo.",
+    "sportsTab": "Deportes En Vivo",
+    "casinoTab": "Casino En Vivo",
+    "inPlayMatches": "Partidos en Juego",
+    "liveDealers": "Mesas en Vivo",
+    "activePlayers": "Jugadores conectados",
+    "recentBets": "Apuestas en vivo de jugadores",
+    "roundStatus": "Estado de la mesa",
+    "bettingOpen": "Hagan sus apuestas",
+    "spinning": "Girando ruleta en vivo...",
+    "dealing": "Repartiendo cartas...",
+    "pitchTracker": "Radar de Partido en Vivo",
+    "possession": "Posesión",
+    "attacks": "Ataques peligrosos"
   }
 }

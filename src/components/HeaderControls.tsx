@@ -37,6 +37,7 @@ export function NavLinks({ role }: { role: string | null }) {
   const pathname = usePathname();
   const links = [
     { href: "/sports", label: t("sports") },
+    { href: "/live", label: t("live"), isLive: true },
     { href: "/casino", label: t("casino") },
     { href: "/lottery", label: t("lottery") },
     { href: "/s", label: t("myService") },
@@ -51,8 +52,22 @@ export function NavLinks({ role }: { role: string | null }) {
           <Link
             key={l.href}
             href={l.href}
-            className={`rounded-full px-4 py-2 whitespace-nowrap transition ${active ? "bg-brand/15 text-brand-strong" : "text-muted hover:bg-surface-2 hover:text-ink"}`}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 whitespace-nowrap transition ${
+              l.isLive
+                ? active
+                  ? "bg-red-500/20 text-red-400 border border-red-500/40"
+                  : "text-red-400 hover:bg-red-500/10"
+                : active
+                ? "bg-brand/15 text-brand-strong"
+                : "text-muted hover:bg-surface-2 hover:text-ink"
+            }`}
           >
+            {l.isLive && (
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-red-500" />
+              </span>
+            )}
             {l.label}
           </Link>
         );

@@ -26,6 +26,12 @@ const ICONS: Record<string, React.ReactNode> = {
       <circle cx="9" cy="15" r="1.2" fill="currentColor" />
     </>
   ),
+  live: (
+    <>
+      <circle cx="12" cy="12" r="3" fill="currentColor" />
+      <circle cx="12" cy="12" r="8" />
+    </>
+  ),
   bets: <path d="M8 4h8M6 8h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2zm3 5h6m-6 3h4" />,
   login: <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l4-4-4-4M14 12H4" />,
 };
@@ -37,6 +43,7 @@ export function BottomNav({ role }: { role: string | null }) {
   const items = [
     { href: "/", key: "home", label: t("home") },
     { href: "/sports", key: "sports", label: t("sports") },
+    { href: "/live", key: "live", label: t("live") },
     { href: "/casino", key: "casino", label: t("casino") },
     { href: "/lottery", key: "lottery", label: t("lottery") },
     { href: "/s", key: "bets", label: t("myServiceShort") },
@@ -49,7 +56,7 @@ export function BottomNav({ role }: { role: string | null }) {
       aria-label="Main"
       className="fixed inset-x-0 bottom-0 z-40 print:hidden border-t border-amber-500/20 bg-slate-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
-      <ul className={`mx-auto grid max-w-md ${items.length === 6 ? "grid-cols-6" : items.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>
+      <ul className={`mx-auto grid max-w-md ${items.length >= 7 ? "grid-cols-7" : items.length === 6 ? "grid-cols-6" : items.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>
         {items.map((item) => {
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           return (

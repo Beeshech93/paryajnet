@@ -18,7 +18,8 @@
     "myService": "Sèvis mwen",
     "myServiceShort": "Sèvis",
     "agent": "Espas Vandè",
-    "agentShort": "Vandè"
+    "agentShort": "Vandè",
+    "live": "An Dirèk"
   },
   "footer": {
     "responsible": "SPORTSBOOK PRO fonksyone sèlman ak kredi demo pou amizman. Pa gen paryaj lajan reyèl. Rezève pou moun 18 an oswa plis. Jwe avèk responsabilite."
@@ -723,5 +724,22 @@
     "cancel": "Annuler la vente",
     "collectCash": "Retirez le gain en espèces au point de vente avec ce code.",
     "collectedCash": "Gain remis en espèces."
+  },
+  "live": {
+    "title": "SPORTSBOOK PRO · An Dirèk",
+    "subtitle": "Aksyon an tan reyèl: match k ap jwe minit pa minit ak tab kazino an dirèk.",
+    "sportsTab": "Espò An Dirèk",
+    "casinoTab": "Kazino An Dirèk",
+    "inPlayMatches": "Match k ap jwe kounye a",
+    "liveDealers": "Tab An Dirèk",
+    "activePlayers": "Jwè ki konekte",
+    "recentBets": "Paryaj lòt jwè an dirèk",
+    "roundStatus": "Eta tab la",
+    "bettingOpen": "Mete miz ou yo",
+    "spinning": "Woulèt la ap vire an dirèk...",
+    "dealing": "Koutye a ap bay kat yo...",
+    "pitchTracker": "Siveyans Match An Dirèk",
+    "possession": "Posesyon",
+    "attacks": "Atak danjere"
   }
 }

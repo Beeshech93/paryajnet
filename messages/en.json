@@ -18,7 +18,8 @@
     "myService": "My service",
     "myServiceShort": "Service",
     "agent": "Agent panel",
-    "agentShort": "Agent"
+    "agentShort": "Agent",
+    "live": "Live"
   },
   "footer": {
     "responsible": "Gambling can be addictive. Play responsibly. Only for people aged 18 and over. Set deposit limits or take a break from your account settings."
@@ -103,14 +104,14 @@
     },
     "codes": {
       "1": "1",
-      "X": "X",
       "2": "2",
+      "12": "12",
+      "X": "X",
       "OVER": "Over",
       "UNDER": "Under",
       "YES": "Yes",
       "NO": "No",
       "1X": "1X",
-      "12": "12",
       "X2": "X2",
       "HOME": "Home",
       "AWAY": "Away",
@@ -717,5 +718,22 @@
     "cancel": "Cancel sale",
     "collectCash": "Collect the winnings in cash at the point of sale with this code.",
     "collectedCash": "Winnings handed over in cash."
+  },
+  "live": {
+    "title": "SPORTSBOOK PRO · Live Arena",
+    "subtitle": "Real-time action: in-play match tracker, live odds, and live casino dealer tables.",
+    "sportsTab": "Live Sports",
+    "casinoTab": "Live Casino",
+    "inPlayMatches": "In-Play Matches",
+    "liveDealers": "Live Dealer Tables",
+    "activePlayers": "Players Online",
+    "recentBets": "Live Multiplayer Bets",
+    "roundStatus": "Round Status",
+    "bettingOpen": "Place your bets",
+    "spinning": "Wheel spinning live...",
+    "dealing": "Dealing cards...",
+    "pitchTracker": "Live Match Tracker",
+    "possession": "Possession",
+    "attacks": "Dangerous Attacks"
   }
 }
