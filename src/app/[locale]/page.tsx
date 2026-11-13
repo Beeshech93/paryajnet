@@ -54,18 +54,27 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       href: "/sports",
       title: t("sportsTitle"),
       body: t("sportsBody"),
-      accent: "text-brand-strong",
-      bar: "bg-brand",
-      tint: "bg-brand/15",
+      accent: "text-amber-400",
+      bar: "bg-linear-to-r from-amber-400 to-yellow-500",
+      tint: "bg-amber-400/15 text-amber-300",
       icon: "⚽",
+    },
+    {
+      href: "/casino",
+      title: t("casinoTitle"),
+      body: t("casinoBody"),
+      accent: "text-emerald-400",
+      bar: "bg-linear-to-r from-emerald-400 to-teal-500",
+      tint: "bg-emerald-400/15 text-emerald-300",
+      icon: "🎰",
     },
     {
       href: "/lottery",
       title: t("lotteryTitle"),
       body: t("lotteryBody"),
-      accent: "text-gold-strong",
-      bar: "bg-gold",
-      tint: "bg-gold/25",
+      accent: "text-yellow-400",
+      bar: "bg-linear-to-r from-yellow-400 to-amber-500",
+      tint: "bg-yellow-400/15 text-yellow-300",
       icon: "🎟️",
     },
   ];
@@ -76,17 +85,17 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
       <AdSlot placement="HOME" />
 
-      <section className="grid gap-4 sm:grid-cols-2">
+      <section className="grid gap-4 sm:grid-cols-3">
         {verticals.map((v) => (
           <Link
             key={v.href}
             href={v.href}
-            className="card group relative overflow-hidden p-6 transition hover:-translate-y-0.5 hover:shadow-pop"
+            className="rounded-2xl border border-slate-800 bg-slate-900/60 group relative overflow-hidden p-6 transition duration-300 hover:-translate-y-1 hover:border-amber-400/40 hover:shadow-xl hover:shadow-amber-500/5"
           >
             <span className={`absolute inset-x-0 top-0 h-1.5 ${v.bar}`} aria-hidden />
             <div className={`flex size-12 items-center justify-center rounded-2xl text-2xl ${v.tint}`}>{v.icon}</div>
             <h2 className={`mt-3 font-display text-lg font-bold ${v.accent}`}>{v.title}</h2>
-            <p className="mt-1 text-sm text-muted">{v.body}</p>
+            <p className="mt-1 text-sm text-slate-400">{v.body}</p>
           </Link>
         ))}
       </section>

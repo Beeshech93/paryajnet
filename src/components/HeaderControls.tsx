@@ -4,7 +4,13 @@ import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter, Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
-const LOCALE_NAMES: Record<string, string> = { pt: "Português", es: "Español", fr: "Français", en: "English" };
+const LOCALE_NAMES: Record<string, string> = {
+  es: "Español",
+  ht: "Kreyòl Ayisyen",
+  fr: "Français",
+  en: "English",
+  pt: "Português",
+};
 
 export function LocaleSwitcher() {
   const locale = useLocale();
@@ -19,7 +25,7 @@ export function LocaleSwitcher() {
     >
       {routing.locales.map((l) => (
         <option key={l} value={l}>
-          {l.toUpperCase()} · {LOCALE_NAMES[l]}
+          {l.toUpperCase()} · {LOCALE_NAMES[l] || l.toUpperCase()}
         </option>
       ))}
     </select>
@@ -31,6 +37,7 @@ export function NavLinks({ role }: { role: string | null }) {
   const pathname = usePathname();
   const links = [
     { href: "/sports", label: t("sports") },
+    { href: "/casino", label: t("casino") },
     { href: "/lottery", label: t("lottery") },
     { href: "/s", label: t("myService") },
     ...(role === "ADMIN" ? [{ href: "/admin", label: t("admin") }] : []),

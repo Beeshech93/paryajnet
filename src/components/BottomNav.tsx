@@ -37,6 +37,7 @@ export function BottomNav({ role }: { role: string | null }) {
   const items = [
     { href: "/", key: "home", label: t("home") },
     { href: "/sports", key: "sports", label: t("sports") },
+    { href: "/casino", key: "casino", label: t("casino") },
     { href: "/lottery", key: "lottery", label: t("lottery") },
     { href: "/s", key: "bets", label: t("myServiceShort") },
     ...(role === "ADMIN" ? [{ href: "/admin", key: "login", label: t("admin") }] : []),
@@ -46,9 +47,9 @@ export function BottomNav({ role }: { role: string | null }) {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 print:hidden border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 print:hidden border-t border-amber-500/20 bg-slate-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
-      <ul className={`mx-auto grid max-w-md ${items.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>
+      <ul className={`mx-auto grid max-w-md ${items.length === 6 ? "grid-cols-6" : items.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>
         {items.map((item) => {
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           return (

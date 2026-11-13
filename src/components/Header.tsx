@@ -9,18 +9,20 @@ export async function Header() {
   const role = user?.role ?? null;
 
   return (
-    <header className="sticky top-0 z-30 print:hidden border-b border-line bg-bg/85 pt-[env(safe-area-inset-top)] backdrop-blur">
+    <header className="sticky top-0 z-30 print:hidden border-b border-amber-500/20 bg-slate-950/90 pt-[env(safe-area-inset-top)] backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 md:gap-4 md:py-3">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 font-display text-lg font-bold tracking-tight md:text-xl"
+          className="flex shrink-0 items-center gap-2 font-display text-lg font-black tracking-tight md:text-xl"
         >
-          <span className="relative flex size-8 items-center justify-center rounded-xl bg-brand shadow-pop" aria-hidden>
-            <span className="absolute -top-1 -right-1 size-3 rounded-full bg-gold ring-2 ring-bg" />
-            <span className="text-sm font-black text-brand-ink">P</span>
+          <span className="relative flex size-8 items-center justify-center rounded-xl bg-linear-to-br from-amber-400 via-yellow-500 to-amber-600 shadow-md shadow-amber-500/20" aria-hidden>
+            <span className="text-sm font-black text-slate-950">SP</span>
           </span>
-          <span>
-            Paryaj<span className="text-danger">Net</span>
+          <span className="flex items-center gap-1.5">
+            <span className="text-white">SPORTSBOOK</span>
+            <span className="rounded-md border border-amber-400/40 bg-amber-400/15 px-1.5 py-0.5 text-xs font-black tracking-wider text-amber-300">
+              PRO
+            </span>
           </span>
         </Link>
         <div className="hidden md:block">
@@ -28,8 +30,8 @@ export async function Header() {
         </div>
         <div className="ml-auto flex items-center gap-2">
           <LocaleSwitcher />
-          <Link href="/s" className="btn-accent hidden px-3 py-1.5 whitespace-nowrap md:inline-flex">
-            {t("myService")}
+          <Link href="/casino" className="hidden rounded-xl border border-amber-400/40 bg-linear-to-r from-amber-500 to-yellow-400 px-3 py-1.5 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/10 hover:from-amber-400 hover:to-yellow-300 md:inline-flex">
+            {t("casino")}
           </Link>
           {user && (
             <form action={logoutAction}>
