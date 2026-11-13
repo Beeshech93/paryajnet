@@ -37,7 +37,7 @@ export function LiveWinsTicker() {
       <span className="flex size-2 items-center justify-center">
         <span className="size-2 animate-ping rounded-full bg-emerald-400" />
       </span>
-      <span className="font-bold text-white uppercase tracking-wider text-[10px]">LIVE DEMO WIN:</span>
+      <span className="font-bold text-white uppercase tracking-wider text-[10px]">PREMIO EN VIVO:</span>
       <div className="flex items-center gap-1.5 truncate">
         <span>{win.flag}</span>
         <span className="font-semibold text-slate-200">{win.player}</span>

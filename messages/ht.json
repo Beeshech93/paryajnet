@@ -1,6 +1,6 @@
 {
   "meta": {
-    "description": "SPORTSBOOK PRO — Paryaj espò, Kazino ak Bòlèt (New York, Florida, Georgia) an mòd Demo pou Ayiti ak Meksik."
+    "description": "SPORTSBOOK PRO — Paryaj espò, Kazino ak Bòlèt (New York, Florida, Georgia) pou Ayiti ak Meksik."
   },
   "nav": {
     "sports": "Espò",
@@ -22,15 +22,15 @@
     "live": "An Dirèk"
   },
   "footer": {
-    "responsible": "SPORTSBOOK PRO fonksyone sèlman ak kredi demo pou amizman. Pa gen paryaj lajan reyèl. Rezève pou moun 18 an oswa plis. Jwe avèk responsabilite."
+    "responsible": "SPORTSBOOK PRO — Rezève pou moun 18 an oswa plis. Jwe avèk responsabilite."
   },
   "home": {
     "kicker": "Espò · Kazino · Bòlèt",
-    "title": "Parye sou sa w renmen, <accent>an mòd Demo san risk.</accent>",
+    "title": "Parye sou sa w renmen, <accent>ak pi bon kòt yo.</accent>",
     "subtitle": "Kòt foutbòl entènasyonal, jwèt kazino an dirèk ak bòlèt New York, Florida ak Georgia.",
     "ctaSports": "Gade match jodi a",
     "ctaRegister": "Eseye Kazino a",
-    "payments": "Kredi Demo gratis · Faucet disponib.",
+    "payments": "Balanse Disponib · Rechaje fasil.",
     "sportsTitle": "Paryaj Espò",
     "sportsBody": "Paryaj senp ak konbine sou match foutbòl, baskètbòl ak gwo lig mondyal yo.",
     "lotteryTitle": "Bòlèt & Loto",
@@ -45,7 +45,7 @@
     "drawPitch": "Bòlèt peye jiska 50× sou premye lo a, loto 3 peye 500×.",
     "noDraw": "Pa gen tiraj louvri kounye a.",
     "heroLive": "An Dirèk · Espò · Kazino · Bòlèt",
-    "trustPayments": "Kredi Demo Sekirize",
+    "trustPayments": "Peman Sekirize",
     "trustFair": "Rezilta Verifyab",
     "trustAge": "18+ Jwèt Responsab",
     "heroLastNumbers": "Dènye nimewo yo ·",
@@ -130,7 +130,7 @@
     "multiple": "Combiné ({count} sélections)",
     "remove": "Retirer",
     "totalOdds": "Kòt total",
-    "stake": "Miz (Demo)",
+    "stake": "Miz",
     "limits": "Min {min} · max {max}",
     "potentialWin": "Posiblite genyen",
     "placeBet": "Valide Paryaj la",

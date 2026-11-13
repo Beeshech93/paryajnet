@@ -65,9 +65,9 @@ export function RouletteGame() {
 
       if (outcome.totalPayout > 0) {
         addCredits(outcome.totalPayout);
-        setWinMessage(`Won +${outcome.totalPayout.toFixed(2)} Demo Credits! (Net: +${outcome.netWin.toFixed(2)})`);
+        setWinMessage(`¡Ganaste +${outcome.totalPayout.toFixed(2)}! (Ganancia Neta: +${outcome.netWin.toFixed(2)})`);
       } else {
-        setWinMessage(`No win this round (-${totalCurrentStake.toFixed(2)} credits). Spin again!`);
+        setWinMessage(`Sin premio esta tirada (-${totalCurrentStake.toFixed(2)}). ¡Gira de nuevo!`);
       }
 
       setLastResult(result);
@@ -86,7 +86,7 @@ export function RouletteGame() {
               European Roulette <span className="text-amber-400">Pro</span>
             </h2>
             <span className="rounded-full border border-amber-400/40 bg-amber-400/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-              DEMO 97.3% RTP
+              97.3% RTP
             </span>
           </div>
           <p className="text-xs text-slate-400 sm:text-sm">
@@ -361,7 +361,7 @@ export function RouletteGame() {
         <div className="flex items-center gap-3">
           <div className="text-right">
             <div className="text-[10px] text-slate-500 uppercase">Total Bet</div>
-            <div className="font-mono text-sm font-bold text-amber-300">{totalCurrentStake} Demo</div>
+            <div className="font-mono text-sm font-bold text-amber-300">{totalCurrentStake}</div>
           </div>
 
           <button

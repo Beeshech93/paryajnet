@@ -55,7 +55,7 @@ export default async function LocaleLayout({
             <footer className="mt-16 border-t border-amber-500/20 bg-slate-950 print:hidden">
               <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-8 text-xs text-slate-400 sm:flex-row sm:items-center">
                 <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-0.5 font-bold text-amber-300">
-                  DEMO 18+
+                  18+
                 </span>
                 <p className="max-w-3xl">{t("responsible")}</p>
                 <div className="md:hidden">

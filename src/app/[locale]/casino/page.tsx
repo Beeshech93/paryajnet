@@ -54,14 +54,14 @@ export default function CasinoHubPage() {
       <div className="relative mb-10 overflow-hidden rounded-3xl border border-amber-500/20 bg-linear-to-r from-slate-950 via-slate-900 to-slate-950 p-6 sm:p-10 shadow-2xl">
         <div className="relative z-10 max-w-2xl">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-xs font-bold tracking-wider text-amber-300">
-            <span className="size-2 animate-pulse rounded-full bg-amber-400" />
-            SPORTSBOOK PRO CASINO · DEMO MODE
+            <span className="size-2 rounded-full bg-amber-400" />
+            SPORTSBOOK PRO · CASINO EXCLUSIVO
           </div>
           <h1 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Premium Casino <span className="bg-linear-to-r from-amber-400 via-yellow-300 to-amber-500 bg-clip-text text-transparent">Simulated Suite</span>
+            Premium Casino <span className="bg-linear-to-r from-amber-400 via-yellow-300 to-amber-500 bg-clip-text text-transparent">Suite</span>
           </h1>
           <p className="mt-3 text-sm text-slate-300 sm:text-base">
-            Enjoy certified provably fair casino games with virtual demo credits. Real-money gambling is strictly disabled. Practice strategies, test game mechanics, and experience the thrill in full safety.
+            Disfruta de juegos de casino provably fair certificados con cuotas y algoritmos transparentes de clase mundial.
           </p>
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function CasinoHubPage() {
 
             <div className="mt-6 flex items-center justify-between border-t border-slate-800/80 pt-4">
               <span className="text-xs font-semibold text-amber-400 group-hover:underline">
-                Play Demo
+                Jugar Ahora
               </span>
               <span className="text-slate-400 transition group-hover:translate-x-1">
                 →
@@ -107,9 +107,9 @@ export default function CasinoHubPage() {
         ))}
       </div>
 
-      {/* Compliance / Demo policy notice */}
+      {/* Compliance / Fair play notice */}
       <div className="mt-12 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-center text-xs text-slate-400 sm:text-sm">
-        <span className="font-bold text-slate-300">DEMO ONLY POLICY:</span> All games use simulated credits for entertainment and testing only. No real money can be deposited, won, or withdrawn. Strictly 18+.
+        <span className="font-bold text-slate-300">SPORTSBOOK PRO:</span> Plataforma de entretenimiento de alta fidelidad. Juegos certificados con algoritmos criptográficos transparentes. 18+
       </div>
     </div>
   );

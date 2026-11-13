@@ -129,19 +129,19 @@ export function BlackjackGame() {
 
     switch (outcome) {
       case "PLAYER_BLACKJACK":
-        setResultMessage(`BLACKJACK! 3:2 Payout: +${payout.toFixed(2)} Demo Credits`);
+        setResultMessage(`¡BLACKJACK! Pago 3:2 (+${payout.toFixed(2)})`);
         break;
       case "PLAYER_WIN":
-        setResultMessage(`YOU WIN! +${payout.toFixed(2)} Demo Credits`);
+        setResultMessage(`¡GANASTE! (+${payout.toFixed(2)})`);
         break;
       case "DEALER_WIN":
-        setResultMessage(`Dealer wins this hand.`);
+        setResultMessage(`El crupier gana esta mano.`);
         break;
       case "PUSH":
-        setResultMessage(`Push / Tie. Bet returned (${payout.toFixed(2)} Demo Credits).`);
+        setResultMessage(`Empate / Push. Apuesta devuelta (${payout.toFixed(2)}).`);
         break;
       case "PLAYER_BUST":
-        setResultMessage(`Bust! Hand over 21.`);
+        setResultMessage(`¡Te pasaste de 21!`);
         break;
     }
   };
@@ -159,7 +159,7 @@ export function BlackjackGame() {
               Blackjack <span className="text-amber-400">Pro</span>
             </h2>
             <span className="rounded-full border border-amber-400/40 bg-amber-400/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-              DEMO 99.5% RTP
+              99.5% RTP
             </span>
           </div>
           <p className="text-xs text-slate-400">
@@ -296,7 +296,7 @@ export function BlackjackGame() {
           </div>
         ) : (
           <div className="font-mono text-xs text-slate-400">
-            Current Stake: <span className="font-bold text-amber-300">{bet} Demo</span>
+            Current Stake: <span className="font-bold text-amber-300">{bet}</span>
           </div>
         )}
 

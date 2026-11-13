@@ -62,11 +62,11 @@ export function LiveSportsTracker() {
   const placeLiveBet = (selection: string, oddVal: number) => {
     const stake = 100;
     if (!deductCredits(stake)) {
-      alert("Insufficient demo credits! Use the Free Demo Faucet at the top.");
+      alert("Saldo insuficiente. Recarga en la barra superior.");
       return;
     }
 
-    setPlacedBetSuccess(`Live Bet Placed: 100 Demo on ${selection} @ ${oddVal.toFixed(2)} (Potential: ${(stake * oddVal).toFixed(2)})`);
+    setPlacedBetSuccess(`Apuesta en Vivo Confirmada: 100 en ${selection} @ ${oddVal.toFixed(2)} (Potencial: ${(stake * oddVal).toFixed(2)})`);
     setTimeout(() => setPlacedBetSuccess(null), 4000);
   };
 
@@ -175,7 +175,7 @@ export function LiveSportsTracker() {
                 Mercados En Vivo (In-Play Odds)
               </span>
               <span className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
-                Instant Demo Bet
+                Apuesta Rápida
               </span>
             </div>
 
@@ -303,7 +303,7 @@ export function LiveSportsTracker() {
           </div>
 
           <div className="mt-4 border-t border-slate-800 pt-3 text-[11px] text-slate-400">
-            Click any odd to place an instant 100 Demo Credits in-play wager.
+            Haz clic en cualquier cuota para colocar una apuesta en vivo inmediata de 100 créditos.
           </div>
         </div>
       </div>

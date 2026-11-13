@@ -49,9 +49,9 @@ export function SlotsGame() {
 
       if (result.totalPayout > 0) {
         addCredits(result.totalPayout);
-        setWinNotification(`JACKPOT WIN! +${result.totalPayout.toFixed(2)} Demo Credits (${result.totalMultiplier}x Total Multiplier)`);
+        setWinNotification(`¡PREMIO MAYOR! +${result.totalPayout.toFixed(2)} (Multiplicador Total: ${result.totalMultiplier}x)`);
       } else {
-        setWinNotification("Spin again for the 777 Jackpot!");
+        setWinNotification("¡Gira de nuevo para el Jackpot 777!");
       }
 
       setIsSpinning(false);
@@ -72,7 +72,7 @@ export function SlotsGame() {
               Golden 7s <span className="text-amber-400">Jackpot Slots</span>
             </h2>
             <span className="rounded-full border border-amber-400/40 bg-amber-400/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-              DEMO 96.5% RTP
+              96.5% RTP
             </span>
           </div>
           <p className="text-xs text-slate-400">
@@ -173,7 +173,7 @@ export function SlotsGame() {
         <div className="flex items-center gap-4">
           <div className="text-right">
             <div className="text-[10px] text-slate-500 uppercase">5 Lines · Total Bet</div>
-            <div className="font-mono text-sm font-bold text-amber-300">{totalBet} Demo</div>
+            <div className="font-mono text-sm font-bold text-amber-300">{totalBet}</div>
           </div>
 
           <button

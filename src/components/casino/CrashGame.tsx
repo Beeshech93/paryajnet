@@ -98,7 +98,7 @@ export function CrashGame() {
               Crash Aviator <span className="text-amber-400">Pro</span>
             </h2>
             <span className="rounded-full border border-amber-400/40 bg-amber-400/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-              DEMO 97.0% RTP
+              97.0% RTP
             </span>
           </div>
           <p className="text-xs text-slate-400">
@@ -143,7 +143,7 @@ export function CrashGame() {
                 {currentMultiplier.toFixed(2)}x
               </div>
               <div className="mt-1 font-bold text-emerald-300">
-                Cashed Out! Won +{winAmount?.toFixed(2)} Demo Credits
+                ¡Cobrado! Ganaste +{winAmount?.toFixed(2)}
               </div>
             </div>
           ) : (
@@ -169,7 +169,7 @@ export function CrashGame() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {/* Stake setting */}
         <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
-          <label className="mb-1 block text-xs font-bold text-slate-400 uppercase">Demo Stake</label>
+          <label className="mb-1 block text-xs font-bold text-slate-400 uppercase">Apuesta</label>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -201,7 +201,7 @@ export function CrashGame() {
 
         {/* Auto Cashout multiplier */}
         <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
-          <label className="mb-1 block text-xs font-bold text-slate-400 uppercase">Auto Cashout (x)</label>
+          <label className="mb-1 block text-xs font-bold text-slate-400 uppercase">Auto Cobro (x)</label>
           <input
             type="number"
             min="1.01"
@@ -222,7 +222,7 @@ export function CrashGame() {
               onClick={() => handleCashOut()}
               className="w-full rounded-xl border border-emerald-400 bg-linear-to-r from-emerald-500 to-green-500 py-3.5 text-center font-bold text-slate-950 shadow-lg shadow-emerald-500/30 hover:from-emerald-400 hover:to-green-400 active:scale-95"
             >
-              CASH OUT ({(stake * currentMultiplier).toFixed(2)} Demo)
+              COBRAR ({(stake * currentMultiplier).toFixed(2)})
             </button>
           ) : (
             <button
@@ -230,7 +230,7 @@ export function CrashGame() {
               onClick={startGame}
               className="w-full rounded-xl border border-amber-400 bg-linear-to-r from-amber-500 to-yellow-400 py-3.5 text-center font-bold text-slate-950 shadow-lg shadow-amber-500/20 hover:from-amber-400 hover:to-yellow-300 active:scale-95"
             >
-              BET ({stake} Demo)
+              APOSTAR ({stake})
             </button>
           )}
         </div>
