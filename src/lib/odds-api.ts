@@ -29,14 +29,15 @@ export type ApiScore = {
 };
 export type ApiSport = { key: string; group: string; title: string; active: boolean; has_outrights: boolean };
 
-/** Leagues offered by default (Brazil first). Admins can change them. */
+/** Leagues offered by default (Mexico Liga MX, Champions League, EPL, La Liga, NBA). */
 export const DEFAULT_SPORTS = [
-  "soccer_brazil_campeonato",
-  "soccer_conmebol_copa_libertadores",
+  "soccer_mexico_ligamx",
+  "soccer_uefa_champs_league",
   "soccer_epl",
   "soccer_spain_la_liga",
-  "soccer_uefa_champs_league",
   "basketball_nba",
+  "soccer_brazil_campeonato",
+  "soccer_conmebol_copa_libertadores",
 ];
 
 /** The key, tolerating common paste mistakes: spaces, quotes or a leading "ODDS_API_KEY=". */

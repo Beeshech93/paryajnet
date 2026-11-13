@@ -114,3 +114,4 @@ for (const [lang, data] of Object.entries(files)) {
     console.log(`Updated ${filePath}`);
   }
 }
+
